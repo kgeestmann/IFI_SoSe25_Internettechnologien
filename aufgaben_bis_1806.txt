@@ -1,0 +1,19 @@
+Komponenten erstellen: 
+
+Sophia:
+- product_details (und service)
+- Navigationsleiste
+- Login/Account erstellen-Bereich
+
+Kim:
+- Admin-Bereich
+- Kundenliste
+- Bestellungen-Liste
+
+Frieda:
+- Kundenbereich
+- Kundenprofil
+- Warenkorb
+- Bestellhistorie
+
+
