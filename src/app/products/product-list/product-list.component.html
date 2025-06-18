@@ -1,7 +1,10 @@
-<h2>Produktliste</h2>
-<p *ngIf="products.length === 0">Keine Produkte gefunden 😢</p>
+<div *ngIf="loading">Lade Produkte...</div>
+<div *ngIf="error">{{ error }}</div>
 
-<div *ngFor="let product of products" class="product-card">
-  <h3>{{ product.product_name }}</h3>
-  <p>Preis: {{ product.product_price}}</p>
+<div *ngIf="!loading && !error">
+  <h2>Produkte</h2>
+  <div *ngFor="let p of product" class="product-card">
+    <span class="product-name">{{ p.name }}</span><br>
+    <span class="product-id">ID: {{ p.id }}</span>
+  </div>
 </div>
