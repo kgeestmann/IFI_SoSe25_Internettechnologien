@@ -18,9 +18,9 @@ app.get('/api/get-products', (req, res) => {
   console.log("Anfrage angekommen");
   var con = createConnection({
     host: "localhost",
-    database: "internettechnologien",
+    database: "eShop", // Jeder muss es anpassen
     user:"root",
-    password:"***REMOVED***"
+    password:"1234" // Jeder muss es anpassen
   });
   con.connect(function(err){
     if(err) throw err;
@@ -34,6 +34,51 @@ app.get('/api/get-products', (req, res) => {
   });
 });
 
+app.get('/api/get-customers', (req, res) => {
+  const con = createConnection({
+    host: "localhost",
+    database: "eShop", //Jeder muss es anpassen
+    user:"root",
+    password:"1234" // Jeder muss es anpassen
+  });
+  con.connect(err => {
+    if(err) {
+      res.status(500).send("DB connection error");
+      return;
+    }
+    con.query("SELECT * FROM Customer", (error, results) => {
+      if(error) {
+        res.status(500).send(error);
+      } else {
+        res.send(results);
+      }
+      con.end();
+    });
+  });
+});
+
+app.get('/api/get-orders', (req, res) => {
+  const con = createConnection({
+    host: "localhost",
+    database: "eShop", // Jeder muss es anpassen
+    user:"root",
+    password:"1234" // Jeder muss es anpassen
+  });
+  con.connect(err => {
+    if(err) {
+      res.status(500).send("DB connection error");
+      return;
+    }
+    con.query("SELECT * FROM Customer_Order", (error, results) => {
+      if(error) {
+        res.status(500).send(error);
+      } else {
+        res.send(results);
+      }
+      con.end();
+    });
+  });
+});
 
 /**
  * Serve static files from /browser
