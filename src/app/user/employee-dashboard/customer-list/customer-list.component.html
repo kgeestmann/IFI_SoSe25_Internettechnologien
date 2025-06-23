@@ -1,0 +1,11 @@
+<div *ngIf="loading">Lade Kunden...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="!loading && !error">
+  <h2>Kunden</h2>
+  <div *ngFor="let c of customers" class="customer-card">
+    <span class="customer-id">Kunden-ID: {{ c.customer_id }}</span><br>
+    <span class="billing-address-id">Rechnungsadresse ID: {{ c.billing_address_id }}</span><br>
+    <span class="shipping-address-id">Lieferadresse ID: {{ c.shipping_address_id }}</span>
+  </div>
+</div>

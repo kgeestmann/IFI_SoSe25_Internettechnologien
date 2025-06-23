@@ -1,0 +1,14 @@
+<div *ngIf="loading">Lade Bestellungen...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="!loading && !error">
+  <h2>Bestellungen</h2>
+  <div *ngFor="let o of orders" class="order-card">
+    <span class="order-id">Bestell-ID: {{ o.order_id }}</span><br>
+    <span class="order-date">Datum: {{ o.date | date }}</span><br>
+    <span class="customer-id">Kunden-ID: {{ o.customer_id }}</span><br>
+    <span class="order-status">Status: {{ o.delivery_status }}</span><br>
+    <span class="order-total">Gesamt: {{ o.total_price | currency:'EUR' }}</span><br>
+    <span class="order-payment">Zahlung: {{ o.payment_method }}</span>
+  </div>
+</div>
