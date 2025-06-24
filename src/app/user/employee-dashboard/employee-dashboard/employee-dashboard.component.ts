@@ -3,12 +3,12 @@ import {CommonModule } from '@angular/common'; // NgFor ist im CommonModule enth
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-employee-dashboard',
   standalone: true,
   imports: [RouterLink, CommonModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  templateUrl: './employee-dashboard.component.html',
+  styleUrl: './employee-dashboard.component.css'
 })
-export class LoginComponent {
+export class EmployeeDashboardComponent {
 
 }

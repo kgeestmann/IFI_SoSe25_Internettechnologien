@@ -17,10 +17,13 @@ const commonEngine = new CommonEngine();
 app.get('/api/get-products', (req, res) => {
   console.log("Anfrage angekommen");
   var con = createConnection({
-    host: "localhost",
-    database: "eShop", // Jeder muss es anpassen
-    user:"root",
-    password:"1234" // Jeder muss es anpassen
+	  host: "***REMOVED***",
+	  database: "25_IT_Gruppe5",
+	  user: "25_IT_Grp5",
+	  password: "***REMOVED***",
+	  ssl: {
+		  rejectUnauthorized: false
+	  }
   });
   con.connect(function(err){
     if(err) throw err;
@@ -35,11 +38,14 @@ app.get('/api/get-products', (req, res) => {
 });
 
 app.get('/api/get-customers', (req, res) => {
-  const con = createConnection({
-    host: "localhost",
-    database: "eShop", //Jeder muss es anpassen
-    user:"root",
-    password:"1234" // Jeder muss es anpassen
+  var con = createConnection({
+	  host: "***REMOVED***",
+	  database: "25_IT_Gruppe5",
+	  user: "25_IT_Grp5",
+	  password: "***REMOVED***",
+	  ssl: {
+		  rejectUnauthorized: false
+	  }
   });
   con.connect(err => {
     if(err) {
@@ -58,11 +64,14 @@ app.get('/api/get-customers', (req, res) => {
 });
 
 app.get('/api/get-orders', (req, res) => {
-  const con = createConnection({
-    host: "localhost",
-    database: "eShop", // Jeder muss es anpassen
-    user:"root",
-    password:"1234" // Jeder muss es anpassen
+  var con = createConnection({
+	  host: "***REMOVED***",
+	  database: "25_IT_Gruppe5",
+	  user: "25_IT_Grp5",
+	  password: "***REMOVED***",
+	  ssl: {
+		  rejectUnauthorized: false
+	  }
   });
   con.connect(err => {
     if(err) {
