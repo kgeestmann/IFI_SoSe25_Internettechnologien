@@ -28,7 +28,7 @@ app.get('/api/get-products', (req, res) => {
   con.connect(function(err){
     if(err) throw err;
     console.log("connected to db");
-    con.query("SELECT * from product", function(error,result,fields){
+    con.query("SELECT * from Product", function(error,result,fields){
       console.log(result);
       res.send(result);
       con.end(function(err){
