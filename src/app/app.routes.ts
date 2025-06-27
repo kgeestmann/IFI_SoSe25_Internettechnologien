@@ -7,6 +7,7 @@ import { CartListComponent } from './user/customer-dashboard/cart-list/cart-list
 import { CustomerDashboardComponent } from './user/customer-dashboard/customer-dashboard/customer-dashboard.component'; 
 import { EmployeeDashboardComponent } from './user/employee-dashboard/employee-dashboard/employee-dashboard.component';
 import { ContactComponent } from './contact/contact.component';
+import { RegistrationComponent } from './user/registration/registration.component';
 
 
 
@@ -20,6 +21,7 @@ export const routes: Routes = [
     { path: 'employee-dashboard', component: EmployeeDashboardComponent },
     { path: 'customers-admin', component: CustomerListComponent },
     { path: 'orders-admin', component: OrderListComponent },
-    { path: 'login', component: LoginComponent }, 
+    { path: 'login', component: LoginComponent },
+    { path: 'registration', component: RegistrationComponent}, 
     { path: '', redirectTo: '/products', pathMatch: 'full' }  // Default-Route
 ];

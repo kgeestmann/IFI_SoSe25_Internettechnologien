@@ -5,6 +5,8 @@
 
   <!-- Nicht eingeloggt -->
   <a *ngIf="!isLoggedIn" routerLink="/login">Login</a>
+  <a *ngIf="!isLoggedIn" routerLink="/registration">Registrieren</a>
+
 
   <!-- Kunde -->
   <a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Cart</a>
