@@ -1,14 +1,38 @@
 import { Component } from '@angular/core';
 import {CommonModule } from '@angular/common'; // NgFor ist im CommonModule enthalten
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../auth.service';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
+  email = '';
+  password = '';
+  error = '';
 
+  constructor(private authService: AuthService, private router: Router) {}
+
+  onSubmit() {
+    this.authService.login(this.email, this.password).subscribe({
+      next: (res) => {
+        this.authService.setLogin(res.role);
+        if (res.role === 'customer') {
+          this.router.navigate(['/customer-dashboard']);
+        } else if (res.role === 'employee') {
+          this.router.navigate(['/employee-dashboard']);
+        }
+      },
+      error: (err) => {
+        this.error = 'Login fehlgeschlagen!';
+      }
+    });
+  }
 }

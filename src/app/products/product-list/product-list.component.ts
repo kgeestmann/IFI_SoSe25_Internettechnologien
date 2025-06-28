@@ -16,7 +16,7 @@ export class ProductListComponent implements OnInit {
 
   constructor(private productService: ProductService) {}
 
-  ngOnInit() {
+  ngOnInit() { //ändern druck in console produkte aus 
     this.productService.getProducts().subscribe({
       next: (data) => {
         console.log('Daten im Frontend:', data);
