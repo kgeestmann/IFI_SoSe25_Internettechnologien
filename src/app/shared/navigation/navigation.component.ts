@@ -1,31 +1,31 @@
-import { Component, Input } from '@angular/core';
-import {CommonModule } from '@angular/common'; // NgFor ist im CommonModule enthalten
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LoginServiceService } from '../../user/login/login-service.service';
+import { AuthService } from '../../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navigation',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, ],
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.css']
-
 })
 
-export class NavigationComponent {
-  constructor(public auth: LoginServiceService) {}
 
-  get isLoggedIn() {
-    return this.auth.isLoggedIn();
-  }
-  get isCustomer() {
-    return this.auth.isCustomer();
-  }
-  get isEmployee() {
-    return this.auth.isEmployee();
+export class NavigationComponent {
+  isLoggedIn$;
+  isCustomer$;
+  isEmployee$;
+
+  constructor(private authService: AuthService, private router: Router) {
+    this.isLoggedIn$ = this.authService.isLoggedIn$;
+    this.isCustomer$ = this.authService.isCustomer$;
+    this.isEmployee$ = this.authService.isEmployee$;
   }
 
   logout() {
-    this.auth.logout();
+    this.authService.logout();
+    this.router.navigate(['/products']);
   }
 }

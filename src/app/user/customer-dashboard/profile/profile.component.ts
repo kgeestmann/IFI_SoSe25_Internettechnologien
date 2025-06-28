@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { LoginServiceService } from '../../login/login-service.service';
+/*import { Component } from '@angular/core';
+//import { LoginServiceService } from '../../login/login-service.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -16,4 +16,4 @@ export class ProfileComponent {
   get user() {
     return this.loginService.currentUser; 
   }
-}
+}*/

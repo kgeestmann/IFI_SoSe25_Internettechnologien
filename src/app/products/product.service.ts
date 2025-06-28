@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Product {
-  product_id: number;      // Passe die Felder an deine Datenbankstruktur an!
+  product_id: number;      
   name: string;
   price: number;
 }

@@ -1,34 +1,38 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule } from '@angular/common'; // NgFor ist im CommonModule enthalten
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../auth.service';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { LoginServiceService } from './login-service.service';
+
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']          // <‑‑ „s“
+  styleUrls: ['./login.component.css']          
 })
 export class LoginComponent {
+  email = '';
+  password = '';
+  error = '';
 
-  loginModel = { email: '', password: '' };
+constructor(public authService: AuthService, private router: Router) {}
 
-  constructor(
-    private loginService: LoginServiceService,
-    private router: Router                       // falls du weiterleiten willst
-  ) {}
-
-  /** Wird vom Formular (ngSubmit) oder Button‑(click) aufgerufen */
-  onLogin(): void {
-    this.loginService
-        .login(this.loginModel.email, this.loginModel.password)
-        .subscribe({
-          next: () => {
-            console.log('Login erfolgreich');
-            this.router.navigate(['/profile'], { replaceUrl: true });          },
-          error: err => console.error('Login fehlgeschlagen', err)
-        });
+  onSubmit() {
+    this.authService.login(this.email, this.password).subscribe({
+      next: (res) => {
+        this.authService.setLogin(res.role);
+        if (res.role === 'customer') {
+          this.router.navigate(['/customer-dashboard']);
+        } else if (res.role === 'employee') {
+          this.router.navigate(['/employee-dashboard']);
+        }
+      },
+      error: (err) => {
+        this.error = 'Login fehlgeschlagen!';
+      }
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { LoginServiceService } from '../../login/login-service.service';
+//import { LoginServiceService } from '../../login/login-service.service';
 import { Product } from '../../../products/product.service';
 
 export interface CartItem {
@@ -16,7 +16,7 @@ export class CartService {
     this.cartSig().reduce((sum, ci) => sum + ci.quantity, 0)
   );
 
-  constructor(private auth: LoginServiceService) {}
+  //constructor(private auth: LoginServiceService) {}
 
   add(p: Product, qty = 1): void {
     if (!this.auth.isLoggedIn()) {

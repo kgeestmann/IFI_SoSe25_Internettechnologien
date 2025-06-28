@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { ProductListComponent } from './products/product-list/product-list.component';
-import { NavigationComponent } from './shared/navigation/navigation.component'; 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NavigationComponent } from './shared/navigation/navigation.component'; // <--- Import hinzufügen
+import { AuthService } from './auth.service';
+
 
 @Component({
   selector: 'app-root',
@@ -20,8 +22,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class AppComponent {
   title = 'project';
-  // Diese Werte später dynamisch aus dem AuthService holen!
-  isLoggedIn = false;
-  isCustomer = false;
-  isEmployee = false;
+  constructor(private authService: AuthService) {
+    this.authService.checkSession();
+  }
 }

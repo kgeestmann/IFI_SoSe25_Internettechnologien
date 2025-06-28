@@ -4,20 +4,28 @@
   <a routerLink="/contact">Kontakt</a>
 
   <!-- Nicht eingeloggt -->
-  <a *ngIf="!isLoggedIn" routerLink="/login">Login</a>
-  <a *ngIf="!isLoggedIn" routerLink="/registration">Registrieren</a>
+  <a *ngIf="!(isLoggedIn$ | async)" routerLink="/login">Login</a>
+  <!--  <a *ngIf="!isLoggedIn" routerLink="/registration">Registrieren</a>  -->
 
 
   <!-- Kunde -->
-  <a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Warenkorb</a>
-  <a *ngIf="isLoggedIn && isCustomer" routerLink="/profile">Profil</a>
-  <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-orders">Bestellungen</a>
-  <a *ngIf="isLoggedIn && isCustomer" (click)="logout()">Logout</a>
+  <ng-container *ngIf="(isLoggedIn$ | async) && (isCustomer$ | async)">
+    <a routerLink="/cart">Cart</a>
+    <a routerLink="/customer-dashboard">My Account</a>
+    <a routerLink="/customer-orders">My Orders</a>
+    <a (click)="logout()">Logout</a>
+  </ng-container>
+
+<!-- a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Warenkorb</a>
+ // <a *ngIf="isLoggedIn && isCustomer" routerLink="/profile">Profil</a>
+ // <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-orders">Bestellungen</a> -->
 
   <!-- Mitarbeiter -->
-  <a *ngIf="isLoggedIn && isEmployee" routerLink="/employee-dashboard">Dashboard</a>
-  <a *ngIf="isLoggedIn && isEmployee" routerLink="/products-admin">Manage Products</a>
-  <a *ngIf="isLoggedIn && isEmployee" routerLink="/orders-admin">Manage Orders</a>
-  <a *ngIf="isLoggedIn && isEmployee" routerLink="/customers-admin">Manage Customers</a>
-  <a *ngIf="isLoggedIn && isEmployee" (click)="logout()">Logout</a>
+  <ng-container *ngIf="(isLoggedIn$ | async) && (isEmployee$ | async)">
+    <a routerLink="/employee-dashboard">Dashboard</a>
+    <a routerLink="/products-admin">Manage Products</a>
+    <a routerLink="/orders-admin">Manage Orders</a>
+    <a routerLink="/customers-admin">Manage Customers</a>
+    <a (click)="logout()">Logout</a>
+  </ng-container>
 </nav>

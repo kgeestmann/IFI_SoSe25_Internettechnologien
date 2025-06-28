@@ -21,7 +21,7 @@ export class ProductListComponent implements OnInit {
   ) {}
 
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.productService.getProducts().subscribe({
       next: data => {
         this.product = data;
@@ -34,7 +34,7 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  addToCart(product: Product): void {
+  /*addToCart(product: Product): void {
     this.cart.add(product);                                        // NEU
-  }
+  }*/
 }
