@@ -1,0 +1,47 @@
+.headline {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  font-family: system-ui, sans-serif;
+}
+
+/* Container ähnlich zum Formular */
+.profile-container {
+  max-width: 320px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-family: system-ui, sans-serif;
+  color: #333;
+}
+
+/* Profil-Infos */
+.profile-container p {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.profile-container strong {
+  font-weight: 600;
+}
+
+/* Link zum Bearbeiten im Button-Stil */
+.profile-container .edit-profile {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: #94bb9b;
+  color: #fff;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.profile-container .edit-profile:hover {
+  background: #5c7761;
+}
