@@ -2,7 +2,6 @@ import { Injectable, signal, computed } from '@angular/core';
 import { LoginServiceService } from '../../login/login-service.service';
 import { Product } from '../../../products/product.service';
 
-/** 👉 einzig gültige Struktur im Warenkorb */
 export interface CartItem {
   product: Product;
   quantity: number;
@@ -12,7 +11,6 @@ export interface CartItem {
 export class CartService {
   private readonly cartSig = signal<CartItem[]>([]);
 
-  /** Observable Ableitungen */
   readonly items     = computed(() => this.cartSig());
   readonly itemCount = computed(() =>
     this.cartSig().reduce((sum, ci) => sum + ci.quantity, 0)
@@ -20,7 +18,6 @@ export class CartService {
 
   constructor(private auth: LoginServiceService) {}
 
-  /** Produkt (default +1) hinzufügen */
   add(p: Product, qty = 1): void {
     if (!this.auth.isLoggedIn()) {
       alert('Bitte zuerst einloggen');
@@ -42,7 +39,6 @@ export class CartService {
     });
   }
 
-  /** Menge reduzieren oder Item löschen */
   remove(target: number | Product, qty = 1): void {
     this.cartSig.update(arr => {
       const idx =
@@ -64,4 +60,9 @@ export class CartService {
   clear(): void {
     this.cartSig.set([]);
   }
+
+  totalPrice() {
+    return this.items().reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  }
+  
 }
