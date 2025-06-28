@@ -1,13 +1,9 @@
-<h2>Login</h2>
-<form>
-  <label for="email">E-Mail:</label>
-  <input id="login-email" type="email" name="email"><br><br>
-  <label for="password">Passwort:</label>
-  <input id="login-password" type="password" name="password"><br><br>
-  <button type="submit">Login</button>
+<h2 class="headline">Login</h2>
+
+<form class="login-form" (ngSubmit)="onLogin()" #f="ngForm">
+  <input type="email" name="email" [(ngModel)]="loginModel.email" placeholder="E‑Mail" required>
+  <input type="password" name="password" [(ngModel)]="loginModel.password" placeholder="Passwort" required>
+  <button type="submit" [disabled]="f.invalid">Login</button>
 </form>
 
-  <a routerLink="/registration">Noch kein Account vorhanden?</a>
-
-
-
+<a class="register-link" routerLink="/registration">Noch kein Account vorhanden?</a>

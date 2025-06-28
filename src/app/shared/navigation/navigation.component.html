@@ -1,7 +1,7 @@
 <nav>
   <!-- Für alle sichtbar -->
-  <a routerLink="/products">Products</a>
-  <a routerLink="/contact">Contact</a>
+  <a routerLink="/products">Produkte</a>
+  <a routerLink="/contact">Kontakt</a>
 
   <!-- Nicht eingeloggt -->
   <a *ngIf="!isLoggedIn" routerLink="/login">Login</a>
@@ -9,11 +9,10 @@
 
 
   <!-- Kunde -->
-  <a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Cart</a>
-  <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-dashboard">My Account</a>
-  <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-orders">My Orders</a>
+  <a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Warenkorb</a>
+  <a *ngIf="isLoggedIn && isCustomer" routerLink="/profile">Profil</a>
+  <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-orders">Bestellungen</a>
   <a *ngIf="isLoggedIn && isCustomer" (click)="logout()">Logout</a>
-  
 
   <!-- Mitarbeiter -->
   <a *ngIf="isLoggedIn && isEmployee" routerLink="/employee-dashboard">Dashboard</a>

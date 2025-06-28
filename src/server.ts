@@ -14,6 +14,30 @@ const indexHtml = join(serverDistFolder, 'index.server.html');
 const app = express();
 const commonEngine = new CommonEngine();
 
+app.get('/api/login', (req, res) => {
+  console.log("Anfrage angekommen");
+  const { email } = req.query as { email?: string };  
+  var con = createConnection({
+	  host: "***REMOVED***",
+	  database: "25_IT_Gruppe5",
+	  user: "25_IT_Grp5",
+	  password: "***REMOVED***",
+	  ssl: {
+		  rejectUnauthorized: false
+	  }
+  });
+
+  con.connect(function(err){
+    if(err) throw err;
+    console.log("connected to db");
+    con.query("SELECT * from User where email = ? ",[email], function(error,result,fields){
+      console.log(result);
+      res.send(result);
+      con.end(function(err){
+      });
+    });
+  });
+});
 
 app.get('/api/get-products', (req, res) => {
   console.log("Anfrage angekommen");

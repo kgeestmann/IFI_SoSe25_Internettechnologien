@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { ProductListComponent } from './products/product-list/product-list.component';
 import { NavigationComponent } from './shared/navigation/navigation.component'; 
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     RouterLink,
     ProductListComponent,
     NavigationComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

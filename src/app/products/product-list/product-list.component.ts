@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import {CommonModule } from '@angular/common'; // NgFor ist im CommonModule enthalten
+import {CommonModule } from '@angular/common';
 import { ProductService, Product } from '../product.service';
+import { CartService } from '../../user/customer-dashboard/cart-list/cart.service';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule], // Wichtig für *ngFor und *ngIf!
+  imports: [CommonModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.css'
 })
@@ -14,19 +15,26 @@ export class ProductListComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private cart: CartService
+  ) {}
 
-  ngOnInit() {
+
+  ngOnInit(): void {
     this.productService.getProducts().subscribe({
-      next: (data) => {
-        console.log('Daten im Frontend:', data);
+      next: data => {
         this.product = data;
         this.loading = false;
       },
-      error: (err) => {
+      error: () => {
         this.error = 'Fehler beim Laden der Produkte';
         this.loading = false;
       }
     });
+  }
+
+  addToCart(product: Product): void {
+    this.cart.add(product);                                        // NEU
   }
 }
