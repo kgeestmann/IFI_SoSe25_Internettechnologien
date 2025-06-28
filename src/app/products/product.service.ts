@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 export interface Product {
   product_id: number;      
   name: string;
-  // weitere Felder nach Bedarf
+    // weitere Felder nach Bedarf
 }
 
 @Injectable({

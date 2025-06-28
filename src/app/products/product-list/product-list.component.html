@@ -1,10 +1,18 @@
-<div *ngIf="loading">Lade Produkte...</div>
-<div *ngIf="error">{{ error }}</div>
+<div *ngIf="loading" class="loader">Lade Produkte …</div>
+<div *ngIf="error" class="error">{{ error }}</div>
 
 <div *ngIf="!loading && !error">
-  <h2>Produkte</h2>
-  <div *ngFor="let p of product" class="product-card">
-    <span class="product-name">{{ p.name }}</span><br>
-    <span class="product-id">ID: {{ p.product_id }}</span>
+  <h2 class="headline">Produkte</h2>
+
+  <!-- Grid‑Layout für Karten -->
+  <div class="products-wrapper">
+    <div *ngFor="let p of product" class="product-card">
+      <span class="product-name">{{ p.name }}</span>
+      <span class="product-id">ID: {{ p.product_id }}</span>
+
+      <button type="button" (click)="addToCart(p)">
+        In den Warenkorb
+      </button>
+    </div>
   </div>
 </div>

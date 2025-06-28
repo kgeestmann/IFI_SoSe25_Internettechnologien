@@ -1,10 +1,12 @@
 <nav>
   <!-- Für alle sichtbar -->
-  <a routerLink="/products">Products</a>
-  <a routerLink="/contact">Contact</a>
+  <a routerLink="/products">Produkte</a>
+  <a routerLink="/contact">Kontakt</a>
 
   <!-- Nicht eingeloggt -->
   <a *ngIf="!(isLoggedIn$ | async)" routerLink="/login">Login</a>
+  // <a *ngIf="!isLoggedIn" routerLink="/registration">Registrieren</a>
+
 
   <!-- Kunde -->
   <ng-container *ngIf="(isLoggedIn$ | async) && (isCustomer$ | async)">
@@ -13,6 +15,10 @@
     <a routerLink="/customer-orders">My Orders</a>
     <a (click)="logout()">Logout</a>
   </ng-container>
+
+//a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Warenkorb</a>
+ // <a *ngIf="isLoggedIn && isCustomer" routerLink="/profile">Profil</a>
+ // <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-orders">Bestellungen</a>
 
   <!-- Mitarbeiter -->
   <ng-container *ngIf="(isLoggedIn$ | async) && (isEmployee$ | async)">

@@ -1,7 +1,6 @@
 Komponenten erstellen: 
 
 Sophia:
-- product_details (und service)
 - Navigationsleiste
 - Login/Account erstellen-Bereich
 
@@ -9,11 +8,27 @@ Kim:
 - Admin-Bereich
 - Kundenliste
 - Bestellungen-Liste
+- Kunden, Bestellungen, Produkte verwalten
+- Transaktion User erstellen (Kunde, Mitarbeiter)
+
+Rumeysa:
+- Produkte in Kasten anzeigen
+    - Name, Bild, Preis
+- Button nach Product_Details
+    - Beschreibung
+    - Bestand (evtl.Sockets)
+- customer_dashboard lädt die Komponente product_list
 
 Frieda:
 - Kundenbereich
 - Kundenprofil
-- Warenkorb
-- Bestellhistorie
+- Warenkorb (in den products_details dynamisch anzeigen wenn eingeloggt)
+- Bestellhistorie (Bestellungen wie die Produkte anzeigen lassen und "Mehr Details" Rechnung zusätzlich anzeigen)
 
+Trigger:
+- Gesamtkosten
+- Bestand aktualisieren
+- Rechnung durch Trigger erstellen oder ganz weg
+//Cascade on delete überall
 
+Socket.io für Schnittstelle!!

@@ -1,0 +1,13 @@
+<h2>Mein Kundenprofil</h2>
+
+<ng-container *ngIf="user() as u; else notLoggedIn">
+  <p><strong>Vorname:</strong> {{ u.firstname }}</p>
+  <p><strong>Nachname:</strong> {{ u.lastname }}</p>
+  <p><strong>E-Mail:</strong> {{ u.email }}</p>
+
+  <a>Profildaten bearbeiten</a>
+</ng-container>
+
+<ng-template #notLoggedIn>
+  <p>Du bist nicht eingeloggt.</p>
+</ng-template>
