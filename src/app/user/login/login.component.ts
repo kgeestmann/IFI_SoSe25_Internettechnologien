@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import {CommonModule } from '@angular/common'; // NgFor ist im CommonModule enthalten
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [ CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']          
 })

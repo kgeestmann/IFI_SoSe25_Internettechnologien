@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { ProductListComponent } from './products/product-list/product-list.component';
+import { RouterOutlet } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NavigationComponent } from './shared/navigation/navigation.component'; // <--- Import hinzufügen
 import { AuthService } from './auth.service';
@@ -11,8 +10,6 @@ import { AuthService } from './auth.service';
   standalone: true,
   imports: [
     RouterOutlet,
-    RouterLink,
-    ProductListComponent,
     NavigationComponent,
     ReactiveFormsModule,
     FormsModule
