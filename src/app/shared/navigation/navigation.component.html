@@ -5,7 +5,7 @@
 
   <!-- Nicht eingeloggt -->
   <a *ngIf="!(isLoggedIn$ | async)" routerLink="/login">Login</a>
-  // <a *ngIf="!isLoggedIn" routerLink="/registration">Registrieren</a>
+  <!--  <a *ngIf="!isLoggedIn" routerLink="/registration">Registrieren</a>  -->
 
 
   <!-- Kunde -->
@@ -16,9 +16,9 @@
     <a (click)="logout()">Logout</a>
   </ng-container>
 
-//a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Warenkorb</a>
+<!-- a *ngIf="isLoggedIn && isCustomer" routerLink="/cart">Warenkorb</a>
  // <a *ngIf="isLoggedIn && isCustomer" routerLink="/profile">Profil</a>
- // <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-orders">Bestellungen</a>
+ // <a *ngIf="isLoggedIn && isCustomer" routerLink="/customer-orders">Bestellungen</a> -->
 
   <!-- Mitarbeiter -->
   <ng-container *ngIf="(isLoggedIn$ | async) && (isEmployee$ | async)">

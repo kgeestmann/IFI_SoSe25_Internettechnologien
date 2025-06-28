@@ -11,14 +11,14 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']          // <‑‑ „s“
+  styleUrls: ['./login.component.css']          
 })
 export class LoginComponent {
   email = '';
   password = '';
   error = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+constructor(public authService: AuthService, private router: Router) {}
 
   onSubmit() {
     this.authService.login(this.email, this.password).subscribe({

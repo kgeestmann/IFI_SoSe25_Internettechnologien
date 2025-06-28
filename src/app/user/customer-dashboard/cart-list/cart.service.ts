@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { LoginServiceService } from '../../login/login-service.service';
+//import { LoginServiceService } from '../../login/login-service.service';
 import { Product } from '../../../products/product.service';
 
 /** 👉 einzig gültige Struktur im Warenkorb */
@@ -18,10 +18,10 @@ export class CartService {
     this.cartSig().reduce((sum, ci) => sum + ci.quantity, 0)
   );
 
-  constructor(private auth: LoginServiceService) {}
+  //constructor(private auth: LoginServiceService) {}
 
   /** Produkt (default +1) hinzufügen */
-  add(p: Product, qty = 1): void {
+  /*add(p: Product, qty = 1): void {
     if (!this.auth.isLoggedIn()) {
       alert('Bitte zuerst einloggen');
       return;
