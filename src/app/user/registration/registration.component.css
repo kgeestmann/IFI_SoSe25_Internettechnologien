@@ -1,3 +1,14 @@
+:host {
+  display: block;
+  font-family: system-ui, sans-serif;
+}
+
+.headline {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
 /* Registrierungsformular */
 .register-form {
   display: flex;
@@ -25,7 +36,7 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
-  font-family: inherit;
+  font-family: system-ui, sans-serif;
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
