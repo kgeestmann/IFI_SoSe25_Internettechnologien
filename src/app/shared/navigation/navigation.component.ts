@@ -1,19 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-navigation',
   standalone: true,
-  imports: [RouterLink, CommonModule, ],
+  imports: [RouterLink, CommonModule, RouterLinkActive],
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.css']
 })
-
-
 export class NavigationComponent {
+  menuActive = false;
+
   isLoggedIn$;
   isCustomer$;
   isEmployee$;
@@ -24,8 +24,20 @@ export class NavigationComponent {
     this.isEmployee$ = this.authService.isEmployee$;
   }
 
+  toggleMenu() {
+    this.menuActive = !this.menuActive;
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/products']);
+  }
+
+  // HostListener für Fenstergröße
+  @HostListener('window:resize')
+  onResize() {
+    if (window.innerWidth > 768) { // 48em ≈ 768px
+      this.menuActive = false;
+    }
   }
 }
