@@ -1,1 +1,36 @@
-<p>employee-dashboard works!</p>
+<div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
+  <div *ngIf="currentUser; else loading" class="dashboard-content">
+    <div class="user-main">
+      <h2 class="headline">Willkommen Mitarbeiter</h2>
+
+      <div class="user-info">
+        <p><strong>Name:</strong> {{ currentUser?.first_name }} {{ currentUser?.last_name }}</p>
+        <p><strong>Email:</strong> {{ currentUser?.email }}</p>
+        <p *ngIf="currentUser?.role"><strong>Rolle:</strong> {{ currentUser.role }}</p>
+      </div>
+    </div>
+
+    <aside class="employee-details product-card" *ngIf="currentUser?.monthly_salary != null || currentUser?.role">
+      <h3>Mitarbeiterinfo</h3>
+
+      <p *ngIf="currentUser?.employee_data?.role">
+        <strong>Rolle:</strong> {{ currentUser.role }}
+      </p>
+
+      <p *ngIf="currentUser?.employee_data?.monthly_salary != null">
+        <strong>Monatsgehalt:</strong> {{ currentUser.employee_data.monthly_salary | currency:'EUR' }}
+      </p>
+    </aside>
+  </div>
+</div>
+
+<ng-template #accessDenied>
+  <div class="alert alert-warning">
+    <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
+    <a routerLink="/login" class="btn btn-primary">Zum Login</a>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <p class="loader">Lade Benutzerdaten...</p>
+</ng-template>

@@ -102,8 +102,6 @@ app.get('/api/get-orders', (req, res) => {
   });
 });
 
-
-
 app.post('/api/login', (req, res) => {
   console.log("Anfrage angekommen");
   const con = createConnection(dbConfig);
@@ -161,6 +159,108 @@ app.post('/api/login', (req, res) => {
   );
 });
 
+app.get('/api/user-details', (req, res) => {
+  if (!req.session.user) {
+    res.status(401).json({ message: 'Nicht eingeloggt' });
+    return;
+  }
+
+  const userId = req.session.user.user_id;
+  const con = createConnection(dbConfig);
+
+  const sql = `
+    SELECT 
+      u.user_id,
+      u.first_name,
+      u.last_name,
+      u.email,
+      c.billing_address_id,
+      c.shipping_address_id,
+      cb.street AS billing_street,
+      cb.house_number AS billing_house_number,
+      cb.zipcode AS billing_zipcode,
+      cb.country AS billing_country,
+      cb.city AS billing_city,
+      cs.street AS shipping_street,
+      cs.house_number AS shipping_house_number,
+      cs.zipcode AS shipping_zipcode,
+      cs.country AS shipping_country,
+      cs.city AS shipping_city,
+      e.monthly_salary,
+      e.role AS employee_role,
+      ea.street AS employee_street,
+      ea.house_number AS employee_house_number,
+      ea.zipcode AS employee_zipcode,
+      ea.country AS employee_country,
+      ea.city AS employee_city,
+      CASE 
+        WHEN c.customer_id IS NOT NULL THEN 'customer'
+        WHEN e.employee_id IS NOT NULL THEN 'employee'
+        ELSE 'unknown'
+      END AS role
+    FROM User u
+    LEFT JOIN Customer c ON u.user_id = c.customer_id
+    LEFT JOIN Address cb ON c.billing_address_id = cb.address_id
+    LEFT JOIN Address cs ON c.shipping_address_id = cs.address_id
+    LEFT JOIN Employee e ON u.user_id = e.employee_id
+    LEFT JOIN Address ea ON e.address_id = ea.address_id
+    WHERE u.user_id = ?
+    LIMIT 1
+  `;
+
+  con.query(sql, [userId], (error, results) => {
+    con.end();
+
+    if (error) {
+      res.status(500).json({ error: error.message });
+      return;
+    }
+
+    const rows = results as any[];
+
+    if (rows.length === 0) {
+      res.status(404).json({ message: 'User nicht gefunden' });
+      return;
+    }
+
+    const row = rows[0];
+
+    const userDetails = {
+      user_id: row.user_id,
+      first_name: row.first_name,
+      last_name: row.last_name,
+      email: row.email,
+      role: row.role,
+      billing_address: row.billing_address_id ? {
+        street: row.billing_street,
+        house_number: row.billing_house_number,
+        zipcode: row.billing_zipcode,
+        country: row.billing_country,
+        city: row.billing_city,
+      } : null,
+      shipping_address: row.shipping_address_id ? {
+        street: row.shipping_street,
+        house_number: row.shipping_house_number,
+        zipcode: row.shipping_zipcode,
+        country: row.shipping_country,
+        city: row.shipping_city,
+      } : null,
+      employee_data: row.employee_role ? {
+        monthly_salary: row.monthly_salary,
+        role: row.employee_role,
+        address: row.employee_street ? {
+          street: row.employee_street,
+          house_number: row.employee_house_number,
+          zipcode: row.employee_zipcode,
+          country: row.employee_country,
+          city: row.employee_city,
+        } : null
+      } : null
+    };
+
+    res.json(userDetails);
+  });
+});
 
 app.get('/api/me', (req, res) => {
   if (req.session.user) {

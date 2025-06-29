@@ -1,13 +1,45 @@
-import { Component } from '@angular/core';
-import {CommonModule } from '@angular/common'; // NgFor ist im CommonModule enthalten
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../auth.service';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-employee-dashboard',
   standalone: true,
-  imports: [ CommonModule],
+  imports: [CommonModule],
   templateUrl: './employee-dashboard.component.html',
-  styleUrl: './employee-dashboard.component.css'
+  styleUrls: ['./employee-dashboard.component.css']
 })
-export class EmployeeDashboardComponent {
+export class EmployeeDashboardComponent implements OnInit {
+  currentUser: any;
+  isEmployee = false;
 
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.authService.checkSession();
+
+    combineLatest([
+      this.authService.isLoggedIn$,
+      this.authService.isEmployee$
+    ]).subscribe(([loggedIn, isEmployee]) => {
+      this.isEmployee = isEmployee;
+
+      if (loggedIn && isEmployee && !this.currentUser) {
+        this.loadUserDetails();
+      }
+    });
+  }
+
+  loadUserDetails() {
+    this.authService.fetchUserDetails().subscribe({
+      next: (details) => {
+        this.currentUser = details;
+        this.authService.setLogin(details);
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der User-Details', err);
+      }
+    });
+  }
 }
