@@ -37,4 +37,8 @@ export class ProductListComponent implements OnInit {
   addToCart(product: Product): void {
     this.cart.add(product);
   }
+
+  goToDetails(product: Product): void {
+  alert(`Produktbeschreibung: ${product.description ?? 'Keine Beschreibung verfügbar.'}`);
+}
 }

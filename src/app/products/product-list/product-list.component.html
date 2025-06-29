@@ -1,18 +1,37 @@
-<div *ngIf="loading" class="loader">Lade Produkte …</div>
-<div *ngIf="error" class="error">{{ error }}</div>
+<h2 class="headline">Produkte</h2>
 
-<div *ngIf="!loading && !error">
-  <h2 class="headline">Produkte</h2>
+<div class="products-wrapper">
+  <div class="product-card">
+    <img class="product-image" src="assets/images/aloevera.jpg" alt="Aloe Vera" />
+    <span class="product-name">Aloe Vera</span>
+    <span class="product-price">15,00 €</span>
+    <button>In den Warenkorb</button>
+  </div>
 
-  <!-- Grid‑Layout für Karten -->
-  <div class="products-wrapper">
-    <div *ngFor="let p of product" class="product-card">
-      <span class="product-name">{{ p.name }}</span>
-      <span class="product-price">{{ p.price | currency: 'EUR' : 'symbol'}}</span>
+  <div class="product-card">
+    <img class="product-image" src="assets/images/ficusbenjamina.jpg" alt="Ficus Benjamina" />
+    <span class="product-name">Ficus Benjamina</span>
+    <span class="product-price">30,00 €</span>
+    <button>In den Warenkorb</button>
+  </div>
+  <div class="product-card">
+    <img class="product-image" src="assets/images/calathea.jpg" alt="Ficus Benjamina" />
+    <span class="product-name">Calathea</span>
+    <span class="product-price">35,00€</span>
+    <button>In den Warenkorb</button>
+  </div>
 
-      <button type="button" (click)="addToCart(p)">
-        In den Warenkorb
-      </button>
-    </div>
+  <div class="product-card">
+    <img class="product-image" src="assets/images/monsteradeliciosa.jpg" alt="Ficus Benjamina" />
+    <span class="product-name">Monstera Deliciosa</span>
+    <span class="product-price">25,00 €</span>
+    <button>In den Warenkorb</button>
+  </div>
+
+  <div class="product-card">
+    <img class="product-image" src="assets/images/sansevieria.jpg" alt="Ficus Benjamina" />
+    <span class="product-name">Sansevieria</span>
+    <span class="product-price">20,00 €</span>
+    <button>In den Warenkorb</button>
   </div>
 </div>
