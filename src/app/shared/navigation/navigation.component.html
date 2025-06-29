@@ -10,9 +10,9 @@
 
   <!-- Kunde -->
   <ng-container *ngIf="(isLoggedIn$ | async) && (isCustomer$ | async)">
-    <a routerLink="/cart">Cart</a>
-    <a routerLink="/customer-dashboard">My Account</a>
-    <a routerLink="/customer-orders">My Orders</a>
+    <a routerLink="/cart">Warenkorb</a>
+    <a routerLink="/profile">Mein Account</a>
+    <a routerLink="/customer-orders">Meine Bestellungen</a>
     <a (click)="logout()">Logout</a>
   </ng-container>
 

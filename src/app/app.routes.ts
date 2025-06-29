@@ -8,7 +8,7 @@ import { EmployeeDashboardComponent } from './user/employee-dashboard/employee-d
 import { CustomerDashboardComponent } from './user/customer-dashboard/customer-dashboard/customer-dashboard.component';
 import { ContactComponent } from './contact/contact.component';
 import { RegistrationComponent } from './user/registration/registration.component';
-//import { ProfileComponent } from './user/customer-dashboard/profile/profile.component';
+import { ProfileComponent } from './user/customer-dashboard/profile/profile.component';
 import { MyOrdersComponent } from './user/customer-dashboard/my-orders/my-orders.component';
 
 
@@ -24,7 +24,7 @@ export const routes: Routes = [
     { path: 'orders-admin', component: OrderListComponent },
     { path: 'login', component: LoginComponent },
     { path: 'registration', component: RegistrationComponent}, 
-    //{ path: 'profile', component: ProfileComponent},
+    { path: 'profile', component: ProfileComponent},
     { path: '', redirectTo: '/products', pathMatch: 'full' } , // Default-Route
     { path: 'customer-dashboard', component: CustomerDashboardComponent }
 

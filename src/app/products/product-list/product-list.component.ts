@@ -34,7 +34,7 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  /*addToCart(product: Product): void {
-    this.cart.add(product);                                        // NEU
-  }*/
+  addToCart(product: Product): void {
+    this.cart.add(product);
+  }
 }

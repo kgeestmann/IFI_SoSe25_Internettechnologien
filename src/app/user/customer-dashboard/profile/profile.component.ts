@@ -1,5 +1,5 @@
-/*import { Component } from '@angular/core';
-//import { LoginServiceService } from '../../login/login-service.service';
+import { Component } from '@angular/core';
+import { LoginServiceService } from '../../login/login-service.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -14,6 +14,6 @@ export class ProfileComponent {
   constructor(private loginService: LoginServiceService) {}
 
   get user() {
-    return this.loginService.currentUser; 
+    return this.loginService.currentUser; //TODO: an neues Login anpassen
   }
-}*/
+}
