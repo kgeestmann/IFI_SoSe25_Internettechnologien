@@ -10,16 +10,15 @@ import { ContactComponent } from './contact/contact.component';
 import { RegistrationComponent } from './user/registration/registration.component';
 import { ProfileComponent } from './user/customer-dashboard/profile/profile.component';
 import { MyOrdersComponent } from './user/customer-dashboard/my-orders/my-orders.component';
-
-
+import { ProductsAdminComponent } from './user/employee-dashboard/products-admin/products-admin.component';
 
 export const routes: Routes = [
     { path: 'products', component: ProductListComponent },
-
     { path: 'cart', component: CartListComponent },
     { path: 'contact', component: ContactComponent },
     { path: 'customer-orders', component: MyOrdersComponent },
     { path: 'employee-dashboard', component: EmployeeDashboardComponent },
+    { path: 'products-admin', component: ProductsAdminComponent },
     { path: 'customers-admin', component: CustomerListComponent },
     { path: 'orders-admin', component: OrderListComponent },
     { path: 'login', component: LoginComponent },
@@ -27,5 +26,4 @@ export const routes: Routes = [
     { path: 'profile', component: ProfileComponent},
     { path: '', redirectTo: '/products', pathMatch: 'full' } , // Default-Route
     { path: 'customer-dashboard', component: CustomerDashboardComponent }
-
 ];
