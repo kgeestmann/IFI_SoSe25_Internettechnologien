@@ -89,12 +89,3 @@ button:hover {
   border-radius: 8px;
   margin-bottom: 0.75rem;
 }
-
-.details-button {
-  margin-top: 0.5rem;
-  background: #c9c19f;
-}
-
-.details-button:hover {
-  background: #9d976d;
-}

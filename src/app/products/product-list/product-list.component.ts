@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {CommonModule } from '@angular/common';
 import { ProductService, Product } from '../product.service';
 import { CartService } from '../../user/customer-dashboard/cart-list/cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
@@ -17,7 +18,8 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private cart: CartService
+    private cart: CartService,
+    private router : Router
   ) {}
 
 
@@ -36,9 +38,10 @@ export class ProductListComponent implements OnInit {
 
   addToCart(product: Product): void {
     this.cart.add(product);
+    this.router.navigate(['/product', product.product_id]);
   }
 
   goToDetails(product: Product): void {
-  alert(`Produktbeschreibung: ${product.description ?? 'Keine Beschreibung verfügbar.'}`);
+  this.router.navigate(['/product', product.product_id]);
 }
 }
