@@ -6,7 +6,8 @@
   width: 100vw;
   box-sizing: border-box;
   padding: 0.625rem 1.25rem;
-  background-color: #CDBA96;
+  margin-bottom: 3rem;
+  background-color: #4f704f;
   position: relative;
   left: 0;
   top: 0;
@@ -30,7 +31,7 @@
 
 .title {
   font-weight: bold;
-  color: #322a1D;
+  color: #cfd8cf;
   margin: 0;
   font-size: 1.35rem;
 }
@@ -44,7 +45,7 @@
 
 .navigationGr a {
   text-decoration: none;
-  color: #322a1D;
+  color: #cfd8cf;
   font-weight: 500;
   padding: 0.5rem 0.9rem;
   border-radius: 6px;
@@ -60,11 +61,17 @@
 a.active,
 .navigationGr a.active {
   font-weight: bold;
-  color: #65311b;
-  background-color: #f3e6d0;
+  color: #4f704f;
+  background-color: #cfd8cf;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
+a.active,
+.navigationGr a:hover {
+  background: #b0d8b7;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.9rem;
+}
 .hide {
   display: none !important;
 }
@@ -76,7 +83,7 @@ a.active,
 
 /* --- Off-Screen-Menü (Burger-Menü) --- */
 .off-screen-menu {
-  background-color: #CDBA96;
+  background-color: #4f704f;
   height: 100vh;
   width: 100%;
   max-width: 12.5rem;
@@ -88,7 +95,7 @@ a.active,
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 1.35rem;
+  font-size: 1.10rem;
   transition: right 0.3s ease;
   z-index: 999;
 }
@@ -106,15 +113,23 @@ a.active,
 }
 .off-screen-menu a {
   text-decoration: none;
-  color: #322a1D;
+  color: #cfd8cf;
   font-weight: 500;
   transition: background 0.2s, color 0.2s;
 }
 .off-screen-menu a.active {
   font-weight: bold;
-  color: #65311b;
-  background-color: #f3e6d0;
+  color: #4f704f;
+  background-color: #cfd8cf;
   border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  padding: 0.3rem;
+}
+
+.off-screen-menu a:hover {
+    background: #b0d8b7;
+    border-radius: 0.5rem;
+    padding: 0.3rem;
 }
 
 /* --- Hamburger-Menü (rechts in der Leiste) --- */
@@ -132,7 +147,7 @@ a.active,
 .ham-menu span {
   height: 0.3125rem;
   width: 100%;
-  background-color: #322a1D;
+  background-color: #cfd8cf;
   border-radius: 1.5625rem;
   position: absolute;
   left: 50%;
@@ -150,7 +165,7 @@ a.active,
   top: 75%;
 }
 .ham-menu.active span {
-  background-color: #322a1D;
+  background-color: #cfd8cf;
 }
 .ham-menu.active span:nth-child(1) {
   top: 50%;
