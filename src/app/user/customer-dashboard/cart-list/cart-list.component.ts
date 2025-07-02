@@ -11,6 +11,5 @@ import { CartService } from './cart.service';
 })
 export class CartListComponent {
   constructor(public cart: CartService) {
-  
   }
 }

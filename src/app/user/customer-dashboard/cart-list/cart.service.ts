@@ -1,5 +1,4 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { LoginServiceService } from '../../login/login-service.service';
 import { Product } from '../../../products/product.service';
 import { AuthService } from '../../../auth.service';
 
