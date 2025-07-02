@@ -1,21 +1,26 @@
-<div *ngIf="product; else errorTpl" class="product-detail-container">
-  <h2 class="headline">{{ product?.name }}</h2>
+<div class="product-page">
+  <button class="back-button" (click)="goBack()">← Zurück</button>
+  <button class="cart-button" (click)="goToCart()">🛒 Warenkorb</button>
 
-  <img
-    [src]="'/assets/images/' + product?.image"
-    [alt]="product?.name"
-    class="product-image"
-  />
+  <div *ngIf="product; else errorTpl" class="product-content">
+    <div class="image-wrapper">
+      <img
+        [src]="'/assets/images/' + product?.image"
+        [alt]="product?.name"
+        class="product-image"
+      />
+    </div>
 
-  <p><strong>Beschreibung:</strong> {{ product?.description || 'Keine Beschreibung verfügbar.' }}</p>
-  <p><strong>Preis:</strong> {{ product?.price | number: '1.2-2' }} €</p>
+    <div class="info-wrapper">
+      <h2 class="headline">{{ product?.name }}</h2>
+      <p><strong>Beschreibung:</strong> {{ product?.description || 'Keine Beschreibung verfügbar.' }}</p>
+      <p><strong>Preis:</strong> {{ product?.price | number: '1.2-2' }} €</p>
 
-  <button *ngIf="isCustomer" (click)="addToCart()">Zum Warenkorb hinzufügen</button>
-  <p *ngIf="!isCustomer">
-    Bitte <a routerLink="/login">einloggen</a>, um dieses Produkt in den Warenkorb zu legen.
-  </p>
+      <button *ngIf="isCustomer" (click)="addToCart()">Zum Warenkorb hinzufügen</button>
+    </div>
+  </div>
+
+  <ng-template #errorTpl>
+    <p>Produkt nicht gefunden.</p>
+  </ng-template>
 </div>
-
-<ng-template #errorTpl>
-  <p>Produkt nicht gefunden.</p>
-</ng-template>

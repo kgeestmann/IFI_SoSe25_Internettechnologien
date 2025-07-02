@@ -4,6 +4,7 @@ import { ProductService, Product } from '../product.service';
 import { CartService } from '../../user/customer-dashboard/cart-list/cart.service';
 import { AuthService } from '../../auth.service';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-product-detail',
@@ -20,7 +21,9 @@ export class ProductDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    private location: Location,
   ) {}
 
   ngOnInit(): void {
@@ -42,4 +45,17 @@ export class ProductDetailComponent implements OnInit {
       alert(`${this.product.name} wurde zum Warenkorb hinzugefügt.`);
     }
   }
+
+  goBack(): void {
+  this.location.back();
+}
+
+goToCart(): void {
+  if (this.isCustomer) {
+    this.router.navigate(['/cart']);
+  } else {
+    this.router.navigate(['/login']);
+  }
+}
+
 }
