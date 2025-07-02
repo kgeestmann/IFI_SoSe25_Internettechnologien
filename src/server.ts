@@ -174,36 +174,23 @@ app.get('/api/user-details', (req, res) => {
       u.first_name,
       u.last_name,
       u.email,
-      c.billing_address_id,
-      c.shipping_address_id,
-      cb.street AS billing_street,
-      cb.house_number AS billing_house_number,
-      cb.zipcode AS billing_zipcode,
-      cb.country AS billing_country,
-      cb.city AS billing_city,
-      cs.street AS shipping_street,
-      cs.house_number AS shipping_house_number,
-      cs.zipcode AS shipping_zipcode,
-      cs.country AS shipping_country,
-      cs.city AS shipping_city,
+      u.address_id,
+      a.street,
+      a.house_number,
+      a.zipcode,
+      a.country,
+      a.city,
       e.monthly_salary,
       e.role AS employee_role,
-      ea.street AS employee_street,
-      ea.house_number AS employee_house_number,
-      ea.zipcode AS employee_zipcode,
-      ea.country AS employee_country,
-      ea.city AS employee_city,
       CASE 
         WHEN c.customer_id IS NOT NULL THEN 'customer'
         WHEN e.employee_id IS NOT NULL THEN 'employee'
         ELSE 'unknown'
       END AS role
     FROM User u
+    LEFT JOIN Address a ON u.address_id = a.address_id
     LEFT JOIN Customer c ON u.user_id = c.customer_id
-    LEFT JOIN Address cb ON c.billing_address_id = cb.address_id
-    LEFT JOIN Address cs ON c.shipping_address_id = cs.address_id
     LEFT JOIN Employee e ON u.user_id = e.employee_id
-    LEFT JOIN Address ea ON e.address_id = ea.address_id
     WHERE u.user_id = ?
     LIMIT 1
   `;
@@ -231,30 +218,16 @@ app.get('/api/user-details', (req, res) => {
       last_name: row.last_name,
       email: row.email,
       role: row.role,
-      billing_address: row.billing_address_id ? {
-        street: row.billing_street,
-        house_number: row.billing_house_number,
-        zipcode: row.billing_zipcode,
-        country: row.billing_country,
-        city: row.billing_city,
-      } : null,
-      shipping_address: row.shipping_address_id ? {
-        street: row.shipping_street,
-        house_number: row.shipping_house_number,
-        zipcode: row.shipping_zipcode,
-        country: row.shipping_country,
-        city: row.shipping_city,
+      address: row.address_id ? {
+        street: row.street,
+        house_number: row.house_number,
+        zipcode: row.zipcode,
+        country: row.country,
+        city: row.city,
       } : null,
       employee_data: row.employee_role ? {
         monthly_salary: row.monthly_salary,
         role: row.employee_role,
-        address: row.employee_street ? {
-          street: row.employee_street,
-          house_number: row.employee_house_number,
-          zipcode: row.employee_zipcode,
-          country: row.employee_country,
-          city: row.employee_city,
-        } : null
       } : null
     };
 
