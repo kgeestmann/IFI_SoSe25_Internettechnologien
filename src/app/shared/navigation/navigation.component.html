@@ -13,7 +13,6 @@
   <div class="navigationGr" [class.hide]="menuActive">
     <a *ngIf="!(isEmployee$ | async)" routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">Produkte</a>
     <a *ngIf="!(isEmployee$ | async)" routerLink="/contact" routerLinkActive="active">Kontakt</a>
-
     <a *ngIf="!(isLoggedIn$ | async)" routerLink="/login" routerLinkActive="active">Login</a>
 
     <ng-container *ngIf="(isLoggedIn$ | async) && (isCustomer$ | async)">
@@ -24,7 +23,6 @@
     </ng-container>
 
     <ng-container *ngIf="(isLoggedIn$ | async) && (isEmployee$ | async)">
-      <!--<a routerLink="/employee-dashboard" routerLinkActive="active">Dashboard</a>-->
       <a routerLink="/products-admin" routerLinkActive="active">Produkte verwalten</a>
       <a routerLink="/orders-admin" routerLinkActive="active">Bestellungen verwalten</a>
       <a routerLink="/customers-admin" routerLinkActive="active">Kunden verwalten</a>
@@ -39,7 +37,6 @@
     <span></span>
   </div>
 </nav>
-
 
 
 <!-- Off-Screen-Menü für Mobil AUSSERHALB von <nav> -->

@@ -22,7 +22,7 @@ constructor(public authService: AuthService, private router: Router) {}
   onSubmit() {
     this.authService.login(this.email, this.password).subscribe({
       next: (res) => {
-        this.authService.setLogin(res.role);
+        this.authService.setLogin(res); 
         if (res.role === 'customer') {
           this.router.navigate(['/customer-dashboard']);
         } else if (res.role === 'employee') {
