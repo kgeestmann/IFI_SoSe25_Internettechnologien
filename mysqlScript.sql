@@ -8,19 +8,10 @@ DROP TABLE IF EXISTS Cart;
 DROP TABLE IF EXISTS Product;
 DROP TABLE IF EXISTS Employee;
 DROP TABLE IF EXISTS Customer;
-DROP TABLE IF EXISTS Address;
 DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS Address;
 
 -- Tabellen neu erstellen
-CREATE TABLE User (
-  user_id INT PRIMARY KEY,
-  first_name VARCHAR(50),Q
-  last_name VARCHAR(100),
-  password VARCHAR(100),
-  email VARCHAR(255) UNIQUE
-  address_id INT,
-);
-
 CREATE TABLE Address (
   address_id INT PRIMARY KEY,
   street VARCHAR(100),
@@ -30,16 +21,22 @@ CREATE TABLE Address (
   city VARCHAR(255)
 );
 
+CREATE TABLE User (
+  user_id INT PRIMARY KEY,
+  first_name VARCHAR(50),
+  last_name VARCHAR(100),
+  password VARCHAR(100),
+  email VARCHAR(255) UNIQUE,
+  address_id INT,
+  FOREIGN KEY (address_id) REFERENCES Address(address_id) 
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+);
+
 CREATE TABLE Customer (
   customer_id INT PRIMARY KEY,
-  FOREIGN KEY (customer_id) REFERENCES User(user_id) 
-    ON DELETE RESTRICT -- User löschen nur wenn kein Kunde existiert (um Datenverlust zu vermeiden)
-    ON UPDATE CASCADE,
-  FOREIGN KEY (billing_address_id) REFERENCES Address(address_id) 
-    ON DELETE SET NULL -- Adresse löschen, Kunde bleibt, Adresse wird NULL gesetzt
-    ON UPDATE CASCADE,
-  FOREIGN KEY (shipping_address_id) REFERENCES Address(address_id) 
-    ON DELETE SET NULL -- wie oben
+  FOREIGN KEY (customer_id) REFERENCES User(user_id)
+    ON DELETE RESTRICT
     ON UPDATE CASCADE
 );
 
@@ -47,11 +44,8 @@ CREATE TABLE Employee (
   employee_id INT PRIMARY KEY,
   monthly_salary DECIMAL(10,2),
   role VARCHAR(255),
-  FOREIGN KEY (employee_id) REFERENCES User(user_id) 
-    ON DELETE RESTRICT -- Mitarbeiter-User nicht löschen, wenn Mitarbeiter-Daten existieren (Schutz)
-    ON UPDATE CASCADE,
-  FOREIGN KEY (address_id) REFERENCES Address(address_id) 
-    ON DELETE SET NULL -- Adresse kann gelöscht werden ohne Mitarbeiter zu löschen
+  FOREIGN KEY (employee_id) REFERENCES User(user_id)
+    ON DELETE RESTRICT
     ON UPDATE CASCADE
 );
 
@@ -60,7 +54,7 @@ CREATE TABLE Product (
   name VARCHAR(255),
   price DECIMAL(10,2),
   description VARCHAR(255),
-  stock_quantity INT
+  stock_quantity INT,
   image VARCHAR(255)
 );
 
@@ -143,18 +137,6 @@ CREATE TABLE Cart_Item (
 
 
 -- Testdaten einfügen
-INSERT INTO User VALUES
-(1, 'Anna', 'Müller', '1', 'anna.mueller@example.com'),
-(2, 'Ben', 'Schmidt','2', 'ben.schmidt@example.com'),
-(3, 'Clara', 'Weber','3', 'clara.weber@example.com'),
-(4, 'David', 'Neumann','4', 'david.neumann@example.com'),
-(5, 'Emma', 'Schneider','5', 'emma.schneider@example.com'),
-(6, 'Felix', 'Hoffmann', '6','felix.hoffmann@example.com'),
-(7, 'Greta', 'Schulz', '7', 'greta.schulz@example.com'),
-(8, 'Heiko', 'Brandt', '8','heiko.brandt@example.com'),
-(9, 'Ines', 'Meier', '9','ines.meier@example.com'),
-(10, 'Jonas', 'Friedrich', '10', 'jonas.friedrich@example.com');
-
 INSERT INTO Address VALUES
 (1, 'Hauptstraße', '12', 10115, 'Deutschland', 'Berlin'),
 (2, 'Bahnhofstraße', '45', 80331, 'Deutschland', 'München'),
@@ -167,19 +149,36 @@ INSERT INTO Address VALUES
 (9, 'Parkallee', '20', 90402, 'Deutschland', 'Nürnberg'),
 (10, 'Rosenweg', '14', 70173, 'Deutschland', 'Stuttgart');
 
+-- Benutzer + NEUE Benutzer
+INSERT INTO User VALUES
+(1, 'Anna', 'Müller', '1', 'anna.mueller@example.com', 1),
+(2, 'Ben', 'Schmidt','2', 'ben.schmidt@example.com', 2),
+(3, 'Clara', 'Weber','3', 'clara.weber@example.com', 3),
+(4, 'David', 'Neumann','4', 'david.neumann@example.com', 4),
+(5, 'Emma', 'Schneider','5', 'emma.schneider@example.com', 5),
+(6, 'Felix', 'Hoffmann', '6','felix.hoffmann@example.com', 6),
+(7, 'Greta', 'Schulz', '7', 'greta.schulz@example.com', 7),
+(8, 'Heiko', 'Brandt', '8','heiko.brandt@example.com', 8),
+(9, 'Ines', 'Meier', '9','ines.meier@example.com', 9),
+(10, 'Jonas', 'Friedrich', '10', 'jonas.friedrich@example.com', 10),
+(11, 'Max', 'Mustermann', '1', '1', 1),
+(12, 'Lisa', 'Beispiel', '2', '2', 2);   
+
 INSERT INTO Customer VALUES
-(1, 1, 2),
-(2, 3, 3),
-(3, 4, 5),
-(4, 5, 5),
-(5, 2, 1);
+(1),
+(2),
+(3),
+(4),
+(5),
+(12);
 
 INSERT INTO Employee VALUES
-(6, 6, 2800.00, 'Verwaltung'),
-(7, 7, 3200.00, 'Lager'),
-(8, 8, 3000.00, 'Kundenservice'),
-(9, 9, 3500.00, 'Produktmanagement'),
-(10, 10, 4000.00, 'Geschäftsführung');
+(6, 2800.00, 'Verwaltung'),
+(7, 3200.00, 'Lager'),
+(8, 3000.00, 'Kundenservice'),
+(9, 3500.00, 'Produktmanagement'),
+(10, 4000.00, 'Geschäftsführung'),
+(11, 2500.00, 'Admin'); 
 
 INSERT INTO Product VALUES
 (1, 'Monstera Deliciosa', 25.00, 'Beliebte tropische Zimmerpflanze mit großen Blättern.', 50, 'monsteradeliciosa.jpg'),
@@ -228,4 +227,4 @@ INSERT INTO Product_Change VALUES
 (2, 9, 3, 'description', '2025-06-02', 'Ideal für Anfänger', 'Ideal für Anfänger'),
 (3, 8, 5, 'stock_quantity', '2025-06-03', '20', '30'),
 (4, 7, 4, 'price', '2025-06-04', '10', '15'),
-(5, 7, 2, 'name', 'Ficus', 'Ficus Benjamina');
+(5, 7, 2, 'name', '2025-06-05', 'Ficus', 'Ficus Benjamina');
