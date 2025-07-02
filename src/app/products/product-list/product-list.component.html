@@ -1,7 +1,12 @@
 <h2 class="headline">Produkte</h2>
 
 <div class="products-wrapper">
-  <div class="product-card" *ngFor="let product of product">
+  <div 
+    class="product-card" 
+    *ngFor="let product of product" 
+    (click)="goToDetails(product)"
+    tabindex="0"
+  >
     <img 
       class="product-image" 
       [src]="'assets/images/' + product.image" 
@@ -9,6 +14,11 @@
     />
     <span class="product-name">{{ product.name }}</span>
     <span class="product-price">{{ product.price | number:'1.2-2' }} €</span>
-    <button class="details-button" (click)="goToDetails(product)">Details ansehen</button>
+    <button 
+      class="details-button" 
+      (click)="goToDetails(product); $event.stopPropagation()"
+    >
+      Details ansehen
+    </button>
   </div>
 </div>
