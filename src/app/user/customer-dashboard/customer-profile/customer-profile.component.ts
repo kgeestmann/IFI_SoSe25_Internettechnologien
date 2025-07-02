@@ -11,7 +11,7 @@ import { combineLatest } from 'rxjs';
   standalone: true,
 })
 
-export class ProfileComponent implements OnInit{
+export class CustomerProfileComponent implements OnInit{
   currentUser: any;
   isCustomer = false;
 
@@ -42,12 +42,5 @@ export class ProfileComponent implements OnInit{
         console.error('Fehler beim Laden der User-Details', err);
       }
     });
-  }
-}
-export class CustomerProfileComponent {
-  constructor(private loginService: LoginServiceService) {}
-
-  get user() {
-    return this.loginService.currentUser; //TODO: an neues Login anpassen
   }
 }
