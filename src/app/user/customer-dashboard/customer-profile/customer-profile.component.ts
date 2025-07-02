@@ -5,12 +5,12 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-profile',
   imports: [CommonModule],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css',
+  templateUrl: './customer-profile.component.html',
+  styleUrl: './customer-profile.component.css',
   standalone: true,
 })
 
-export class ProfileComponent {
+export class CustomerProfileComponent {
   constructor(private loginService: LoginServiceService) {}
 
   get user() {

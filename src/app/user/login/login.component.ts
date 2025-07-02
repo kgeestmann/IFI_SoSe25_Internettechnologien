@@ -24,9 +24,9 @@ constructor(public authService: AuthService, private router: Router) {}
       next: (res) => {
         this.authService.setLogin(res); 
         if (res.role === 'customer') {
-          this.router.navigate(['/customer-dashboard']);
+          this.router.navigate(['/products']);
         } else if (res.role === 'employee') {
-          this.router.navigate(['/employee-dashboard']);
+          this.router.navigate(['/products-admin']);
         }
       },
       error: (err) => {

@@ -3,6 +3,8 @@ Komponenten erstellen:
 Sophia:
 - Navigationsleiste
 - Login/Account erstellen-Bereich
+- Multiuser
+- Footer
 
 Kim:
 - Admin-Bereich
@@ -25,10 +27,14 @@ Frieda:
 - Warenkorb (in den products_details dynamisch anzeigen wenn eingeloggt)
 - Bestellhistorie (Bestellungen wie die Produkte anzeigen lassen und "Mehr Details" Rechnung zusätzlich anzeigen)
 
+
+Datenbank: 
 Trigger:
-- Gesamtkosten
+- Gesamtkosten, Bestand, Preis ()
+- Rechnung kann ist keine Tabell,  durch Trigger erstellen oder ganz weg
+- delivery status kann aus Order Tabelle raus  
 - Bestand aktualisieren
-- Rechnung durch Trigger erstellen oder ganz weg
 //Cascade on delete überall
+
 
 Socket.io für Schnittstelle!!

@@ -36,7 +36,7 @@ export class NavigationComponent {
   // HostListener für Fenstergröße
   @HostListener('window:resize')
   onResize() {
-    if (window.innerWidth > 768) { // 48em ≈ 768px
+    if (window.innerWidth > 768) {
       this.menuActive = false;
     }
   }

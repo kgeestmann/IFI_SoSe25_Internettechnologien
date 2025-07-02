@@ -7,10 +7,10 @@ import { combineLatest } from 'rxjs';
   selector: 'app-employee-dashboard',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './employee-dashboard.component.html',
-  styleUrls: ['./employee-dashboard.component.css']
+  templateUrl: './employee-profile.component.html',
+  styleUrls: ['./employee-profile.component.css']
 })
-export class EmployeeDashboardComponent implements OnInit {
+export class EmployeeProfileComponent implements OnInit {
   currentUser: any;
   isEmployee = false;
 
