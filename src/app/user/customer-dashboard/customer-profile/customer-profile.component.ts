@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../auth.service';
 import { combineLatest } from 'rxjs';
+import { LoginComponent } from '../../login/login.component';
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule],
+  imports: [CommonModule, LoginComponent],
   templateUrl: './customer-profile.component.html',
   styleUrl: './customer-profile.component.css',
   standalone: true,
