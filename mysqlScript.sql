@@ -228,3 +228,83 @@ INSERT INTO Product_Change VALUES
 (3, 8, 5, 'stock_quantity', '2025-06-03', '20', '30'),
 (4, 7, 4, 'price', '2025-06-04', '10', '15'),
 (5, 7, 2, 'name', '2025-06-05', 'Ficus', 'Ficus Benjamina');
+
+
+--Trigger
+
+--leeren Warenkorb für jeden User erstellen 
+CREATE TRIGGER create_cart_after_new_customer
+AFTER INSERT ON Customer
+FOR EACH ROW
+BEGIN
+  INSERT INTO Cart (cart_id, customer_id, total_price)
+  VALUES (NEW.customer_id, NEW.customer_id, 0.00);
+END;
+
+--cart updaten (nach hinzufügen neuer produkte)
+CREATE TRIGGER cart_total_after_cartitem_insert
+AFTER INSERT ON Cart_Item
+FOR EACH ROW
+BEGIN
+  UPDATE Cart
+  SET total_price = (
+    SELECT SUM(price) FROM Cart_Item WHERE cart_id = NEW.cart_id
+  )
+  WHERE cart_id = NEW.cart_id;
+END;
+
+CREATE TRIGGER cart_total_after_cartitem_update
+AFTER UPDATE ON Cart_Item
+FOR EACH ROW
+BEGIN
+  UPDATE Cart
+  SET total_price = (
+    SELECT SUM(price) FROM Cart_Item WHERE cart_id = NEW.cart_id
+  )
+  WHERE cart_id = NEW.cart_id;
+END;
+
+CREATE TRIGGER cart_total_after_cartitem_delete
+AFTER DELETE ON Cart_Item
+FOR EACH ROW
+BEGIN
+  UPDATE Cart
+  SET total_price = (
+    SELECT COALESCE(SUM(price), 0) FROM Cart_Item WHERE cart_id = OLD.cart_id
+  )
+  WHERE cart_id = OLD.cart_id;
+END;
+
+--Produktänderungen
+CREATE TRIGGER log_product_update
+AFTER UPDATE ON Product
+FOR EACH ROW
+BEGIN
+  IF OLD.price <> NEW.price THEN
+    INSERT INTO Product_Change (product_change_id, employee_id, product_id, field_changed, change_date, field_before, field_after)
+    VALUES (
+      NULL, NULL, NEW.product_id, 'price', CURRENT_DATE, OLD.price, NEW.price
+    );
+  END IF;
+
+  IF OLD.name <> NEW.name THEN
+    INSERT INTO Product_Change (product_change_id, employee_id, product_id, field_changed, change_date, field_before, field_after)
+    VALUES (
+      NULL, NULL, NEW.product_id, 'name', CURRENT_DATE, OLD.name, NEW.name
+    );
+  END IF;
+
+  IF OLD.description <> NEW.description THEN
+    INSERT INTO Product_Change (product_change_id, employee_id, product_id, field_changed, change_date, field_before, field_after)
+    VALUES (
+      NULL, NULL, NEW.product_id, 'description', CURRENT_DATE, OLD.description, NEW.description
+    );
+  END IF;
+
+  IF OLD.stock_quantity <> NEW.stock_quantity THEN
+    INSERT INTO Product_Change (product_change_id, employee_id, product_id, field_changed, change_date, field_before, field_after)
+    VALUES (
+      NULL, NULL, NEW.product_id, 'stock_quantity', CURRENT_DATE, OLD.stock_quantity, NEW.stock_quantity
+    );
+  END IF;
+END;
