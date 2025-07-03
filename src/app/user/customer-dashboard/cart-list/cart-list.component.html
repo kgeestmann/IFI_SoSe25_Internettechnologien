@@ -1,7 +1,8 @@
 <h2 class="headline">
-  Warenkorb ({{ cart.itemCount() }} Artikel)
+  Mein Warenkorb
 </h2>
 
+<!--
 <div *ngIf="cart.itemCount(); else emptyCart" class="cart-wrapper">
   <ul class="cart-list">
     <li *ngFor="let item of cart.items(); let i = index" class="cart-item">
@@ -13,17 +14,17 @@
 
       <button
         type="button"
-        class="remove-btn"
-        (click)="cart.remove(i)">
+        class="remove-btn" >
         Entfernen
       </button>
     </li>
   </ul>
+-->
 
   <!-- Zusammenfassung -->
   <div class="summary">
     <div class="total-price">
-      Gesamt:&nbsp;{{ cart.totalPrice() | currency:'EUR':'symbol' }}
+      Gesamt:&nbsp;
     </div>
 
     <button
@@ -35,10 +36,10 @@
 
   <button
     type="button"
-    class="clear-btn"
-    (click)="cart.clear()">
+    class="clear-btn">
     Alles löschen
   </button>
+  <div>
 </div>
 
 <ng-template #emptyCart>

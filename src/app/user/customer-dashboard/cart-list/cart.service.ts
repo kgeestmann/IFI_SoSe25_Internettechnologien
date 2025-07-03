@@ -1,6 +1,7 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Product } from '../../../products/product.service';
 import { AuthService } from '../../../auth.service';
+import { HttpClient } from '@angular/common/http';
 
 export interface CartItem {
   product: Product;
@@ -9,60 +10,34 @@ export interface CartItem {
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  private readonly cartSig = signal<CartItem[]>([]);
+  private userId: number | null = null;
 
-  readonly items     = computed(() => this.cartSig());
-  readonly itemCount = computed(() =>
-    this.cartSig().reduce((sum, ci) => sum + ci.quantity, 0)
-  );
-
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService, private http: HttpClient) {
+    this.auth.currentUser$.subscribe(user => {
+      this.userId = user?.user_id ?? null;
+    });
+  }
 
   add(p: Product, qty = 1): void {
-    if (!(this.auth.isLoggedIn$)) {
+    if (!this.userId) {
       alert('Bitte zuerst einloggen');
       return;
     }
-    this.cartSig.update(arr => {
-      const idx = arr.findIndex(ci => ci.product.product_id === p.product_id);
-      if (idx > -1) {
-        // Menge erhöhen
-        const updated = [...arr];
-        updated[idx] = {
-          ...updated[idx],
-          quantity: updated[idx].quantity + qty,
-        };
-        return updated;
+
+    this.http.post('/api/cart/add', {
+      customer_id: this.userId,
+      product_id: p.product_id,
+      quantity: qty,
+      price: p.price * qty,
+    }).subscribe({
+      next: () => {
+        // Hier kannst du den lokalen Signal-Status aktualisieren,
+        // z.B. per erneuten Laden des Warenkorbs vom Backend.
+        console.log('Artikel erfolgreich hinzugefügt');
+      },
+      error: () => {
+        alert('Fehler beim Hinzufügen zum Warenkorb');
       }
-      // neues Item
-      return [...arr, { product: p, quantity: qty }];
     });
   }
-
-  remove(target: number | Product, qty = 1): void {
-    this.cartSig.update(arr => {
-      const idx =
-        typeof target === 'number'
-          ? target
-          : arr.findIndex(ci => ci.product.product_id === target.product_id);
-      if (idx < 0) return arr;
-
-      const item = arr[idx];
-      if (item.quantity > qty) {
-        const updated = [...arr];
-        updated[idx] = { ...item, quantity: item.quantity - qty };
-        return updated;
-      }
-      return arr.filter((_, i) => i !== idx); // komplett entfernen
-    });
-  }
-
-  clear(): void {
-    this.cartSig.set([]);
-  }
-
-  totalPrice() {
-    return this.items().reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  }
-  
 }
