@@ -195,19 +195,6 @@ END;
 //
 DELIMITER ;
 
--- Warenkorb loeschen nach Bestellung
-DELIMITER //
-CREATE TRIGGER clear_cart_after_order
-AFTER INSERT ON Customer_Order
-FOR EACH ROW
-BEGIN
-  DELETE ci FROM Cart_Item ci
-  JOIN Cart c ON ci.cart_id = c.cart_id
-  WHERE c.customer_id = NEW.customer_id;
-END;
-//
-DELIMITER ;
-
 -- Rechnung erstellen nachdem Bestellung getaetigt wurde
 DELIMITER //
 CREATE TRIGGER create_invoice_after_order
@@ -288,3 +275,18 @@ INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date,
 (8, 5, 'stock_quantity', '2025-06-03', '20', '30'),
 (7, 4, 'price', '2025-06-04', '10', '15'),
 (7, 2, 'name', '2025-06-05', 'Ficus', 'Ficus Benjamina');
+
+-- Dummy Daten
+INSERT INTO Customer_Order (customer_id, date, delivery_status, total_price, payment_method) VALUES
+(1, '2025-06-01', 'versendet', 65.00, 'PayPal'),
+(2, '2025-06-05', 'in Bearbeitung', 60.00, 'Rechnung'),
+(3, '2025-06-10', 'versendet', 30.00, 'SEPA'),
+(4, '2025-06-15', 'offen', 35.00, 'Kreditkarte'),
+(5, '2025-06-20', 'abgeschlossen', 35.00, 'PayPal');
+
+INSERT INTO Order_Item (order_id, product_id, quantity, price) VALUES
+(1, 2, 2, 50.00), 
+(1, 4, 1, 15.00),
+(2, 3, 3, 60.00),  
+(3, 2, 1, 30.00),    
+(4, 5, 1, 35.00);
