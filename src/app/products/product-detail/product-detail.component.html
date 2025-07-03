@@ -14,31 +14,7 @@
     <div class="info-wrapper">
       <h2 class="headline">{{ product.name }}</h2>
       <p><strong>Preis:</strong> {{ product.price | number: '1.2-2' }} €</p>
-
-      <div class="info-buttons">
-        <button (click)="toggleInfo()">
-          🪴 Über diese Pflanze
-        </button>
-        <button (click)="toggleCare()">
-          💧 Pflege
-        </button>
-      </div>
-
-      <div
-        *ngIf="showInfo"
-        [@expandCollapse]="showInfo ? 'expanded' : 'collapsed'"
-        class="info-box"
-      >
-        <p><strong>Über diese Pflanze:</strong> {{ product.infoText }}</p>
-      </div>
-
-      <div
-        *ngIf="showCare"
-        [@expandCollapse]="showCare ? 'expanded' : 'collapsed'"
-        class="care-section"
-      >
-        <p><strong>Pflege:</strong> {{ product.care }}</p>
-      </div>
+      <p><strong>Beschreibung:</strong> {{ product.description }}</p>
 
       <button *ngIf="isCustomer" (click)="addToCart()">
         🛒 Zum Warenkorb hinzufügen
@@ -51,13 +27,19 @@
       <p>Produkt nicht gefunden.</p>
     </div>
   </ng-template>
+
   <div class="recommendation-section" *ngIf="recommendedProducts.length > 0">
-  <h3>🌿 Weitere Artikel, die dir gefallen könnten</h3>
-  <div class="recommendation-list">
-    <div *ngFor="let item of recommendedProducts" class="recommendation-card" (click)="goToProduct(item.product_id)">
-      <img [src]="'/assets/images/' + item.image" [alt]="item.name" />
-      <h4>{{ item.name }}</h4>
-      <p>{{ item.price | number: '1.2-2' }} €</p>
+    <h3>🌿 Weitere Artikel, die dir gefallen könnten</h3>
+    <div class="recommendation-list">
+      <div
+        *ngFor="let item of recommendedProducts"
+        class="recommendation-card"
+        (click)="goToProduct(item.product_id)"
+      >
+        <img [src]="'/assets/images/' + item.image" [alt]="item.name" />
+        <h4>{{ item.name }}</h4>
+        <p>{{ item.price | number: '1.2-2' }} €</p>
+      </div>
     </div>
   </div>
 </div>
