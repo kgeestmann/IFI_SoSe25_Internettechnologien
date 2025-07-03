@@ -62,7 +62,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Info */
+/* Info-Bereich */
 .info-wrapper {
   flex: 1;
   display: flex;
@@ -77,6 +77,40 @@
   margin: 0;
 }
 
+/* Preisblock mit Hinweis */
+.price-block {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.price-display {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #222;
+  margin: 0;
+}
+
+.price-note {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+/* Beschreibung als Liste */
+.description-list {
+  padding-left: 1.2rem;
+  margin: 0;
+  list-style-type: circle;
+}
+
+.description-list li {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Button */
 button {
   align-self: flex-start;
   padding: 0.5rem 1rem;
@@ -92,6 +126,8 @@ button {
 button:hover {
   background-color: #5c7761;
 }
+
+/* Empfehlungen */
 .recommendation-section {
   margin-top: 3rem;
 }

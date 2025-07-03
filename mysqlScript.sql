@@ -256,17 +256,17 @@ INSERT INTO Employee (employee_id, monthly_salary, role) VALUES
 
 -- Produkte
 INSERT INTO Product (name, price, description, stock_quantity, image) VALUES
-('Monstera Deliciosa', 25.00, 'Beliebte tropische Zimmerpflanze mit großen Blättern.', 50, 'monsteradeliciosa.jpg'),
-('Ficus Benjamina', 30.00, 'Pflegeleichter Zimmerbaum, auch „Birkenfeige“ genannt.', 40, 'ficusbenjamina.jpg'),
-('Sansevieria', 20.00, 'Ideal für Anfänger.', 60, 'sansevieria.jpg'),
-('Aloe Vera', 15.00, 'Heilpflanze mit pflegeleichten Ansprüchen.', 80, 'aloevera.jpg'),
-('Calathea', 35.00, 'Dekorative Blätter mit Muster – braucht viel Feuchtigkeit.', 30, 'calathea.jpg'),
-('Hoya Kerrii', 15.00, 'Herzförmige Blätter, beliebte Geschenkidee.', 45, 'hoyakerrii.jpg'),
-('Sinningia', 22.00, 'Blütenreiche Zimmerpflanze mit samtigen Blättern.', 35, 'sinningia.jpg'),
-('Zamioculcas Zamiifolia', 28.00, 'Robuste Pflanze, ideal für dunklere Räume.', 50, 'zamioculcaszamiifolia.jpg'),
-('Orchideen', 32.00, 'Elegante Blühpflanze mit exotischem Flair.', 40, 'orchideen.jpg'),
-('Lithops', 18.00, '„Lebende Steine“ – sukkulente Miniaturpflanzen.', 55, 'lithops.jpg'),
-('Lavendel', 12.00, 'Duftende Pflanze mit beruhigender Wirkung.', 70, 'lavendel.jpg');
+('Monstera Deliciosa', 25.00, 'Beliebte tropische Zimmerpflanze mit großen Blättern', 50, 'monsteradeliciosa.jpg'),
+('Ficus Benjamina', 30.00, 'Pflegeleichter Zimmerbaum, auch „Birkenfeige“ genannt', 40, 'ficusbenjamina.jpg'),
+('Sansevieria', 20.00, 'Ideal für Anfänger', 60, 'sansevieria.jpg'),
+('Aloe Vera', 15.00, 'Heilpflanze mit pflegeleichten Ansprüchen', 80, 'aloevera.jpg'),
+('Calathea', 35.00, 'Dekorative Blätter mit Muster – braucht viel Feuchtigkeit', 30, 'calathea.jpg'),
+('Hoya Kerrii', 15.00, 'Herzförmige Blätter, beliebte Geschenkidee', 45, 'hoyakerrii.jpg'),
+('Sinningia', 22.00, 'Blütenreiche Zimmerpflanze mit samtigen Blättern', 35, 'sinningia.jpg'),
+('Zamioculcas Zamiifolia', 28.00, 'Robuste Pflanze, ideal für dunklere Räume', 50, 'zamioculcaszamiifolia.jpg'),
+('Orchidee', 32.00, 'Elegante Blühpflanze mit exotischem Flair', 40, 'orchideen.jpg'),
+('Lithops', 18.00, '„Lebende Steine“ – sukkulente Miniaturpflanzen', 55, 'lithops.jpg'),
+('Lavendel', 12.00, 'Duftende Pflanze mit beruhigender Wirkung', 70, 'lavendel.jpg');
 
 -- Produktänderungen
 INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date, field_before, field_after) VALUES

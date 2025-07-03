@@ -1,6 +1,5 @@
 <div class="product-page">
   <button class="back-button" (click)="goBack()">← Zurück</button>
-  <button class="cart-button" (click)="goToCart()">🛒 Warenkorb</button>
 
   <div *ngIf="product; else errorTpl" class="product-content">
     <div class="image-wrapper">
@@ -13,8 +12,17 @@
 
     <div class="info-wrapper">
       <h2 class="headline">{{ product.name }}</h2>
-      <p><strong>Preis:</strong> {{ product.price | number: '1.2-2' }} €</p>
-      <p><strong>Beschreibung:</strong> {{ product.description }}</p>
+
+      <div class="price-block">
+        <p class="price-display">
+          <strong id="price">{{ product.price | number:'1.0-0' }},-</strong>
+        </p>
+        <p class="price-note">pro Stück inkl. MwSt.</p>
+      </div>
+
+      <ul class="description-list">
+        <li>{{ product.description }}</li>
+      </ul>
 
       <button *ngIf="isCustomer" (click)="addToCart()">
         🛒 Zum Warenkorb hinzufügen
@@ -38,7 +46,7 @@
       >
         <img [src]="'/assets/images/' + item.image" [alt]="item.name" />
         <h4>{{ item.name }}</h4>
-        <p>{{ item.price | number: '1.2-2' }} €</p>
+        <p>{{ item.price | number:'1.0-0' }},-</p>
       </div>
     </div>
   </div>
