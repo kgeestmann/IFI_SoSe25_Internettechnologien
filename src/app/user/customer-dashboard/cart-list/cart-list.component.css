@@ -33,7 +33,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: .75rem 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -41,29 +41,75 @@
   border-bottom: none;
 }
 
-.item-info {
+/* Details des Artikels (Name + Preis) */
+.item-details {
+  display: flex;
+  flex-direction: column;
+  max-width: 50%;
+}
+
+.item-name {
   font-size: 1rem;
+  font-weight: 600;
+  color: #222;
 }
 
-.quantity {
+.item-price {
+  font-size: 0.9rem;
   color: #666;
-  font-size: .9rem;
-  margin-left: .25rem;
+  margin-top: 0.25rem;
 }
 
-/* Buttons: Entfernen */
+/* Mengensteuerung */
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-btn {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.step-btn:hover {
+  background: #e0e0e0;
+}
+
+.quantity-display {
+  min-width: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Button: Entfernen */
 .remove-btn {
   background: #f5f5f5;
   color: #666;
   border: 1px solid #ddd;
   border-radius: 6px;
-  padding: .35rem .75rem;
+  padding: 0.35rem 0.75rem;
   cursor: pointer;
-  transition: background .2s ease;
+  transition: background 0.2s ease;
+  font-size: 1.25rem;
+  line-height: 1;
+  user-select: none;
 }
-.remove-btn:hover { background: #e0e0e0; }
 
-/* ZUSAMMENFASSUNG (Gesamt + Checkout) */
+.remove-btn:hover {
+  background: #e0e0e0;
+}
+
+/* Zusammenfassung */
 .summary {
   display: flex;
   justify-content: space-between;
@@ -74,41 +120,49 @@
 .total-price {
   font-size: 1.25rem;
   font-weight: 600;
+  color: #222;
 }
 
-/* Button: Bestellung aufgeben (Primary) */
+/* Button: Bestellung aufgeben */
 .order-btn {
   background: #2e7d32;          /* satttes Grün */
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: .6rem 1.25rem;
+  padding: 0.6rem 1.25rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0,0,0,.1);
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+
 .order-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0,0,0,.15);
 }
-.order-btn:active { transform: translateY(0); }
 
-/* Button: Alles löschen (Secondary) */
+.order-btn:active {
+  transform: translateY(0);
+}
+
+/* Button: Alles löschen */
 .clear-btn {
   margin-top: 1rem;
   width: 100%;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
   background: #94bb9b;     /* dezentes Grün */
   color: #fff;
   font-weight: 500;
   cursor: pointer;
-  transition: background .2s ease;
+  transition: background 0.2s ease;
 }
-.clear-btn:hover { background: #5c7761; }
+
+.clear-btn:hover {
+  background: #5c7761;
+}
 
 /* Leerzustand */
 .empty-text {

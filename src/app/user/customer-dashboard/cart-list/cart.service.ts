@@ -2,7 +2,6 @@ import { Injectable, computed, signal } from '@angular/core';
 import { Product } from '../../../products/product.service';
 import { AuthService } from '../../../auth.service';
 import { HttpClient } from '@angular/common/http';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 export interface CartItem {
   product_id: number;
@@ -22,7 +21,7 @@ export interface Cart {
 export class CartService {
   private userId: number | null = null;
 
-  // Optionale Signals für reactive Nutzung im UI
+  // Signal für den Warenkorb
   private cart = signal<Cart | null>(null);
   readonly cart$ = computed(() => this.cart());
 
@@ -30,14 +29,11 @@ export class CartService {
     this.auth.currentUser$.subscribe(user => {
       this.userId = user?.user_id ?? null;
       if (this.userId) {
-        this.getCart(); // Lade Cart beim Login
+        this.getCart();
       }
     });
   }
 
-  /**
-   * Artikel zum Warenkorb hinzufügen
-   */
   add(p: Product, qty = 1): void {
     if (!this.userId) {
       alert('Bitte zuerst einloggen');
@@ -52,7 +48,7 @@ export class CartService {
     }).subscribe({
       next: () => {
         console.log('Artikel erfolgreich hinzugefügt');
-        this.getCart(); // optional: Warenkorb nach dem Hinzufügen aktualisieren
+        this.getCart();
       },
       error: () => {
         alert('Fehler beim Hinzufügen zum Warenkorb');
@@ -60,8 +56,87 @@ export class CartService {
     });
   }
 
-  getCart() {
-  return this.http.get<Cart>('/api/get-cart');
-}
+  getCart(): void {
+    this.http.get<Cart>('/api/get-cart').subscribe({
+      next: (cart) => this.cart.set(cart),
+      error: () => {
+        alert('Fehler beim Laden des Warenkorbs');
+        this.cart.set(null);
+      }
+    });
+  }
 
+  updateQuantity(product_id: number, delta: number, unitPrice: number): void {
+    if (!this.userId) {
+      alert('Bitte zuerst einloggen');
+      return;
+    }
+
+    this.http.post('/api/cart/add', {
+      customer_id: this.userId,
+      product_id,
+      quantity: delta,
+      price: unitPrice * delta
+    }).subscribe({
+      next: () => {
+        console.log(`Artikelmenge um ${delta > 0 ? '+' : ''}${delta} geändert`);
+        this.getCart();
+      },
+      error: () => {
+        alert('Fehler beim Aktualisieren der Artikelmenge');
+      }
+    });
+  }
+
+  removeItem(item: CartItem): void {
+    if (!this.userId) {
+      alert('Bitte zuerst einloggen');
+      return;
+    }
+
+    const unitPrice = item.price / item.quantity;
+
+    this.http.post('/api/cart/add', {
+      customer_id: this.userId,
+      product_id: item.product_id,
+      quantity: -item.quantity,
+      price: -unitPrice * item.quantity
+    }).subscribe({
+      next: () => {
+        console.log('Artikel entfernt');
+
+        // Variante 1: Kompletten Warenkorb vom Backend neu laden (sicher, aber mehr API-Calls)
+        this.getCart();
+
+        // Variante 2 (optional): Lokal das Signal aktualisieren ohne API-Call
+        /*
+        const currentCart = this.cart();
+        if (currentCart) {
+          const updatedItems = currentCart.items.filter(i => i.product_id !== item.product_id);
+          this.cart.set({ ...currentCart, items: updatedItems });
+        }
+        */
+      },
+      error: () => {
+        alert('Fehler beim Entfernen des Artikels');
+      }
+    });
+  }
+
+  clearCart(): void {
+    if (!this.userId) {
+      alert('Bitte zuerst einloggen');
+      return;
+    }
+
+    this.http.post('/api/cart/clear', { customer_id: this.userId }).subscribe({
+      next: () => {
+        console.log('Warenkorb wurde geleert');
+        this.getCart();
+      },
+      error: () => {
+        alert('Fehler beim Leeren des Warenkorbs');
+      }
+    });
+  }
 }

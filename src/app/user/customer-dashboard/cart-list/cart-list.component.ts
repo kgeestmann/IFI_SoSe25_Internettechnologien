@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // NgFor ist im CommonModule enthalten
+import { Component, computed, effect, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { CartItem, CartService } from './cart.service';
 
 @Component({
@@ -9,26 +9,48 @@ import { CartItem, CartService } from './cart.service';
   templateUrl: './cart-list.component.html',
   styleUrls: ['./cart-list.component.css']
 })
-export class CartListComponent implements OnInit {
-  cartItems: CartItem[] = [];
+export class CartListComponent {
+  private cartService = inject(CartService);
 
-  constructor(private cartService: CartService) {}
+  cart = this.cartService.cart$;
 
-  ngOnInit(): void {
-  this.cartService.getCart().subscribe({
-    next: cart => {
-      this.cartItems = cart.items;  // <-- Hier
-    },
-    error: () => {
-      console.error('Warenkorb konnte nicht geladen werden');
-    }
+  totalPrice = computed(() => {
+    const cart = this.cart();
+    return cart ? cart.items.reduce((sum, item) => sum + item.price, 0) : 0;
   });
-}
 
-  // 💡 Neue Getter-Methode für die Gesamtsumme
-  get totalPrice(): number {
-    return this.cartItems
-      .map(item => item.price * item.quantity)
-      .reduce((sum, current) => sum + current, 0);
+  // Optional: Getter für Template
+  get cartItems(): CartItem[] {
+    return this.cart()?.items ?? [];
+  }
+
+  constructor() {
+    this.cartService.getCart();
+
+    effect(() => {
+      console.log('Aktueller Warenkorb:', this.cart());
+    });
+  }
+
+  increaseQuantity(item: CartItem): void {
+    const unitPrice = item.price / item.quantity;
+    this.cartService.updateQuantity(item.product_id, 1, unitPrice);
+  }
+
+  decreaseQuantity(item: CartItem): void {
+    if (item.quantity <= 1) {
+      this.cartService.removeItem(item);
+    } else {
+      const unitPrice = item.price / item.quantity;
+      this.cartService.updateQuantity(item.product_id, -1, unitPrice);
+    }
+  }
+
+  removeItem(item: CartItem): void {
+    this.cartService.removeItem(item);
+  }
+
+  clearCart(): void {
+    this.cartService.clearCart();
   }
 }

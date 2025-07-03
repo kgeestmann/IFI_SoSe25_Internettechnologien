@@ -5,29 +5,33 @@
 <div *ngIf="cartItems.length; else emptyCart" class="cart-wrapper">
   <ul class="cart-list">
     <li *ngFor="let item of cartItems" class="cart-item">
-      <span class="item-info">
-        {{ item.name }}
-        {{ item.price | currency:'EUR':'symbol' }}
-        <span class="quantity">× {{ item.quantity }}</span>
-      </span>
+      <div class="item-details">
+        <div class="item-name">{{ item.name }}</div>
+        <div class="item-price">{{ (item.price)/item.quantity| currency:'EUR':'symbol' }}</div>
+      </div>
 
-      <button type="button" class="remove-btn">
-        Entfernen
+      <div class="quantity-stepper">
+        <button (click)="decreaseQuantity(item)" aria-label="Menge verringern" class="step-btn">−</button>
+        <span class="quantity-display">{{ item.quantity }}</span>
+        <button (click)="increaseQuantity(item)" aria-label="Menge erhöhen" class="step-btn">+</button>
+      </div>
+
+      <button type="button" class="remove-btn" (click)="removeItem(item)" aria-label="Artikel entfernen">
+        ×
       </button>
     </li>
   </ul>
 
   <div class="summary">
     <div class="total-price">
-      Gesamt: {{ totalPrice | currency:'EUR':'symbol' }}
+      Gesamt: {{ totalPrice() | currency:'EUR':'symbol' }}
     </div>
-
     <button type="button" class="order-btn">
-      Bestellung&nbsp;aufgeben
+      Bestellung aufgeben
     </button>
   </div>
 
-  <button type="button" class="clear-btn">
+  <button type="button" class="clear-btn" (click)="clearCart()">
     Alles löschen
   </button>
 </div>

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import bootstrap from './main.server';
 import { createConnection, RowDataPacket } from 'mysql2';
 import session from 'express-session';
+import { OkPacket } from 'mysql';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -174,6 +175,81 @@ function updateCartTotal(con: ReturnType<typeof createConnection>, cart_id: numb
     }
   );
 }
+
+app.post('/api/cart/clear', (req, res) => {
+  const { customer_id } = req.body;
+
+  if (!customer_id) {
+    return res.status(400).json({ message: 'Fehlende customer_id' });
+  }
+
+  const con = createConnection(dbConfig);
+
+  con.connect(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+    }
+
+    // 1. Warenkorb-ID abrufen (SELECT liefert Array)
+    return con.query(
+      'SELECT cart_id FROM Cart WHERE customer_id = ?',
+      [customer_id],
+      (err, results) => {
+        if (err) {
+          con.end();
+          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
+        }
+
+        const carts = results as RowDataPacket[];
+
+        if (carts.length === 0) {
+          con.end();
+          return res.status(404).json({ message: 'Kein Warenkorb gefunden' });
+        }
+
+        const cart_id = carts[0]['cart_id'];
+
+        // 2. Alle Artikel aus Cart_Item löschen (DELETE liefert OkPacket, kein Array!)
+        return con.query(
+          'DELETE FROM Cart_Item WHERE cart_id = ?',
+          [cart_id],
+          (err, result) => {
+            if (err) {
+              con.end();
+              return res.status(500).json({ message: 'Fehler beim Leeren des Warenkorbs' });
+            }
+
+            const deleteResult = result as OkPacket;
+
+            if (deleteResult.affectedRows === 0) {
+              // Warenkorb war schon leer, kein Problem
+              console.log('Warenkorb war bereits leer');
+            }
+
+            // 3. Gesamtpreis im Warenkorb auf 0 setzen (UPDATE liefert OkPacket)
+            return con.query(
+              'UPDATE Cart SET total_price = 0 WHERE cart_id = ?',
+              [cart_id],
+              (err, result) => {
+                con.end();
+
+                if (err) {
+                  return res.status(500).json({ message: 'Fehler beim Aktualisieren des Gesamtpreises' });
+                }
+
+                return res.status(200).json({ message: 'Warenkorb geleert' });
+              }
+            );
+            return;
+          }
+        );
+        return;
+      }
+    );
+    return;
+  });
+  return;
+});
 
 app.get('/api/get-cart', (req, res) => {
   const sessionUser = req.session.user;
