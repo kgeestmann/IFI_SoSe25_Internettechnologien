@@ -2,6 +2,8 @@
 DROP TABLE IF EXISTS Cart_Item;
 DROP TABLE IF EXISTS Order_Item;
 DROP TABLE IF EXISTS Product_Change;
+DROP TABLE IF EXISTS User_Change;
+DROP TABLE IF EXISTS Order_Change;
 DROP TABLE IF EXISTS Invoice;
 DROP TABLE IF EXISTS Customer_Order;
 DROP TABLE IF EXISTS Cart;
@@ -175,7 +177,7 @@ CREATE TABLE Order_Change (
     ON UPDATE CASCADE,
   FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
     ON DELETE SET NULL 
-    ON UPDATE CASCADE,
+    ON UPDATE CASCADE
 );
 
 
@@ -189,51 +191,6 @@ FOR EACH ROW
 BEGIN
   INSERT INTO Cart (customer_id, total_price)
   VALUES (NEW.customer_id, 0.00);
-END;
-//
-DELIMITER ;
-
--- Warenkorb-Neuberechnung nach Insert
-DELIMITER //
-CREATE TRIGGER cart_total_after_cartitem_insert
-AFTER INSERT ON Cart_Item
-FOR EACH ROW
-BEGIN
-  UPDATE Cart
-  SET total_price = (
-    SELECT COALESCE(SUM(price), 0) FROM Cart_Item WHERE cart_id = NEW.cart_id
-  )
-  WHERE cart_id = NEW.cart_id;
-END;
-//
-DELIMITER ;
-
--- Warenkorb-Neuberechnung nach Update
-DELIMITER //
-CREATE TRIGGER cart_total_after_cartitem_update
-AFTER UPDATE ON Cart_Item
-FOR EACH ROW
-BEGIN
-  UPDATE Cart
-  SET total_price = (
-    SELECT COALESCE(SUM(price), 0) FROM Cart_Item WHERE cart_id = NEW.cart_id
-  )
-  WHERE cart_id = NEW.cart_id;
-END;
-//
-DELIMITER ;
-
--- Warenkorb-Neuberechnung nach Delete
-DELIMITER //
-CREATE TRIGGER cart_total_after_cartitem_delete
-AFTER DELETE ON Cart_Item
-FOR EACH ROW
-BEGIN
-  UPDATE Cart
-  SET total_price = (
-    SELECT COALESCE(SUM(price), 0) FROM Cart_Item WHERE cart_id = OLD.cart_id
-  )
-  WHERE cart_id = OLD.cart_id;
 END;
 //
 DELIMITER ;
