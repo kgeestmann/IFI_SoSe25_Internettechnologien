@@ -70,13 +70,6 @@
   justify-content: center;
   gap: 1rem;
 }
-.info-buttons {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
-
 
 .headline {
   font-size: 2rem;
