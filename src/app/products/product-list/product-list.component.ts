@@ -3,6 +3,8 @@ import {CommonModule } from '@angular/common';
 import { ProductService, Product } from '../product.service';
 import { CartService } from '../../user/customer-dashboard/cart-list/cart.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -16,11 +18,16 @@ export class ProductListComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
+  isEmployee$: Observable<boolean>;
+
   constructor(
     private productService: ProductService,
     private cart: CartService,
-    private router : Router
-  ) {}
+    private router : Router,
+    private authService : AuthService
+  ) {
+    this.isEmployee$ = this.authService.isEmployee$;
+  }
 
 
   ngOnInit() {
@@ -43,5 +50,9 @@ export class ProductListComponent implements OnInit {
 
   goToDetails(product: Product): void {
   this.router.navigate(['/product', product.product_id]);
+  }
+
+  goToEditProducts(product: Product): void {
+  this.router.navigate(['/edit-products', product.product_id]);
 }
 }

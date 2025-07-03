@@ -241,6 +241,42 @@ app.get('/api/get-cart', (req, res) => {
 });
 
 
+app.get('/api/get-product/:id', (req, res) => {
+  const productId = req.params.id;
+
+  const con = createConnection(dbConfig);
+
+  con.connect(function(err) {
+    if (err) {
+      console.error('DB-Verbindung fehlgeschlagen:', err);
+      res.status(500).send('Datenbankfehler');
+      return;
+    }
+    console.log("connected to db");
+
+    con.query(
+      "SELECT * FROM Product WHERE product_id = ?",
+      [productId],
+      function (error, results, fields) {
+        if (error) {
+          console.error('Fehler bei der Abfrage:', error);
+          res.status(500).send('Abfragefehler');
+        } else {
+          if (Array.isArray(results) && results.length === 0) {
+            res.status(404).send('Produkt nicht gefunden');
+          } else if (Array.isArray(results)) {
+            res.send(results[0]);
+          } else {
+            res.status(500).send('Unerwartetes Ergebnis');
+          }
+        }
+        con.end();
+      }
+    );
+
+  }); 
+});  
+
 app.get('/api/get-customers', (req, res) => {
   const con = createConnection(dbConfig);
   con.connect(err => {
@@ -409,6 +445,8 @@ app.get('/api/user-details', (req, res) => {
     res.json(userDetails);
   });
 });
+
+
 
 app.get('/api/me', (req, res) => {
   if (req.session.user) {

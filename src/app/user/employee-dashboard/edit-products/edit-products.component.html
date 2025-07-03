@@ -1,0 +1,27 @@
+<ng-container *ngIf="product; else errorTpl">
+  <div class="product-content">
+    <div class="image-wrapper">
+      <img
+        [src]="'/assets/images/' + product.image"
+        [alt]="product.name"
+        class="product-image"
+      />
+    </div>
+
+    <div class="info-wrapper">
+      <h2 class="headline">{{ product.name }}</h2>
+
+      <p>{{ product.description }}</p>
+      <p><strong>Preis:</strong> {{ product.price | currency:'EUR' }}</p>
+
+      <button (click)="goBack()">Zurück zur Übersicht</button>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #errorTpl>
+  <div class="product-content">
+    <p>{{ error || 'Produkt nicht gefunden.' }}</p>
+    <button (click)="goBack()">Zurück zur Übersicht</button>
+  </div>
+</ng-template>

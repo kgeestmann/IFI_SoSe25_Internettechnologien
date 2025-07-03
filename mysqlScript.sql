@@ -23,7 +23,7 @@ CREATE TABLE Address (
   city VARCHAR(255)
 );
 
--- Benutzerbasis
+-- Benutzer
 CREATE TABLE User (
   user_id INT AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(50),
@@ -64,7 +64,7 @@ CREATE TABLE Product (
   image VARCHAR(255)
 );
 
--- Warenkörbe (1 pro Kunde)
+-- Warenkorb
 CREATE TABLE Cart (
   cart_id INT AUTO_INCREMENT PRIMARY KEY,
   customer_id INT,
@@ -179,9 +179,6 @@ CREATE TABLE Order_Change (
     ON DELETE SET NULL 
     ON UPDATE CASCADE
 );
-
-
--- Trigger
 
 -- Automatisch Warenkorb anlegen, wenn Kunde registriert
 DELIMITER //
