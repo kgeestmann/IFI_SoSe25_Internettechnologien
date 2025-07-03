@@ -66,6 +66,181 @@ app.get('/api/get-products', (req, res) => {
   });
 });
 
+
+app.post('/api/cart/add', (req, res) => {
+  const { customer_id, product_id, quantity, price } = req.body;
+
+  if (!customer_id || !product_id || !quantity || !price) {
+    return res.status(400).json({ message: 'Fehlende Angaben' });
+  }
+
+  const con = createConnection(dbConfig);
+
+  con.connect(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+    }
+
+    con.query(
+      'SELECT cart_id FROM Cart WHERE customer_id = ?',
+      [customer_id],
+      (err, results) => {
+        if (err) {
+          con.end();
+          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
+        }
+
+        const carts = results as RowDataPacket[];
+
+        if (carts.length === 0) {
+          con.end();
+          return res.status(404).json({ message: 'Kein Warenkorb gefunden' });
+        }
+
+        const cart_id = carts[0]['cart_id'];
+        const unit_price = price / quantity;
+
+        con.query(
+          'SELECT quantity FROM Cart_Item WHERE cart_id = ? AND product_id = ?',
+          [cart_id, product_id],
+          (err, itemResult) => {
+            if (err) {
+              con.end();
+              return res.status(500).json({ message: 'Fehler beim Prüfen des Warenkorbs' });
+            }
+
+            const items = itemResult as RowDataPacket[];
+
+            if (items.length > 0) {
+              const existingQuantity = items[0]['quantity'];
+              const newQuantity = existingQuantity + quantity;
+              const newTotalPrice = newQuantity * unit_price;
+
+              con.query(
+                'UPDATE Cart_Item SET quantity = ?, price = ? WHERE cart_id = ? AND product_id = ?',
+                [newQuantity, newTotalPrice, cart_id, product_id],
+                err => {
+                  if (err) {
+                    con.end();
+                    return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
+                  }
+                  return updateCartTotal(con, cart_id, res);
+                }
+              );
+              return; // wichtig, damit callback endet
+            } else {
+              con.query(
+                'INSERT INTO Cart_Item (cart_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
+                [cart_id, product_id, quantity, price],
+                err => {
+                  if (err) {
+                    con.end();
+                    return res.status(500).json({ message: 'Fehler beim Hinzufügen des Artikels' });
+                  }
+                  return updateCartTotal(con, cart_id, res);
+                }
+              );
+              return;
+            }
+          }
+        );
+        return;
+      }
+    );
+    return;
+  });
+
+  return; // wichtig: Hauptfunktion gibt synchron return
+});
+
+function updateCartTotal(con: ReturnType<typeof createConnection>, cart_id: number, res: express.Response) {
+  return con.query(
+    `UPDATE Cart
+     SET total_price = (
+       SELECT IFNULL(SUM(price), 0)
+       FROM Cart_Item
+       WHERE cart_id = ?
+     )
+     WHERE cart_id = ?`,
+    [cart_id, cart_id],
+    err => {
+      con.end();
+
+      if (err) {
+        return res.status(500).json({ message: 'Fehler beim Aktualisieren des Gesamtpreises' });
+      }
+
+      return res.status(201).json({ message: 'Artikel hinzugefügt oder aktualisiert' });
+    }
+  );
+}
+
+app.get('/api/get-cart', (req, res) => {
+  const sessionUser = req.session.user;
+
+  if (!sessionUser || sessionUser.role !== 'customer') {
+    return res.status(401).json({ message: 'Nicht autorisiert' });
+  }
+
+  const customer_id = sessionUser.user_id;
+  const con = createConnection(dbConfig);
+
+  con.connect(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+    }
+
+
+    return con.query(
+      'SELECT cart_id FROM Cart WHERE customer_id = ?',
+      [customer_id],
+      (err, results) => {
+        if (err) {
+          con.end();
+          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
+        }
+
+        const cartId = (results as RowDataPacket[])[0]['cart_id'];
+        console.log("Verwende cartId:", cartId);
+
+        const sql = `
+          SELECT 
+            ci.product_id,
+            p.name,
+            p.description,
+            p.image,
+            ci.quantity,
+            ci.price
+          FROM Cart_Item ci
+          LEFT JOIN Product p ON ci.product_id = p.product_id
+          WHERE ci.cart_id = ?
+        `;
+
+        console.log("SQL Query wird ausgeführt mit cartId:", cartId);
+
+
+        return con.query(sql, [cartId], (err, items) => {
+  if (err) {
+    console.error("SQL-Fehler bei get-cart:", err);
+    con.end();
+    return res.status(500).json({ message: 'Fehler beim Laden der Warenkorbdaten' });
+  }
+  
+  console.log("Items aus DB:", items);
+  con.end();
+  res.json({
+    cart_id: cartId,
+    items
+  });
+        return;
+        });
+      }
+    );
+  });
+  return;
+});
+
+
 app.get('/api/get-customers', (req, res) => {
   const con = createConnection(dbConfig);
   con.connect(err => {
@@ -290,111 +465,3 @@ if (isMainModule(import.meta.url)) {
 }
 
 export default app;
-
-app.post('/api/cart/add', (req, res) => {
-  const { customer_id, product_id, quantity, price } = req.body;
-
-  if (!customer_id || !product_id || !quantity || !price) {
-    return res.status(400).json({ message: 'Fehlende Angaben' });
-  }
-
-  const con = createConnection(dbConfig);
-
-  con.connect(err => {
-    if (err) {
-      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
-    }
-
-    con.query(
-      'SELECT cart_id FROM Cart WHERE customer_id = ?',
-      [customer_id],
-      (err, results) => {
-        if (err) {
-          con.end();
-          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
-        }
-
-        const carts = results as RowDataPacket[];
-
-        if (carts.length === 0) {
-          con.end();
-          return res.status(404).json({ message: 'Kein Warenkorb gefunden' });
-        }
-
-        const cart_id = carts[0]['cart_id'];
-        const unit_price = price / quantity;
-
-        con.query(
-          'SELECT quantity FROM Cart_Item WHERE cart_id = ? AND product_id = ?',
-          [cart_id, product_id],
-          (err, itemResult) => {
-            if (err) {
-              con.end();
-              return res.status(500).json({ message: 'Fehler beim Prüfen des Warenkorbs' });
-            }
-
-            const items = itemResult as RowDataPacket[];
-
-            if (items.length > 0) {
-              const existingQuantity = items[0]['quantity'];
-              const newQuantity = existingQuantity + quantity;
-              const newTotalPrice = newQuantity * unit_price;
-
-              con.query(
-                'UPDATE Cart_Item SET quantity = ?, price = ? WHERE cart_id = ? AND product_id = ?',
-                [newQuantity, newTotalPrice, cart_id, product_id],
-                err => {
-                  if (err) {
-                    con.end();
-                    return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
-                  }
-                  return updateCartTotal(con, cart_id, res);
-                }
-              );
-              return; // wichtig, damit callback endet
-            } else {
-              con.query(
-                'INSERT INTO Cart_Item (cart_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
-                [cart_id, product_id, quantity, price],
-                err => {
-                  if (err) {
-                    con.end();
-                    return res.status(500).json({ message: 'Fehler beim Hinzufügen des Artikels' });
-                  }
-                  return updateCartTotal(con, cart_id, res);
-                }
-              );
-              return;
-            }
-          }
-        );
-        return;
-      }
-    );
-    return;
-  });
-
-  return; // wichtig: Hauptfunktion gibt synchron return
-});
-
-function updateCartTotal(con: ReturnType<typeof createConnection>, cart_id: number, res: express.Response) {
-  return con.query(
-    `UPDATE Cart
-     SET total_price = (
-       SELECT IFNULL(SUM(price), 0)
-       FROM Cart_Item
-       WHERE cart_id = ?
-     )
-     WHERE cart_id = ?`,
-    [cart_id, cart_id],
-    err => {
-      con.end();
-
-      if (err) {
-        return res.status(500).json({ message: 'Fehler beim Aktualisieren des Gesamtpreises' });
-      }
-
-      return res.status(201).json({ message: 'Artikel hinzugefügt oder aktualisiert' });
-    }
-  );
-}

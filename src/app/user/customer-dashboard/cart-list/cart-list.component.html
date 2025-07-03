@@ -2,44 +2,34 @@
   Mein Warenkorb
 </h2>
 
-<!--
-<div *ngIf="cart.itemCount(); else emptyCart" class="cart-wrapper">
+<div *ngIf="cartItems.length; else emptyCart" class="cart-wrapper">
   <ul class="cart-list">
-    <li *ngFor="let item of cart.items(); let i = index" class="cart-item">
+    <li *ngFor="let item of cartItems" class="cart-item">
       <span class="item-info">
-        {{ item.product.name }}
-        {{ item.product.price | currency:'EUR':'symbol' }}
+        {{ item.name }}
+        {{ item.price | currency:'EUR':'symbol' }}
         <span class="quantity">× {{ item.quantity }}</span>
       </span>
 
-      <button
-        type="button"
-        class="remove-btn" >
+      <button type="button" class="remove-btn">
         Entfernen
       </button>
     </li>
   </ul>
--->
 
-  <!-- Zusammenfassung -->
   <div class="summary">
     <div class="total-price">
-      Gesamt:&nbsp;
+      Gesamt: {{ totalPrice | currency:'EUR':'symbol' }}
     </div>
 
-    <button
-      type="button"
-      class="order-btn">
+    <button type="button" class="order-btn">
       Bestellung&nbsp;aufgeben
     </button>
   </div>
 
-  <button
-    type="button"
-    class="clear-btn">
+  <button type="button" class="clear-btn">
     Alles löschen
   </button>
-  <div>
 </div>
 
 <ng-template #emptyCart>
