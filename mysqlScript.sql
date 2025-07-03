@@ -186,6 +186,13 @@ INSERT INTO Product VALUES
 (3, 'Sansevieria', 20.00, 'Ideal für Anfänger.', 60, 'sansevieria.jpg'),
 (4, 'Aloe Vera', 15.00, 'Heilpflanze mit pflegeleichten Ansprüchen.', 80, 'aloevera.jpg'),
 (5, 'Calathea', 35.00, 'Dekorative Blätter mit Muster – braucht viel Feuchtigkeit.', 30, 'calathea.jpg');
+(6, 'Hoya Kerrii', 15.00, 'Herzförmige Blätter, beliebte Geschenkidee.', 45, 'hoyakerrii.jpg'),
+(7, 'Sinningia', 22.00, 'Blütenreiche Zimmerpflanze mit samtigen Blättern.', 35, 'sinningia.jpg'),
+(8, 'Zamioculcas Zamiifolia', 28.00, 'Robuste Pflanze, ideal für dunklere Räume.', 50, 'zamioculcaszamiifolia.jpg'),
+(9, 'Orchideen', 32.00, 'Elegante Blühpflanze mit exotischem Flair.', 40, 'orchideen.jpg'),
+(10, 'Lithops', 18.00, '„Lebende Steine“ – sukkulente Miniaturpflanzen.', 55, 'lithops.jpg'),
+(11, 'Lavendel', 12.00, 'Duftende Pflanze mit beruhigender Wirkung.', 70, 'lavendel.jpg');
+
 
 INSERT INTO Cart VALUES
 (1, 1, 65.00),
