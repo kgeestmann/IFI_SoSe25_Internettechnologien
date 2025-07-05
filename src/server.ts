@@ -67,6 +67,43 @@ app.get('/api/get-products', (req, res) => {
   });
 });
 
+app.post('/api/products', async (req, res) => {
+  const user = req.session.user;
+
+  // Nur Mitarbeiter dürfen Produkte erstellen
+  if (!user || user.role !== 'employee') {
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte erstellen' });
+  }
+
+  const { name, description, price, stock_quantity, image } = req.body;
+
+  // Pflichtfelder prüfen
+  if (!name || price === undefined || stock_quantity === undefined || !description || !image) {
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder (name, price, stock_quantity, description, image)' });
+  }
+
+  const con = createConnection(dbConfig).promise();
+
+  try {
+    await con.connect();
+
+    // Nur Produkt einfügen, kein Logging mehr
+    const [insertResult] = await con.query(
+      'INSERT INTO Product (name, description, price, stock_quantity, image) VALUES (?, ?, ?, ?, ?)',
+      [name, description, price, stock_quantity, image]
+    );
+
+    const insertedId = (insertResult as OkPacket).insertId;
+
+    await con.end();
+
+    return res.status(201).json({ message: 'Produkt erfolgreich erstellt', product_id: insertedId });
+  } catch (error: any) {
+    await con.end();
+    console.error('Fehler beim Einfügen des Produkts:', error);
+    return res.status(500).json({ message: 'Fehler beim Erstellen des Produkts', error: error.message });
+  }
+});
 
 app.post('/api/cart/add', (req, res) => {
   const { customer_id, product_id, quantity, price } = req.body;
@@ -316,7 +353,6 @@ app.get('/api/get-cart', (req, res) => {
   return;
 });
 
-
 app.get('/api/get-product/:id', (req, res) => {
   const productId = req.params.id;
 
@@ -521,8 +557,6 @@ app.get('/api/user-details', (req, res) => {
     res.json(userDetails);
   });
 });
-
-
 
 app.get('/api/me', (req, res) => {
   if (req.session.user) {

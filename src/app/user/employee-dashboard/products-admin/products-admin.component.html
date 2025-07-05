@@ -1,23 +1,31 @@
 <div class="product-create-page">
   <h2 class="product-create-headline">Neues Produkt erstellen</h2>
 
-  <form class="product-create-form" action="upload.php" method="post" enctype="multipart/form-data">
+  <form 
+    (ngSubmit)="onSubmit()" 
+    [formGroup]="productForm" 
+    enctype="multipart/form-data" 
+    novalidate 
+    class="product-create-form"
+  >
     <label for="name" class="product-create-label">Produktname</label>
-    <input type="text" id="name" name="name" class="product-create-input" required>
+    <input type="text" id="name" formControlName="name" class="product-create-input" required>
 
     <label for="price" class="product-create-label">Preis (€)</label>
-    <input type="number" id="price" name="price" class="product-create-input" min="0" step="0.01" required>
+    <input type="number" id="price" formControlName="price" class="product-create-input" min="0" step="0.01" required>
 
     <label for="description" class="product-create-label">Beschreibung</label>
-    <input type="text" id="description" name="description" class="product-create-input" required>
+    <input type="text" id="description" formControlName="description" class="product-create-input" required>
 
     <label for="stock_quantity" class="product-create-label">Lagerbestand</label>
-    <input type="number" id="stock_quantity" name="stock_quantity" class="product-create-input" min="0" required>
+    <input type="number" id="stock_quantity" formControlName="stock_quantity" class="product-create-input" min="0" required>
 
-    <label for="image" class="product-create-label">Produktbild hochladen</label>
-    <input type="file" id="image" name="image" class="product-create-input" accept="image/*" required>
+    <label for="image" class="product-create-label">Bild-Dateiname</label>
+    <input type="text" id="image" formControlName="image" class="product-create-input" required>
 
-    <button type="submit" class="product-create-button">Produkt speichern</button>
+    <button type="submit" class="product-create-button" [disabled]="!productForm.valid">
+      Produkt speichern
+    </button>
   </form>
 </div>
 
