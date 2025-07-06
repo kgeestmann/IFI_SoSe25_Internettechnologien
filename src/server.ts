@@ -323,28 +323,34 @@ app.get('/api/get-cart', (req, res) => {
             p.description,
             p.image,
             ci.quantity,
-            ci.price
+            ci.price,
+            c.total_price
           FROM Cart_Item ci
           LEFT JOIN Product p ON ci.product_id = p.product_id
+          INNER JOIN Cart c ON ci.cart_id = c.cart_id
           WHERE ci.cart_id = ?
         `;
 
         console.log("SQL Query wird ausgeführt mit cartId:", cartId);
 
 
-        return con.query(sql, [cartId], (err, items) => {
+        return con.query(sql, [cartId], (err, results) => {
   if (err) {
     console.error("SQL-Fehler bei get-cart:", err);
     con.end();
     return res.status(500).json({ message: 'Fehler beim Laden der Warenkorbdaten' });
   }
-  
-  console.log("Items aus DB:", items);
+
+  const items = results as RowDataPacket;
+
+  const total_price = items.length > 0 ? items[0].total_price : 0;  
+
   con.end();
   res.json({
     cart_id: cartId,
-    items
-  });
+    items,
+    total_price
+    });
         return;
         });
       }

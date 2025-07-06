@@ -15,6 +15,7 @@ export interface CartItem {
 export interface Cart {
   cart_id: number;
   items: CartItem[];
+
 }
 
 @Injectable({ providedIn: 'root' })
@@ -104,18 +105,7 @@ export class CartService {
     }).subscribe({
       next: () => {
         console.log('Artikel entfernt');
-
-        // Variante 1: Kompletten Warenkorb vom Backend neu laden (sicher, aber mehr API-Calls)
         this.getCart();
-
-        // Variante 2 (optional): Lokal das Signal aktualisieren ohne API-Call
-        /*
-        const currentCart = this.cart();
-        if (currentCart) {
-          const updatedItems = currentCart.items.filter(i => i.product_id !== item.product_id);
-          this.cart.set({ ...currentCart, items: updatedItems });
-        }
-        */
       },
       error: () => {
         alert('Fehler beim Entfernen des Artikels');

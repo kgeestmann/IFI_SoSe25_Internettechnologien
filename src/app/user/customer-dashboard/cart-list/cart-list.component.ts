@@ -14,11 +14,6 @@ export class CartListComponent {
 
   cart = this.cartService.cart$;
 
-  totalPrice = computed(() => {
-    const cart = this.cart();
-    return cart ? cart.items.reduce((sum, item) => sum + item.price, 0) : 0;
-  });
-
   // Optional: Getter für Template
   get cartItems(): CartItem[] {
     return this.cart()?.items ?? [];
