@@ -14,6 +14,7 @@ import { ProductsAdminComponent } from './user/employee-dashboard/products-admin
 import { EditProductsComponent } from './user/employee-dashboard/edit-products/edit-products.component';
 import { EditOrdersComponent } from './user/employee-dashboard/edit-orders/edit-orders.component';
 import { EditCustomersComponent } from './user/employee-dashboard/edit-customers/edit-customers.component';
+import { LogsComponent } from './user/employee-dashboard/logs/logs.component';
 
 export const routes: Routes = [
     { path: 'products', component: ProductListComponent },
@@ -28,6 +29,7 @@ export const routes: Routes = [
     { path: 'edit-products/:id', component: EditProductsComponent },
     { path: 'edit-orders/:id', component: EditOrdersComponent },
     { path: 'edit-customers/:id', component: EditCustomersComponent },
+    { path: 'logs', component: LogsComponent},
     { path: 'login', component: LoginComponent },
     { path: 'registration', component: RegistrationComponent}, 
     { path: 'customer-profile', component: CustomerProfileComponent},

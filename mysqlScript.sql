@@ -287,3 +287,27 @@ INSERT INTO Order_Item (order_id, product_id, quantity, price) VALUES
 (2, 3, 3, 60.00),  
 (3, 2, 1, 30.00),    
 (4, 5, 1, 35.00);
+
+-- Änderung 1: Emma Schneider (user_id = 5) – Änderung der E-Mail
+INSERT INTO User_Change (user_id, employee_id, field_changed, change_date, field_before, field_after) VALUES
+(5, 8, 'email', '2025-06-05', 'emma.schneider@altmail.de', 'emma.schneider@example.com');
+
+-- Änderung 2: Clara Weber (user_id = 3) – Änderung des Nachnamens
+INSERT INTO User_Change (user_id, employee_id, field_changed, change_date, field_before, field_after) VALUES
+(3, 6, 'last_name', '2025-06-08', 'Schmidt', 'Weber');
+
+-- Änderung 3: Jonas Friedrich (user_id = 10) – Änderung des Passworts
+INSERT INTO User_Change (user_id, employee_id, field_changed, change_date, field_before, field_after) VALUES
+(10, 9, 'password', '2025-06-10', '1234', '10');
+
+-- Änderung 1: Bestellung 2 – Änderung des Lieferstatus
+INSERT INTO Order_Change (order_id, employee_id, field_changed, change_date, field_before, field_after) VALUES
+(2, 7, 'delivery_status', '2025-06-06', 'offen', 'in Bearbeitung');
+
+-- Änderung 2: Bestellung 4 – Änderung der Zahlungsmethode
+INSERT INTO Order_Change (order_id, employee_id, field_changed, change_date, field_before, field_after) VALUES
+(4, 8, 'payment_method', '2025-06-16', 'SEPA', 'Kreditkarte');
+
+-- Änderung 3: Bestellung 1 – Änderung des Gesamtpreises
+INSERT INTO Order_Change (order_id, employee_id, field_changed, change_date, field_before, field_after) VALUES
+(1, 9, 'total_price', '2025-06-02', '60.00', '65.00');

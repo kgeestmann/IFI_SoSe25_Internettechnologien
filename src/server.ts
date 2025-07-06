@@ -533,6 +533,47 @@ app.post('/api/edit-order', (req, res) => {
   return;
 });
 
+app.get('/api/get-logs', (req, res) => {
+  const con = createConnection(dbConfig);
+  
+  con.connect(err => {
+    if (err) {
+      res.status(500).send("DB connection error");
+      return;
+    }
+
+    con.query("SELECT * FROM Product_Change", (error1, productLogs) => {
+      if (error1) {
+        con.end();
+        res.status(500).send(error1);
+        return;
+      }
+
+      con.query("SELECT * FROM Order_Change", (error2, orderLogs) => {
+        if (error2) {
+          con.end();
+          res.status(500).send(error2);
+          return;
+        }
+
+        con.query("SELECT * FROM User_Change", (error3, userLogs) => {
+          con.end();
+
+          if (error3) {
+            res.status(500).send(error3);
+          } else {
+            res.json({
+              products: productLogs,
+              orders: orderLogs,
+              users: userLogs
+            });
+          }
+        });
+      });
+    });
+  });
+});
+
 app.post('/api/login', (req, res) => {
   console.log("Anfrage angekommen");
   const con = createConnection(dbConfig);

@@ -49,6 +49,18 @@ export class ProductsAdminComponent implements OnInit {
     });
   }
 
+  loadUserDetails() {
+    this.authService.fetchUserDetails().subscribe({
+      next: (details) => {
+        this.currentUser = details;
+        this.authService.setLogin(details);
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der User-Details', err);
+      }
+    });
+  }
+
   onSubmit() {
     if (!this.productForm.valid) {
       return;
@@ -64,18 +76,6 @@ export class ProductsAdminComponent implements OnInit {
       error: (err) => {
         alert('Fehler beim Erstellen des Produkts');
         console.error(err);
-      }
-    });
-  }
-
-  loadUserDetails() {
-    this.authService.fetchUserDetails().subscribe({
-      next: (details) => {
-        this.currentUser = details;
-        this.authService.setLogin(details);
-      },
-      error: (err) => {
-        console.error('Fehler beim Laden der User-Details', err);
       }
     });
   }
