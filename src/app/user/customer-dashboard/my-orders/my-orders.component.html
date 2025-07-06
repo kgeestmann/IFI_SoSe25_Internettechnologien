@@ -1,1 +1,22 @@
-<h2 class="headline">Meine Bestellungen</h2>
+<ng-container *ngIf="!loading && !error; else loadingOrErr">
+  <h2 class="headline">Meine Bestellungen</h2>
+
+  <div class="orders-wrapper" *ngIf="orders.length; else none">
+    <div class="order-card" *ngFor="let order of orders">
+      <span>Bestell‑ID: {{ order.order_id }}</span>
+      <span>Datum: {{ order.date }}</span>
+      <span>Status: {{ order.delivery_status }}</span>
+      <span>Gesamt: {{ order.total_price }}</span>
+      <span>Zahlung: {{ order.payment_method }}</span>
+    </div>
+  </div>
+
+  <ng-template #none>
+    <p>Du hast noch keine Bestellungen.</p>
+  </ng-template>
+</ng-container>
+
+<ng-template #loadingOrErr>
+  <p *ngIf="loading">Lade Bestellungen …</p>
+  <p *ngIf="error">{{ error }}</p>
+</ng-template>

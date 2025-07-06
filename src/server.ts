@@ -469,6 +469,37 @@ app.post('/api/cart/checkout', (req, res) => {
   return;
 });
 
+app.get('/api/get-my-orders', (req, res) => {
+  const user = req.session.user;
+  if (!user || user.role !== 'customer') {
+    return res.status(401).json({ message: 'Nicht autorisiert' });
+  }
+
+  const con = createConnection(dbConfig);
+  con.connect(err => {
+    if (err) {
+      return res.status(500).send("DB connection error");
+    }
+
+    const sql = `
+      SELECT *
+      FROM Customer_Order
+      WHERE customer_id = ?
+      ORDER BY date DESC
+    `;
+
+    con.query(sql, [user.user_id], (error, results) => {
+      if (error) {
+        res.status(500).send(error);
+      } else {
+        res.send(results);
+      }
+      con.end();
+    });
+    return;
+  });
+  return;
+});
 
 app.get('/api/get-product/:id', (req, res) => {
   const productId = req.params.id;
