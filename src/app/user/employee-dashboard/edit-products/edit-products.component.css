@@ -1,10 +1,4 @@
-.headline {
-  margin: 0 0 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  text-align: center;
-}
-
+/* edit-products.component.css */
 .product-page {
   display: flex;
   flex-direction: column;
@@ -14,19 +8,16 @@
   position: relative;
 }
 
-.back-button{
+.back-button {
   position: absolute;
   top: 1rem;
+  left: 1rem;
   background: none;
   border: none;
   font-size: 1rem;
   color: #2c6e49;
   text-decoration: underline;
   cursor: pointer;
-}
-
-.back-button {
-  left: 1rem;
 }
 
 .product-content {
@@ -71,43 +62,93 @@
 .headline {
   font-size: 2rem;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 1rem;
 }
 
-button {
-  align-self: flex-start;
-  padding: 0.5rem 1rem;
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #94bb9b;
+}
+
+button[type="submit"] {
+  padding: 0.75rem 1.5rem;
   background-color: #94bb9b;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-button:hover {
+button[type="submit"]:hover {
   background-color: #5c7761;
 }
 
-.error {
-  color: #c00;
-  font-weight: 600;
-}
-
-.loader {
-  padding: 1rem;
-  text-align: center;
-  color: #555;
-  font-style: italic;
+button[type="submit"]:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .alert {
   padding: 1rem;
-  border-radius: 6px;
-  background-color: #fff3cd;
-  color: #856404;
-  max-width: 400px;
-  margin: 2rem auto;
-  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.error {
+  color: #721c24;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.btn-danger {
+  padding: 0.75rem 1.5rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-left: 1rem;
+}
+
+.btn-danger:hover {
+  background-color: #bb2d3b;
+}
+
+.btn-danger:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }

@@ -55,4 +55,10 @@ export class ProductListComponent implements OnInit {
   goToEditProducts(product: Product): void {
   this.router.navigate(['/edit-products', product.product_id]);
 }
+  loadProducts(): void {
+    this.productService.getProducts().subscribe({
+      next: (products) => this.product = products,
+      error: () => this.error = 'Fehler beim Laden der Produkte.'
+    });
+}
 }

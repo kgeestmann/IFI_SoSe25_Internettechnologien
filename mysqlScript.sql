@@ -142,7 +142,7 @@ CREATE TABLE Product_Change (
     ON DELETE SET NULL 
     ON UPDATE CASCADE,
   FOREIGN KEY (product_id) REFERENCES Product(product_id) 
-    ON DELETE RESTRICT 
+    ON DELETE SET NULL 
     ON UPDATE CASCADE
 );
 
@@ -156,7 +156,7 @@ CREATE TABLE User_Change (
   field_before VARCHAR(255),
   field_after VARCHAR(255),
   FOREIGN KEY (user_id) REFERENCES User(user_id)
-    ON DELETE RESTRICT 
+    ON DELETE SET NULL 
     ON UPDATE CASCADE,
   FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
     ON DELETE SET NULL 
@@ -173,7 +173,7 @@ CREATE TABLE Order_Change (
   field_before VARCHAR(255),
   field_after VARCHAR(255),
   FOREIGN KEY (order_id) REFERENCES Customer_Order(order_id)
-    ON DELETE RESTRICT 
+    ON DELETE SET NULL 
     ON UPDATE CASCADE,
   FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
     ON DELETE SET NULL 
