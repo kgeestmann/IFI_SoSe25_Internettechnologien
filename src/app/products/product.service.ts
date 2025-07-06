@@ -7,6 +7,7 @@ export interface Product {
   name: string;
   price: number;
   description?: string;
+  stock_quantity: number;
   image: string;
 }
 
@@ -16,11 +17,17 @@ export interface Product {
 export class ProductService {
   constructor(private http: HttpClient) {}
 
+  // Alle Produkte abrufen
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>('/api/get-products');
   }
 
+  // Einzelnes Produkt anhand der ID abrufen
   getProductById(id: number): Observable<Product> {
-  return this.http.get<Product>(`/api/get-product/${id}`);
-}
+    return this.http.get<Product>(`/api/get-product/${id}`);
+  }
+
+  // Produkt aktualisieren
+  updateProduct(product: Product): Observable<any> {
+    return this.http.put('/api/edit-product', product);  }
 }

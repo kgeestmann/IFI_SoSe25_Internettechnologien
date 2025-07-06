@@ -51,59 +51,6 @@ const dbConfig = {
   ssl: { rejectUnauthorized: false }
 };
 
-app.get('/api/get-products', (req, res) => {
-  console.log("Anfrage angekommen");
-  const con = createConnection(dbConfig);
-
-  con.connect(function(err){
-    if(err) throw err;
-    console.log("connected to db");
-    con.query("SELECT * from Product", function(error,result,fields){
-      //console.log(result);
-      res.send(result);
-      con.end(function(err){
-      });
-    });
-  });
-});
-
-app.post('/api/products', async (req, res) => {
-  const user = req.session.user;
-
-  // Nur Mitarbeiter dürfen Produkte erstellen
-  if (!user || user.role !== 'employee') {
-    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte erstellen' });
-  }
-
-  const { name, description, price, stock_quantity, image } = req.body;
-
-  // Pflichtfelder prüfen
-  if (!name || price === undefined || stock_quantity === undefined || !description || !image) {
-    return res.status(400).json({ message: 'Fehlende Pflichtfelder (name, price, stock_quantity, description, image)' });
-  }
-
-  const con = createConnection(dbConfig).promise();
-
-  try {
-    await con.connect();
-
-    // Nur Produkt einfügen, kein Logging mehr
-    const [insertResult] = await con.query(
-      'INSERT INTO Product (name, description, price, stock_quantity, image) VALUES (?, ?, ?, ?, ?)',
-      [name, description, price, stock_quantity, image]
-    );
-
-    const insertedId = (insertResult as OkPacket).insertId;
-
-    await con.end();
-
-    return res.status(201).json({ message: 'Produkt erfolgreich erstellt', product_id: insertedId });
-  } catch (error: any) {
-    await con.end();
-    console.error('Fehler beim Einfügen des Produkts:', error);
-    return res.status(500).json({ message: 'Fehler beim Erstellen des Produkts', error: error.message });
-  }
-});
 
 app.post('/api/cart/add', (req, res) => {
   const { customer_id, product_id, quantity, price } = req.body;
@@ -369,6 +316,81 @@ app.get('/api/get-cart', (req, res) => {
   return;
 });
 
+app.get('/api/get-products', (req, res) => {
+  console.log("Anfrage angekommen");
+  const con = createConnection(dbConfig);
+
+  con.connect(function(err){
+    if(err) throw err;
+    console.log("connected to db");
+    con.query("SELECT * from Product", function(error,result,fields){
+      //console.log(result);
+      res.send(result);
+      con.end(function(err){
+      });
+    });
+  });
+});
+
+app.post('/api/products', async (req, res) => {
+  const user = req.session.user;
+
+  if (!user || user.role !== 'employee') {
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte erstellen' });
+  }
+
+  const { name, description, price, stock_quantity, image } = req.body;
+
+  if (!name || price === undefined || stock_quantity === undefined || !description || !image) {
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder (name, price, stock_quantity, description, image)' });
+  }
+
+  const con = createConnection(dbConfig).promise();
+
+  try {
+    await con.connect();
+
+    const [insertResult] = await con.query(
+      'INSERT INTO Product (name, description, price, stock_quantity, image) VALUES (?, ?, ?, ?, ?)',
+      [name, description, price, stock_quantity, image]
+    );
+
+    const insertedId = (insertResult as OkPacket).insertId;
+
+    const fieldsToLog = [
+      { field: 'name', value: name },
+      { field: 'description', value: description },
+      { field: 'price', value: price },
+      { field: 'stock_quantity', value: stock_quantity },
+      { field: 'image', value: image }
+    ];
+
+    const logPromises = fieldsToLog.map(field => 
+      con.query(
+        'INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), NULL, ?)',
+        [user.user_id, insertedId, field.field, field.value]
+      )
+    );
+
+    await Promise.all(logPromises);
+
+    await con.end();
+
+    return res.status(201).json({ 
+      message: 'Produkt erfolgreich erstellt', 
+      product_id: insertedId,
+      logs_created: fieldsToLog.length 
+    });
+  } catch (error: any) {
+    await con.end();
+    console.error('Fehler beim Erstellen des Produkts:', error);
+    return res.status(500).json({ 
+      message: 'Fehler beim Erstellen des Produkts', 
+      error: error.message 
+    });
+  }
+});
+
 app.get('/api/get-product/:id', (req, res) => {
   const productId = req.params.id;
 
@@ -404,6 +426,77 @@ app.get('/api/get-product/:id', (req, res) => {
 
   }); 
 });  
+
+app.put('/api/edit-product', async (req, res) => {
+  const user = req.session.user;
+
+  if (!user || user.role !== 'employee') {
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte bearbeiten' });
+  }
+
+  const { product_id, name, description, price, stock_quantity, image } = req.body;
+
+  if (!product_id || !name || price === undefined || stock_quantity === undefined || !description || !image) {
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder (product_id, name, price, stock_quantity, description, image)' });
+  }
+
+  const con = createConnection(dbConfig).promise();
+
+  try {
+    await con.connect();
+
+    const [currentProductRows] = await con.query<RowDataPacket[]>(
+      'SELECT name, description, price, stock_quantity, image FROM Product WHERE product_id = ?',
+      [product_id]
+    );
+
+    if (currentProductRows.length === 0) {
+      await con.end();
+      return res.status(404).json({ message: 'Produkt nicht gefunden' });
+    }
+
+    const oldValues = currentProductRows[0];
+    const changes = [];
+
+    if (oldValues['name'] !== name) {
+      changes.push({ field: 'name', before: oldValues['name'], after: name });
+    }
+    if (oldValues['description'] !== description) {
+      changes.push({ field: 'description', before: oldValues['description'], after: description });
+    }
+    if (oldValues['price'] !== price) {
+      changes.push({ field: 'price', before: oldValues['price'], after: price });
+    }
+    if (oldValues['stock_quantity'] !== stock_quantity) {
+      changes.push({ field: 'stock_quantity', before: oldValues['stock_quantity'], after: stock_quantity });
+    }
+    if (oldValues['image'] !== image) {
+      changes.push({ field: 'image', before: oldValues['image'], after: image });
+    }
+
+    await con.query(
+      'UPDATE Product SET name = ?, description = ?, price = ?, stock_quantity = ?, image = ? WHERE product_id = ?',
+      [name, description, price, stock_quantity, image, product_id]
+    );
+
+    if (changes.length > 0) {
+      const changePromises = changes.map(change => 
+        con.query(
+          'INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), ?, ?)',
+          [user.user_id, product_id, change.field, change.before, change.after]
+        )
+      );
+      await Promise.all(changePromises);
+    }
+
+    await con.end();
+    return res.status(200).json({ message: 'Produkt erfolgreich aktualisiert', changes_made: changes.length > 0 });
+  } catch (error: any) {
+    await con.end();
+    console.error('Fehler beim Aktualisieren des Produkts:', error);
+    return res.status(500).json({ message: 'Fehler beim Aktualisieren des Produkts', error: error.message });
+  }
+});
 
 app.get('/api/get-customers', (req, res) => {
   const con = createConnection(dbConfig);

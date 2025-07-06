@@ -21,6 +21,7 @@
       <div *ngIf="selectedLogType === 'products' && logs?.products?.length" class="log-section">
         <h3 class="subheadline">Produktänderungen</h3>
         <div class="log-card" *ngFor="let log of logs.products" tabindex="0">
+          <span class="log-entry">Mitarbeiter-ID: {{ log.employee_id || 'System' }}</span>
           <span class="log-entry">ID: {{ log.product_change_id }}</span>
           <span class="log-entry">Produkt-ID: {{ log.product_id }}</span>
           <span class="log-entry">Feld: {{ log.field_changed }}</span>

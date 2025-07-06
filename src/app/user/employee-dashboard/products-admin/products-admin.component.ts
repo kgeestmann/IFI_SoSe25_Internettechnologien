@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ProductListComponent } from '../../../products/product-list/product-list.component';
@@ -16,9 +16,12 @@ import { combineLatest } from 'rxjs';
   ]
 })
 export class ProductsAdminComponent implements OnInit {
+  @ViewChild(ProductListComponent) productListComponent?: ProductListComponent;
   productForm: FormGroup;
   currentUser: any;
   isEmployee = false;
+  error = '';
+  successMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -69,13 +72,14 @@ export class ProductsAdminComponent implements OnInit {
     const productData = this.productForm.value;
 
     this.http.post('/api/products', productData).subscribe({
-      next: () => {
-        alert('Produkt erfolgreich erstellt!');
+      next: (response) => {
+        // successMessage funktioniert nicht
+        this.successMessage = 'Produkt erfolgreich erstellt!';
         this.productForm.reset();
+        this.productListComponent?.loadProducts();
       },
-      error: (err) => {
-        alert('Fehler beim Erstellen des Produkts');
-        console.error(err);
+      error: (error) => {
+        this.error = error.error.message || 'Fehler beim Erstellen des Produkts';
       }
     });
   }
