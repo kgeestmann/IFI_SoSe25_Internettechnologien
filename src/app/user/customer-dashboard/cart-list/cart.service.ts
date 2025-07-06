@@ -28,7 +28,7 @@ export class CartService {
   constructor(private auth: AuthService, private http: HttpClient) {
     this.auth.currentUser$.subscribe(user => {
       this.userId = user?.user_id ?? null;
-      if (this.userId) {
+      if (this.userId && user?.type === 'Customer') {
         this.getCart();
       }
     });

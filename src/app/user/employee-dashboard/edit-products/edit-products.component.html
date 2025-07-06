@@ -1,27 +1,46 @@
-<ng-container *ngIf="product; else errorTpl">
+<!-- Nur anzeigen, wenn isEmployee true -->
+<div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
+  <div *ngIf="currentUser; else loading" class="dashboard-content">
+    
+  <div class="product-page"> 
+  <button class="back-button" (click)="goBack()">← Zurück</button>
+  <h2 class="headline">Produkt bearbeiten</h2>
   <div class="product-content">
-    <div class="image-wrapper">
-      <img
-        [src]="'/assets/images/' + product.image"
-        [alt]="product.name"
-        class="product-image"
-      />
-    </div>
+    <ng-container *ngIf="product; else errorTpl">
+      
+      <div class="image-wrapper">
+        <img [src]="'/assets/images/' + product.image"
+             [alt]="product.name"
+             class="product-image"/>
+      </div>
 
-    <div class="info-wrapper">
-      <h2 class="headline">{{ product.name }}</h2>
-
-      <p>{{ product.description }}</p>
-      <p><strong>Preis:</strong> {{ product.price | currency:'EUR' }}</p>
-
-      <button (click)="goBack()">Zurück zur Übersicht</button>
-    </div>
+      <div class="info-wrapper">
+        <h2 class="headline">{{ product.name }}</h2>
+        <p>{{ product.description }}</p>
+        <p><strong>Preis:</strong> {{ product.price | currency:'EUR' }}</p>
+      </div>
+    </ng-container>
   </div>
-</ng-container>
+</div>
+
+</div>
+</div>
 
 <ng-template #errorTpl>
   <div class="product-content">
     <p>{{ error || 'Produkt nicht gefunden.' }}</p>
-    <button (click)="goBack()">Zurück zur Übersicht</button>
   </div>
+</ng-template>
+
+<!-- Zugriff verweigert -->
+<ng-template #accessDenied>
+  <div class="alert alert-warning">
+    <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
+    <a routerLink="/login" class="btn btn-primary">Zum Login</a>
+  </div>
+</ng-template>
+
+<!-- Ladeanzeige -->
+<ng-template #loading>
+  <p class="loader">Lade Bestellungen...</p>
 </ng-template>

@@ -75,6 +75,11 @@ button:hover {
   background: #5c7761;
 }
 
+.error {
+  color: #c00;
+  font-weight: 600;
+}
+
 .loader {
   padding: 1rem;
   text-align: center;

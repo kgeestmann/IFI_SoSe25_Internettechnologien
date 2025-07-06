@@ -1,8 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common'; // für *ngFor und *ngIf
-import {CustomerService, Customer} from '../customer.service';
-import {Router} from '@angular/router';
-import {Order} from '../order.service';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CustomerService, Customer } from '../customer.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../auth.service';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-customer-list',
@@ -16,11 +17,47 @@ export class CustomerListComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private customerService: CustomerService,
-              private router: Router) {
-  }
+  currentUser: any;
+  isEmployee = false;
+
+  constructor(
+    private customerService: CustomerService,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    this.authService.checkSession();
+
+    combineLatest([
+      this.authService.isLoggedIn$,
+      this.authService.isEmployee$
+    ]).subscribe(([loggedIn, isEmployee]) => {
+      this.isEmployee = isEmployee;
+
+      if (loggedIn && isEmployee && !this.currentUser) {
+        this.loadUserDetails();
+      } else if (!loggedIn || !isEmployee) {
+        this.loading = false;
+      }
+    });
+  }
+
+  loadUserDetails() {
+    this.authService.fetchUserDetails().subscribe({
+      next: (details) => {
+        this.currentUser = details;
+        this.authService.setLogin(details);
+        this.loadCustomers(); 
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der User-Details', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  loadCustomers() {
     this.customerService.getCustomers().subscribe({
       next: (data) => {
         this.customers = data;

@@ -1,4 +1,8 @@
-<ng-container *ngIf="customer; else errorTpl">
+<!-- Nur anzeigen, wenn isEmployee true -->
+<div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
+  <div *ngIf="currentUser; else loading" class="dashboard-content">
+    
+  <ng-container *ngIf="customer; else errorTpl">
   <div class="customer-content">
     <div class="info-wrapper">
       <h2 class="headline">Kunde</h2>
@@ -27,9 +31,25 @@
   </div>
 </ng-container>
 
+  </div>
+</div>
+
 <ng-template #errorTpl>
   <div class="product-content">
     <p>{{ error || 'Kunde nicht gefunden.' }}</p>
     <button (click)="goBack()">Zurück zu den Kundes</button>
   </div>
+</ng-template>
+
+<!-- Zugriff verweigert -->
+<ng-template #accessDenied>
+  <div class="alert alert-warning">
+    <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
+    <a routerLink="/login" class="btn btn-primary">Zum Login</a>
+  </div>
+</ng-template>
+
+<!-- Ladeanzeige -->
+<ng-template #loading>
+  <p class="loader">Lade Kunde...</p>
 </ng-template>

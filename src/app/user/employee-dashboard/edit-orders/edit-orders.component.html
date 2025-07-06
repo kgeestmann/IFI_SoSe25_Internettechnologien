@@ -1,7 +1,11 @@
-<ng-container *ngIf="order; else errorTpl">
+<!-- Nur anzeigen, wenn isEmployee true -->
+<div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
+  <div *ngIf="currentUser; else loading" class="dashboard-content">
+    
+  <ng-container *ngIf="order; else errorTpl">
   <div class="order-content">
     <div class="info-wrapper">
-      <h2 class="headline">Bestell</h2>
+      <h2 class="headline">Bestellung</h2>
       <form class="order-edit-form" (ngSubmit)="editOrder()">
         <label for="order-id-label" class="order-edit-label">Bestell-ID:</label>
         <label for="order-id-label" class="order-edit-label">{{ order.order_id }}</label>
@@ -27,9 +31,25 @@
   </div>
 </ng-container>
 
+  </div>
+</div>
+
 <ng-template #errorTpl>
   <div class="product-content">
     <p>{{ error || 'Bestellung nicht gefunden.' }}</p>
     <button (click)="goBack()">Zurück zu den Bestellungen</button>
   </div>
+</ng-template>
+
+<!-- Zugriff verweigert -->
+<ng-template #accessDenied>
+  <div class="alert alert-warning">
+    <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
+    <a routerLink="/login" class="btn btn-primary">Zum Login</a>
+  </div>
+</ng-template>
+
+<!-- Ladeanzeige -->
+<ng-template #loading>
+  <p class="loader">Lade Bestellung...</p>
 </ng-template>

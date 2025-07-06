@@ -159,3 +159,25 @@ button:hover {
   border-radius: 8px;
   margin-bottom: 0.5rem;
 }
+
+.error {
+  color: #c00;
+  font-weight: 600;
+}
+
+.loader {
+  padding: 1rem;
+  text-align: center;
+  color: #555;
+  font-style: italic;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 6px;
+  background-color: #fff3cd;
+  color: #856404;
+  max-width: 400px;
+  margin: 2rem auto;
+  text-align: center;
+}

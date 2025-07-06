@@ -1,34 +1,66 @@
-import {Component, OnInit} from '@angular/core';
-import {Order, OrderService} from '../order.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Order, OrderService } from '../order.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../auth.service';
+import { combineLatest, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-edit-orders',
   imports: [CommonModule, FormsModule],
   templateUrl: './edit-orders.component.html',
-  styleUrl: './edit-orders.component.css',
+  styleUrls: ['./edit-orders.component.css'],
   standalone: true,
 })
-export class EditOrdersComponent implements OnInit {
+export class EditOrdersComponent implements OnInit, OnDestroy {
   order: Order | null = null;
   error: string = '';
+
+  currentUser: any = null;
+  isEmployee = false;
+
+  private authSub?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private orderService: OrderService,
-    private router: Router
-  ) {
-  }
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.authService.checkSession();
+
+    this.authSub = combineLatest([
+      this.authService.isLoggedIn$,
+      this.authService.isEmployee$,
+    ]).subscribe(([loggedIn, isEmployee]) => {
+      this.isEmployee = isEmployee;
+
+      if (loggedIn && isEmployee && !this.currentUser) {
+        this.loadUserDetails();
+      }
+    });
+
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id || isNaN(id)) {
       this.error = 'Ungültige Bestellung-ID.';
       return;
     }
     this.loadOrder(id);
+  }
+
+  loadUserDetails() {
+    this.authService.fetchUserDetails().subscribe({
+      next: (details) => {
+        this.currentUser = details;
+        this.authService.setLogin(details);
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der User-Details', err);
+      },
+    });
   }
 
   loadOrder(id: number): void {
@@ -42,7 +74,7 @@ export class EditOrdersComponent implements OnInit {
         }
       },
       error: () => {
-        this.error = 'Fehler beim Laden des Bestellung.';
+        this.error = 'Fehler beim Laden der Bestellung.';
       },
     });
   }
@@ -54,5 +86,9 @@ export class EditOrdersComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/orders-admin']);
+  }
+
+  ngOnDestroy(): void {
+    this.authSub?.unsubscribe();
   }
 }

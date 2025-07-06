@@ -1,8 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {OrderService, Order} from '../order.service';
-import {Product} from '../../../products/product.service';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { OrderService, Order } from '../order.service';
+import { Product } from '../../../products/product.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../auth.service';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-order-list',
@@ -16,11 +18,32 @@ export class OrderListComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
 
-  constructor(private orderService: OrderService,
-              private router: Router) {
-  }
+  currentUser: any;
+  isEmployee = false;
+
+  constructor(
+    private orderService: OrderService,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    this.authService.checkSession();
+
+    combineLatest([
+      this.authService.isLoggedIn$,
+      this.authService.isEmployee$
+    ]).subscribe(([loggedIn, isEmployee]) => {
+      this.isEmployee = isEmployee;
+
+      if (loggedIn && isEmployee && !this.currentUser) {
+        this.loadUserDetails();
+      }
+    });
+    this.loadOrders();
+  }
+
+  loadOrders() {
     this.orderService.getOrders().subscribe({
       next: (data) => {
         this.orders = data;
@@ -29,6 +52,18 @@ export class OrderListComponent implements OnInit {
       error: () => {
         this.error = 'Fehler beim Laden der Bestellungen';
         this.loading = false;
+      }
+    });
+  }
+
+  loadUserDetails() {
+    this.authService.fetchUserDetails().subscribe({
+      next: (details) => {
+        this.currentUser = details;
+        this.authService.setLogin(details);
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der User-Details', err);
       }
     });
   }

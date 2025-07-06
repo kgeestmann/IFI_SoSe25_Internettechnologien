@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ProductListComponent } from '../../../products/product-list/product-list.component';
+import { AuthService } from '../../../auth.service';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-products-admin',
@@ -13,16 +15,37 @@ import { ProductListComponent } from '../../../products/product-list/product-lis
     ProductListComponent
   ]
 })
-export class ProductsAdminComponent {
+export class ProductsAdminComponent implements OnInit {
   productForm: FormGroup;
+  currentUser: any;
+  isEmployee = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private authService: AuthService
+  ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
       description: ['', Validators.required],
       stock_quantity: [0, [Validators.required, Validators.min(0)]],
       image: ['', Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    this.authService.checkSession();
+
+    combineLatest([
+      this.authService.isLoggedIn$,
+      this.authService.isEmployee$
+    ]).subscribe(([loggedIn, isEmployee]) => {
+      this.isEmployee = isEmployee;
+
+      if (loggedIn && isEmployee && !this.currentUser) {
+        this.loadUserDetails();
+      }
     });
   }
 
@@ -41,6 +64,18 @@ export class ProductsAdminComponent {
       error: (err) => {
         alert('Fehler beim Erstellen des Produkts');
         console.error(err);
+      }
+    });
+  }
+
+  loadUserDetails() {
+    this.authService.fetchUserDetails().subscribe({
+      next: (details) => {
+        this.currentUser = details;
+        this.authService.setLogin(details);
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der User-Details', err);
       }
     });
   }

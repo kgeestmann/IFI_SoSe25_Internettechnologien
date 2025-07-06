@@ -1,12 +1,11 @@
-<h2 class="headline">
-  <div *ngIf="loading; else elseBlock">Lade Kunden...</div>
-  <ng-template #elseBlock>Kunden</ng-template>
-  <div *ngIf="error">{{ error }}</div>
-</h2>
+<!-- Nur anzeigen, wenn isEmployee true -->
+<div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
+  <div *ngIf="currentUser; else loading" class="dashboard-content">
+
+<h2 class="headline">Kunden</h2>
 
 <div class="customers-wrapper">
   <div class="customer-card" *ngFor="let customer of customers" tabindex="0">
-    <span class="customer-entry">Kunden-ID: {{ customer.customer_id }}</span><br>
     <span class="customer-entry">Straße: {{ customer.street }}</span><br>
     <span class="customer-entry">Hausnummer: {{ customer.house_number }}</span><br>
     <span class="customer-entry">PLZ: {{ customer.zipcode }}</span><br>
@@ -15,3 +14,18 @@
     <button class="edit-button" (click)="goToEditCustomer(customer); $event.stopPropagation()">Kunde bearbeiten</button>
   </div>
 </div>
+</div>
+</div>
+
+<!-- Zugriff verweigert -->
+<ng-template #accessDenied>
+  <div class="alert alert-warning">
+    <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
+    <a routerLink="/login" class="btn btn-primary">Zum Login</a>
+  </div>
+</ng-template>
+
+<!-- Ladeanzeige -->
+<ng-template #loading>
+  <p class="loader">Lade Kunden...</p>
+</ng-template>

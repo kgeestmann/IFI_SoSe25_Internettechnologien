@@ -1,3 +1,10 @@
+.headline {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .product-page {
   display: flex;
   flex-direction: column;
@@ -7,8 +14,7 @@
   position: relative;
 }
 
-.back-button,
-.cart-button {
+.back-button{
   position: absolute;
   top: 1rem;
   background: none;
@@ -21,10 +27,6 @@
 
 .back-button {
   left: 1rem;
-}
-
-.cart-button {
-  right: 1rem;
 }
 
 .product-content {
@@ -87,40 +89,25 @@ button {
 button:hover {
   background-color: #5c7761;
 }
-.recommendation-section {
-  margin-top: 3rem;
+
+.error {
+  color: #c00;
+  font-weight: 600;
 }
 
-.recommendation-section h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.recommendation-list {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-}
-
-.recommendation-card {
-  min-width: 200px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+.loader {
   padding: 1rem;
-  cursor: pointer;
   text-align: center;
-  transition: transform 0.2s ease;
+  color: #555;
+  font-style: italic;
 }
 
-.recommendation-card:hover {
-  transform: translateY(-4px);
-}
-
-.recommendation-card img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
+.alert {
+  padding: 1rem;
+  border-radius: 6px;
+  background-color: #fff3cd;
+  color: #856404;
+  max-width: 400px;
+  margin: 2rem auto;
+  text-align: center;
 }
