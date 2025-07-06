@@ -4,7 +4,7 @@ import express from 'express';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import bootstrap from './main.server';
-import { createConnection, RowDataPacket } from 'mysql2';
+import { createConnection, ResultSetHeader, RowDataPacket } from 'mysql2';
 import session from 'express-session';
 import { OkPacket } from 'mysql';
 
@@ -368,6 +368,107 @@ app.get('/api/get-cart', (req, res) => {
   });
   return;
 });
+
+app.post('/api/cart/checkout', (req, res) => {
+  const user = req.session.user;
+  if (!user || user.role !== 'customer') {
+    return res.status(401).json({ message: 'Nicht autorisiert' });
+  }
+
+  const con = createConnection(dbConfig);
+
+  con.connect(err => {
+    if (err) return res.status(500).json({ message: 'DB‑Verbindung fehlgeschlagen' });
+
+    con.beginTransaction(err => {
+      if (err) { con.end(); return res.status(500).json({ message: 'Transaktionsfehler' }); }
+
+      /* 1. Warenkorb holen */
+      con.query(
+        `SELECT cart_id, total_price
+           FROM Cart
+          WHERE customer_id = ?`,
+        [user.user_id],
+        (err, results) => {
+          if (err) return rollback('Fehler beim Lesen des Warenkorbs');
+
+          const cartRows = results as RowDataPacket[];
+          if (!cartRows.length || cartRows[0]['total_price'] === 0) {
+            return rollback('Warenkorb leer', 400);
+          }
+
+          const cart_id     = cartRows[0]['cart_id'];
+          const total_price = cartRows[0]['total_price'];
+
+          /* 2. Bestellungskopf einfügen */
+          con.query(
+            `INSERT INTO Customer_Order
+               (customer_id, date, delivery_status, total_price, payment_method)
+             VALUES (?, CURDATE(), 'open', ?, 'invoice')`,
+            [user.user_id, total_price],
+            (err, results) => {
+              if (err) return rollback('Fehler beim Anlegen der Bestellung');
+
+              const order_id = (results as ResultSetHeader).insertId;
+
+              /* 3. Positionen kopieren in Order_Item */
+              con.query(
+                `INSERT INTO Order_Item
+                   (order_id, product_id, quantity, price)
+                 SELECT ?, product_id, quantity, price
+                   FROM Cart_Item
+                  WHERE cart_id = ?`,
+                [order_id, cart_id],
+                err => {
+                  if (err) return rollback('Fehler beim Kopieren der Positionen');
+
+                  /* 4. Warenkorb leeren */
+                  con.query(
+                    `DELETE FROM Cart_Item WHERE cart_id = ?`,
+                    [cart_id],
+                    err => {
+                      if (err) return rollback('Fehler beim Leeren des Warenkorbs');
+
+                      con.query(
+                        `UPDATE Cart SET total_price = 0 WHERE cart_id = ?`,
+                        [cart_id],
+                        err => {
+                          if (err) return rollback('Fehler beim Zurücksetzen des Warenkorbs');
+
+                          /* 5. Commit und Antwort */
+                          con.commit(err => {
+                            con.end();
+                            if (err) return res.status(500).json({ message: 'Commit‑Fehler' });
+
+                            return res.status(201).json({
+                              message: 'Bestellung erfolgreich erstellt',
+                              order_id
+                            });
+                          });
+                        }
+                      );
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      );
+
+      function rollback(msg: string, code = 500) {
+        con.rollback(() => {
+          con.end();
+          res.status(code).json({ message: msg });
+        });
+      }
+      return;
+    });
+    return;
+  });
+  return;
+});
+
 
 app.get('/api/get-product/:id', (req, res) => {
   const productId = req.params.id;

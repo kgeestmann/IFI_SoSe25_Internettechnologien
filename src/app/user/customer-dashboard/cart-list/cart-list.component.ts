@@ -52,4 +52,9 @@ export class CartListComponent {
   clearCart(): void {
     this.cartService.clearCart();
   }
+
+  checkout(): void {
+    this.cartService.checkout();
+    console.log("geklickt im component");
+  }
 }

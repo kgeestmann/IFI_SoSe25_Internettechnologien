@@ -129,4 +129,26 @@ export class CartService {
       }
     });
   }
+
+  checkout() {
+  if (!this.userId) {
+    alert('Bitte zuerst einloggen');
+    return;
+  }
+
+  this.http.post<{ order_id: number; message: string }>(
+    '/api/cart/checkout',
+    {}
+  ).subscribe({
+    next: (resp) => {
+      console.log('Checkout erfolgreich:', resp);
+      alert(`Bestellung #${resp.order_id} erfolgreich!`);
+      this.getCart();
+    },
+    error: (err) => {
+      console.error('Checkout Fehler:', err);
+      alert('Checkout fehlgeschlagen');
+    }
+  });
+}
 }

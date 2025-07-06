@@ -26,7 +26,7 @@
     <div class="total-price">
       Gesamt: {{ totalPrice | currency:'EUR':'symbol' }}
     </div>
-    <button type="button" class="order-btn">
+    <button type="button" class="order-btn" (click)="checkout()" [disabled]="!cartItems.length">
       Bestellung aufgeben
     </button>
   </div>
