@@ -154,6 +154,21 @@ app.post('/api/cart/add', (req, res) => {
               const newQuantity = existingQuantity + quantity;
               const newTotalPrice = newQuantity * unit_price;
 
+              if (newQuantity <= 0) {
+                con.query(
+                  'DELETE FROM Cart_Item WHERE cart_id = ? AND product_id = ?',
+                  [cart_id, product_id],
+                  err => {
+                    if (err) {
+                      con.end();
+                      return res.status(500).json({ message: 'Fehler beim Löschen des Artikels' });
+                    }
+                    return updateCartTotal(con, cart_id, res);  // ← Gesamtpreis neu berechnen
+                  }
+                );
+                return;
+              }
+
               con.query(
                 'UPDATE Cart_Item SET quantity = ?, price = ? WHERE cart_id = ? AND product_id = ?',
                 [newQuantity, newTotalPrice, cart_id, product_id],
