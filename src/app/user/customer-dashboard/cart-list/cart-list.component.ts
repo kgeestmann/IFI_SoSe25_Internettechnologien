@@ -19,6 +19,10 @@ export class CartListComponent {
     return this.cart()?.items ?? [];
   }
 
+  get totalPrice(): number {
+  return this.cart()?.total_price ?? 0;
+}
+
   constructor() {
     this.cartService.getCart();
 

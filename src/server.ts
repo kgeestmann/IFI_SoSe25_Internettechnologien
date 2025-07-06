@@ -341,9 +341,9 @@ app.get('/api/get-cart', (req, res) => {
     return res.status(500).json({ message: 'Fehler beim Laden der Warenkorbdaten' });
   }
 
-  const items = results as RowDataPacket;
+  const items = results as RowDataPacket[];
 
-  const total_price = items.length > 0 ? items[0].total_price : 0;  
+  const total_price = items.length > 0 ? items[0]['total_price'] : 0;  
 
   con.end();
   res.json({

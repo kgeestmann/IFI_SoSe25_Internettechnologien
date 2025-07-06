@@ -15,7 +15,7 @@ export interface CartItem {
 export interface Cart {
   cart_id: number;
   items: CartItem[];
-
+  total_price: number;
 }
 
 @Injectable({ providedIn: 'root' })
