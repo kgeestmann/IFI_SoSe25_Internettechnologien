@@ -163,7 +163,7 @@ app.post('/api/cart/add', (req, res) => {
                       con.end();
                       return res.status(500).json({ message: 'Fehler beim Löschen des Artikels' });
                     }
-                    return updateCartTotal(con, cart_id, res);  // ← Gesamtpreis neu berechnen
+                    return updateCartTotal(con, cart_id, res);
                   }
                 );
                 return;
@@ -180,7 +180,7 @@ app.post('/api/cart/add', (req, res) => {
                   return updateCartTotal(con, cart_id, res);
                 }
               );
-              return; // wichtig, damit callback endet
+              return;
             } else {
               con.query(
                 'INSERT INTO Cart_Item (cart_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
@@ -203,7 +203,7 @@ app.post('/api/cart/add', (req, res) => {
     return;
   });
 
-  return; // wichtig: Hauptfunktion gibt synchron return
+  return;
 });
 
 function updateCartTotal(con: ReturnType<typeof createConnection>, cart_id: number, res: express.Response) {
@@ -329,7 +329,6 @@ app.get('/api/get-cart', (req, res) => {
         }
 
         const cartId = (results as RowDataPacket[])[0]['cart_id'];
-        console.log("Verwende cartId:", cartId);
 
         const sql = `
           SELECT 
@@ -346,12 +345,8 @@ app.get('/api/get-cart', (req, res) => {
           WHERE ci.cart_id = ?
         `;
 
-        console.log("SQL Query wird ausgeführt mit cartId:", cartId);
-
-
         return con.query(sql, [cartId], (err, results) => {
   if (err) {
-    console.error("SQL-Fehler bei get-cart:", err);
     con.end();
     return res.status(500).json({ message: 'Fehler beim Laden der Warenkorbdaten' });
   }
