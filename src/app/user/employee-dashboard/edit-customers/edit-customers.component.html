@@ -5,12 +5,21 @@
       <form class="customer-edit-form" (ngSubmit)="editCustomer()">
         <label for="customer-id-label" class="customer-edit-label">Kunde-ID:</label>
         <label for="customer-id-label" class="customer-edit-label">{{ customer.customer_id }}</label>
-        <label for="customer-billing-address-label" class="customer-billing-address-label">Rechnungsadresse ID:</label>
-        <input type="text" id="customer-billing-address" name="customer-billing-address" class="customer-edit-input"
-               value="{{ customer.billing_address_id }}" [(ngModel)]="customer.billing_address_id" required>
-        <label for="customer-shipping-address-label" class="customer-shipping-address-label">Lieferadresse ID:</label>
-        <input type="text" id="customer-shipping-address" name="customer-shipping-address" class="customer-edit-input"
-               value="{{ customer.shipping_address_id }}" [(ngModel)]="customer.shipping_address_id" required>
+        <label for="customer-street-label" class="customer-street-label">Straße:</label>
+        <input type="text" id="customer-street" name="customer-street" class="customer-edit-input"
+               value="{{ customer.street }}" [(ngModel)]="customer.street" required>
+        <label for="customer-house-number-label" class="customer-house-number-label">Hausnummer:</label>
+        <input type="text" id="customer-house-number" name="customer-house-number" class="customer-edit-input"
+               value="{{ customer.house_number }}" [(ngModel)]="customer.house_number" required>
+        <label for="customer-zip-code-label" class="customer-zip-code-label">PLZ:</label>
+        <input type="text" id="customer-zip-code" name="customer-zip-code" class="customer-edit-input"
+               value="{{ customer.zipcode }}" [(ngModel)]="customer.zipcode" required>
+        <label for="customer-country-label" class="customer-country-label">Land:</label>
+        <input type="text" id="customer-country" name="customer-country" class="customer-edit-input"
+               value="{{ customer.country }}" [(ngModel)]="customer.country" required>
+        <label for="customer-city-label" class="customer-city-label">Stadt:</label>
+        <input type="text" id="customer-city" name="customer-city" class="customer-edit-input"
+               value="{{ customer.city }}" [(ngModel)]="customer.city" required>
         <button type="submit" class="customer-edit-button">Kunde speichern</button>
         <button (click)="goBack()">Zurück zu den Kundes</button>
       </form>

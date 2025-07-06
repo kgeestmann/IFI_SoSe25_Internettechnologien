@@ -7,8 +7,11 @@
 <div class="customers-wrapper">
   <div class="customer-card" *ngFor="let customer of customers" tabindex="0">
     <span class="customer-entry">Kunden-ID: {{ customer.customer_id }}</span><br>
-    <span class="customer-entry">Rechnungsadresse ID: {{ customer.billing_address_id }}</span><br>
-    <span class="customer-entry">Lieferadresse ID: {{ customer.shipping_address_id }}</span>
+    <span class="customer-entry">Straße: {{ customer.street }}</span><br>
+    <span class="customer-entry">Hausnummer: {{ customer.house_number }}</span><br>
+    <span class="customer-entry">PLZ: {{ customer.zipcode }}</span><br>
+    <span class="customer-entry">Land: {{ customer.country }}</span><br>
+    <span class="customer-entry">Stadt: {{ customer.city }}</span><br>
     <button class="edit-button" (click)="goToEditCustomer(customer); $event.stopPropagation()">Kunde bearbeiten</button>
   </div>
 </div>

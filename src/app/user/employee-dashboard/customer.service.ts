@@ -4,8 +4,11 @@ import { Observable } from 'rxjs';
 
 export interface Customer {
   customer_id: number;
-  billing_address_id: number;
-  shipping_address_id: number;
+  street: string;
+  house_number: number;
+  zipcode: string;
+  country: string;
+  city: string;
 }
 
 @Injectable({
@@ -28,8 +31,11 @@ export class CustomerService {
     }
     this.http.post('/api/edit-customer', {
       customer_id: customer.customer_id,
-      billing_address_id: customer.billing_address_id,
-      shipping_address_id: customer.shipping_address_id
+      street: customer.street,
+      house_number: customer.house_number,
+      zipcode: customer.zipcode,
+      country: customer.country,
+      city: customer.city
     }).subscribe({
       error: () => {
         alert('Fehler beim Aktualisieren des Kunden.');

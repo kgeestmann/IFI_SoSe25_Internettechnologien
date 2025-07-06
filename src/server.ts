@@ -435,8 +435,8 @@ app.get('/api/get-customer/:id', (req, res) => {
 });
 
 app.post('/api/edit-customer', (req, res) => {
-  const { customer_id, billing_address_id, shipping_address_id } = req.body;
-  if (!customer_id || !billing_address_id || !shipping_address_id) {
+  const { customer_id, street, house_number, zipcode, country, city } = req.body;
+  if (!customer_id || !street || !house_number || !zipcode || !country || !city) {
     return res.status(400).json({ message: 'Fehlende Angaben' });
   }
   const con = createConnection(dbConfig);
@@ -445,8 +445,8 @@ app.post('/api/edit-customer', (req, res) => {
       return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
     }
     con.query(
-      'UPDATE Customer SET billing_address_id = ?, shipping_address_id = ? WHERE customer_id = ?',
-      [billing_address_id, shipping_address_id, customer_id],
+      'UPDATE User SET address_id = ? WHERE user_id = ?', // TODO - This needs updating so it can save the customer details
+      [customer_id],
       err => {
         if (err) {
           console.error('SQL Error:', err);
