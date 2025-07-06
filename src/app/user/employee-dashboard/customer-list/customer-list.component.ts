@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // für *ngFor und *ngIf
-import { CustomerService, Customer } from '../customer.service';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common'; // für *ngFor und *ngIf
+import {CustomerService, Customer} from '../customer.service';
+import {Router} from '@angular/router';
+import {Order} from '../order.service';
 
 @Component({
   selector: 'app-customer-list',
@@ -14,7 +16,9 @@ export class CustomerListComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private customerService: CustomerService) {}
+  constructor(private customerService: CustomerService,
+              private router: Router) {
+  }
 
   ngOnInit() {
     this.customerService.getCustomers().subscribe({
@@ -27,5 +31,9 @@ export class CustomerListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  goToEditCustomer(customer: Customer): void {
+    this.router.navigate(['/edit-customers', customer.customer_id]);
   }
 }

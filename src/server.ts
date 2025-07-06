@@ -407,6 +407,60 @@ app.get('/api/get-customers', (req, res) => {
   });
 });
 
+app.get('/api/get-customer/:id', (req, res) => {
+  const customer_id = req.params.id;
+  const con = createConnection(dbConfig);
+  con.connect(err => {
+    if(err) {
+      res.status(500).send("DB connection error");
+      return;
+    }
+    con.query("SELECT * FROM Customer WHERE customer_id = ?",
+      [customer_id],
+      (error, results) => {
+        if(error) {
+          res.status(500).send(error);
+        } else {
+          if (Array.isArray(results) && results.length === 0) {
+            res.status(404).send('Kunde nicht gefunden.');
+          } else if (Array.isArray(results)) {
+            res.send(results[0]);
+          } else {
+            res.status(500).send('Unerwartetes Ergebnis');
+          }
+        }
+        con.end();
+      });
+  });
+});
+
+app.post('/api/edit-customer', (req, res) => {
+  const { customer_id, billing_address_id, shipping_address_id } = req.body;
+  if (!customer_id || !billing_address_id || !shipping_address_id) {
+    return res.status(400).json({ message: 'Fehlende Angaben' });
+  }
+  const con = createConnection(dbConfig);
+  con.connect(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+    }
+    con.query(
+      'UPDATE Customer SET billing_address_id = ?, shipping_address_id = ? WHERE customer_id = ?',
+      [billing_address_id, shipping_address_id, customer_id],
+      err => {
+        if (err) {
+          console.error('SQL Error:', err);
+          con.end();
+          return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
+        }
+        return res.status(200).json({ message: 'Bestellung erfolgreich aktualisiert.' });
+      }
+    );
+    return;
+  });
+  return;
+});
+
 app.get('/api/get-orders', (req, res) => {
   const con = createConnection(dbConfig);
   con.connect(err => {
@@ -423,6 +477,60 @@ app.get('/api/get-orders', (req, res) => {
       con.end();
     });
   });
+});
+
+app.get('/api/get-order/:id', (req, res) => {
+  const order_id = req.params.id;
+  const con = createConnection(dbConfig);
+  con.connect(err => {
+    if(err) {
+      res.status(500).send("DB connection error");
+      return;
+    }
+    con.query("SELECT * FROM Customer_Order WHERE order_id = ?",
+      [order_id],
+      (error, results) => {
+      if(error) {
+        res.status(500).send(error);
+      } else {
+        if (Array.isArray(results) && results.length === 0) {
+          res.status(404).send('Bestellung nicht gefunden');
+        } else if (Array.isArray(results)) {
+          res.send(results[0]);
+        } else {
+          res.status(500).send('Unerwartetes Ergebnis');
+        }
+      }
+      con.end();
+    });
+  });
+});
+
+app.post('/api/edit-order', (req, res) => {
+  const { order_id, customer_id, date, delivery_status, total_price, payment_method } = req.body;
+  if (!order_id || !customer_id || !date || !delivery_status || !total_price || !payment_method) {
+    return res.status(400).json({ message: 'Fehlende Angaben' });
+  }
+  const con = createConnection(dbConfig);
+  con.connect(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+    }
+    con.query(
+      'UPDATE Customer_Order SET customer_id = ?, date = ?, delivery_status = ?, total_price = ?, payment_method = ? WHERE order_id = ?',
+      [customer_id, new Date(date).toISOString().split('T')[0], delivery_status, total_price, payment_method, order_id],
+      err => {
+        if (err) {
+          console.error('SQL Error:', err);
+          con.end();
+          return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
+        }
+        return res.status(200).json({ message: 'Bestellung erfolgreich aktualisiert.' });
+      }
+    );
+    return;
+  });
+  return;
 });
 
 app.post('/api/login', (req, res) => {

@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { OrderService, Order } from '../order.service';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {OrderService, Order} from '../order.service';
+import {Product} from '../../../products/product.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-order-list',
@@ -11,10 +13,12 @@ import { OrderService, Order } from '../order.service';
 })
 export class OrderListComponent implements OnInit {
   orders: Order[] = [];
-  loading = true;
+  loading: boolean = true;
   error: string | null = null;
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderService: OrderService,
+              private router: Router) {
+  }
 
   ngOnInit() {
     this.orderService.getOrders().subscribe({
@@ -27,5 +31,9 @@ export class OrderListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  goToEditOrder(order: Order): void {
+    this.router.navigate(['/edit-orders', order.order_id]);
   }
 }

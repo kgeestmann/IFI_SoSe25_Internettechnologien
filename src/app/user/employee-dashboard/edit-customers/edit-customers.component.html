@@ -1,1 +1,26 @@
-<p>edit-customers works!</p>
+<ng-container *ngIf="customer; else errorTpl">
+  <div class="customer-content">
+    <div class="info-wrapper">
+      <h2 class="headline">Kunde</h2>
+      <form class="customer-edit-form" (ngSubmit)="editCustomer()">
+        <label for="customer-id-label" class="customer-edit-label">Kunde-ID:</label>
+        <label for="customer-id-label" class="customer-edit-label">{{ customer.customer_id }}</label>
+        <label for="customer-billing-address-label" class="customer-billing-address-label">Rechnungsadresse ID:</label>
+        <input type="text" id="customer-billing-address" name="customer-billing-address" class="customer-edit-input"
+               value="{{ customer.billing_address_id }}" [(ngModel)]="customer.billing_address_id" required>
+        <label for="customer-shipping-address-label" class="customer-shipping-address-label">Lieferadresse ID:</label>
+        <input type="text" id="customer-shipping-address" name="customer-shipping-address" class="customer-edit-input"
+               value="{{ customer.shipping_address_id }}" [(ngModel)]="customer.shipping_address_id" required>
+        <button type="submit" class="customer-edit-button">Kunde speichern</button>
+        <button (click)="goBack()">Zurück zu den Kundes</button>
+      </form>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #errorTpl>
+  <div class="product-content">
+    <p>{{ error || 'Kunde nicht gefunden.' }}</p>
+    <button (click)="goBack()">Zurück zu den Kundes</button>
+  </div>
+</ng-template>

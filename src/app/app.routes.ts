@@ -12,6 +12,8 @@ import { CustomerProfileComponent } from './user/customer-dashboard/customer-pro
 import { MyOrdersComponent } from './user/customer-dashboard/my-orders/my-orders.component';
 import { ProductsAdminComponent } from './user/employee-dashboard/products-admin/products-admin.component';
 import { EditProductsComponent } from './user/employee-dashboard/edit-products/edit-products.component';
+import { EditOrdersComponent } from './user/employee-dashboard/edit-orders/edit-orders.component';
+import { EditCustomersComponent } from './user/employee-dashboard/edit-customers/edit-customers.component';
 
 export const routes: Routes = [
     { path: 'products', component: ProductListComponent },
@@ -22,6 +24,8 @@ export const routes: Routes = [
     { path: 'employee-profile', component: EmployeeProfileComponent },
     { path: 'products-admin', component: ProductsAdminComponent },
     { path: 'edit-products/:id', component: EditProductsComponent },
+    { path: 'edit-orders/:id', component: EditOrdersComponent },
+    { path: 'edit-customers/:id', component: EditCustomersComponent },
     { path: 'customers-admin', component: CustomerListComponent },
     { path: 'orders-admin', component: OrderListComponent },
     { path: 'login', component: LoginComponent },

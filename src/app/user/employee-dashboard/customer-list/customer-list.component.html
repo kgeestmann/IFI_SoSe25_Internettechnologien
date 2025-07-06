@@ -1,11 +1,14 @@
-<div *ngIf="loading">Lade Kunden...</div>
-<div *ngIf="error">{{ error }}</div>
+<h2 class="headline">
+  <div *ngIf="loading; else elseBlock">Lade Kunden...</div>
+  <ng-template #elseBlock>Kunden</ng-template>
+  <div *ngIf="error">{{ error }}</div>
+</h2>
 
-<div *ngIf="!loading && !error">
-  <h2>Kunden</h2>
-  <div *ngFor="let c of customers" class="customer-card">
-    <span class="customer-id">Kunden-ID: {{ c.customer_id }}</span><br>
-    <span class="billing-address-id">Rechnungsadresse ID: {{ c.billing_address_id }}</span><br>
-    <span class="shipping-address-id">Lieferadresse ID: {{ c.shipping_address_id }}</span>
+<div class="customers-wrapper">
+  <div class="customer-card" *ngFor="let customer of customers" tabindex="0">
+    <span class="customer-entry">Kunden-ID: {{ customer.customer_id }}</span><br>
+    <span class="customer-entry">Rechnungsadresse ID: {{ customer.billing_address_id }}</span><br>
+    <span class="customer-entry">Lieferadresse ID: {{ customer.shipping_address_id }}</span>
+    <button class="edit-button" (click)="goToEditCustomer(customer); $event.stopPropagation()">Kunde bearbeiten</button>
   </div>
 </div>
