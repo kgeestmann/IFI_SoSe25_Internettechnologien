@@ -119,6 +119,24 @@ export class EditProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  deleteProduct(): void {
+    if (!this.product || !confirm('Möchten Sie dieses Produkt wirklich löschen?')) {
+      return;
+    }
+
+    this.productService.deleteProduct(this.product.product_id).subscribe({
+      next: () => {
+        this.successMessage = 'Produkt erfolgreich gelöscht!';
+        setTimeout(() => {
+          this.router.navigate(['/products-admin']);
+        }, 1500);
+      },
+      error: (error) => {
+        this.error = error.error.message || 'Fehler beim Löschen des Produkts';
+      }
+    });
+  }
+
   goBack(): void {
     this.router.navigate(['/products-admin']);
   }

@@ -29,5 +29,12 @@ export class ProductService {
 
   // Produkt aktualisieren
   updateProduct(product: Product): Observable<any> {
-    return this.http.put('/api/edit-product', product);  }
+    return this.http.put('/api/edit-product', product);  
+  
+  }
+
+    // Produkt löschen
+  deleteProduct(productId: number): Observable<any> {
+    return this.http.delete(`/api/delete-product/${productId}`, { withCredentials: true });
+  }
 }

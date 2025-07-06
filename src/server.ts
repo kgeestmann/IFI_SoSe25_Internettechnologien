@@ -498,6 +498,65 @@ app.put('/api/edit-product', async (req, res) => {
   }
 });
 
+app.delete('/api/delete-product/:id', async (req, res) => {
+  const user = req.session.user;
+
+  if (!user || user.role !== 'employee') {
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte löschen' });
+  }
+
+  const productId = req.params.id;
+
+  if (!productId || isNaN(Number(productId))) {
+    return res.status(400).json({ message: 'Ungültige Produkt-ID' });
+  }
+
+  const con = createConnection(dbConfig).promise();
+
+  try {
+    await con.connect();
+
+    // Erst prüfen, ob das Produkt existiert
+    const [productRows] = await con.query<RowDataPacket[]>(
+      'SELECT * FROM Product WHERE product_id = ?',
+      [productId]
+    );
+
+    if (productRows.length === 0) {
+      await con.end();
+      return res.status(404).json({ message: 'Produkt nicht gefunden' });
+    }
+
+    const product = productRows[0];
+
+    // Zuerst das Logging durchführen, BEVOR das Produkt gelöscht wird
+    await con.query(
+      'INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), ?, NULL)',
+      [user.user_id, productId, 'product_deleted', JSON.stringify(product)]
+    );
+
+    // Dann das Produkt löschen
+    await con.query(
+      'DELETE FROM Product WHERE product_id = ?',
+      [productId]
+    );
+
+    await con.end();
+
+    return res.status(200).json({ 
+      message: 'Produkt erfolgreich gelöscht',
+      deleted_product: product
+    });
+  } catch (error: any) {
+    await con.end();
+    console.error('Fehler beim Löschen des Produkts:', error);
+    return res.status(500).json({ 
+      message: 'Fehler beim Löschen des Produkts', 
+      error: error.message 
+    });
+  }
+});
+
 app.get('/api/get-customers', (req, res) => {
   const con = createConnection(dbConfig);
   con.connect(err => {
