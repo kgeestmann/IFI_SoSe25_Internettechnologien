@@ -5,15 +5,15 @@
     <h2 class="headline">Änderungsprotokoll</h2>
 
     <div class="log-selector">
-    <label for="logType">Kategorie wählen:</label>
-    <div class="custom-select-wrapper">
+      <label for="logType">Kategorie wählen:</label>
+      <div class="custom-select-wrapper">
         <select id="logType" [(ngModel)]="selectedLogType">
-        <option value="products">Produktänderungen ({{ logs?.products?.length || 0 }})</option>
-        <option value="orders">Bestelländerungen ({{ logs?.orders?.length || 0 }})</option>
-        <option value="users">Benutzeränderungen ({{ logs?.users?.length || 0 }})</option>
+          <option value="products">Produktänderungen ({{ logs?.products?.length || 0 }})</option>
+          <option value="orders">Bestelländerungen ({{ logs?.orders?.length || 0 }})</option>
+          <option value="users">Benutzeränderungen ({{ logs?.users?.length || 0 }})</option>
         </select>
         <span class="chevron">&#9662;</span>
-    </div>
+      </div>
     </div>
 
     <div class="logs-wrapper">

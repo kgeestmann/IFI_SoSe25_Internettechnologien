@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService, Order } from '../order.service';
-import { Product } from '../../../products/product.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../auth.service';
 import { combineLatest } from 'rxjs';

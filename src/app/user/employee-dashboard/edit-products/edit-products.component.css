@@ -1,4 +1,3 @@
-/* edit-products.component.css */
 .product-page {
   display: flex;
   flex-direction: column;
@@ -110,28 +109,6 @@ button[type="submit"]:disabled {
   cursor: not-allowed;
 }
 
-.alert {
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-}
-
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.error {
-  color: #721c24;
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
-}
-
 .btn-danger {
   padding: 0.75rem 1.5rem;
   background-color: #dc3545;
@@ -151,4 +128,36 @@ button[type="submit"]:disabled {
 .btn-danger:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.loader {
+  padding: 1rem;
+  text-align: center;
+  color: #555;
+  font-style: italic;
+}
+
+.error {
+  color: #c00;
+  font-weight: 600;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 6px;
+  background-color: #fff3cd;
+  color: #856404;
+  max-width: 400px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
 }
