@@ -25,7 +25,7 @@
           <span class="log-entry">ID: {{ log.product_change_id }}</span>
           <span class="log-entry">Produkt-ID: {{ log.product_id }}</span>
           <span class="log-entry">Feld: {{ log.field_changed }}</span>
-          <span class="log-entry">Datum: {{ log.change_date | date:'dd.MM.yyyy HH:mm' }}</span>
+          <span class="log-entry">Datum: {{ log.change_date | date:'dd.MM.yyyy' }}</span>
           <div class="change-values">
             <span class="change-before">Vorher: {{ log.field_before || '–' }}</span>
             <span class="change-arrow">→</span>
@@ -41,7 +41,7 @@
           <span class="log-entry">ID: {{ log.order_change_id }}</span>
           <span class="log-entry">Bestell-ID: {{ log.order_id }}</span>
           <span class="log-entry">Feld: {{ log.field_changed }}</span>
-          <span class="log-entry">Datum: {{ log.change_date | date:'dd.MM.yyyy HH:mm' }}</span>
+          <span class="log-entry">Datum: {{ log.change_date | date:'dd.MM.yyyy' }}</span>
           <div class="change-values">
             <span class="change-before">Vorher: {{ log.field_before || '–' }}</span>
             <span class="change-arrow">→</span>
@@ -57,7 +57,7 @@
           <span class="log-entry">ID: {{ log.user_change_id }}</span>
           <span class="log-entry">Benutzer-ID: {{ log.user_id }}</span>
           <span class="log-entry">Feld: {{ log.field_changed }}</span>
-          <span class="log-entry">Datum: {{ log.change_date | date:'dd.MM.yyyy HH:mm' }}</span>
+          <span class="log-entry">Datum: {{ log.change_date | date:'dd.MM.yyyy' }}</span>
           <div class="change-values">
             <span class="change-before">Vorher: {{ log.field_before || '–' }}</span>
             <span class="change-arrow">→</span>
@@ -74,7 +74,6 @@
 <ng-template #accessDenied>
   <div class="alert alert-warning">
     <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
-    <a routerLink="/login" class="btn btn-primary">Zum Login</a>
   </div>
 </ng-template>
 

@@ -2,12 +2,23 @@
 <div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
   <div *ngIf="currentUser; else loading" class="dashboard-content">
     <div class="user-main">
-      <h2 class="headline">Willkommen Mitarbeiter</h2>
+      <h2 class="headline">Willkommen {{ currentUser?.first_name }}!</h2>
 
       <div class="user-info">
         <p><strong>Name:</strong> {{ currentUser?.first_name }} {{ currentUser?.last_name }}</p>
         <p><strong>Email:</strong> {{ currentUser?.email }}</p>
-        <p *ngIf="currentUser?.role"><strong>Rolle:</strong> {{ currentUser.role }}</p>
+        <h3>Adresse</h3>
+        <p *ngIf="currentUser?.address?.street">
+          <strong>Straße:</strong> {{ currentUser.address.street }} {{ currentUser.address.house_number }}
+        </p>
+
+        <p *ngIf="currentUser?.address?.zipcode || currentUser?.address?.city">
+          <strong>Ort:</strong> {{ currentUser.address.zipcode }} {{ currentUser.address.city }}
+        </p>
+
+        <p *ngIf="currentUser?.address?.country">
+          <strong>Land:</strong> {{ currentUser.address.country }}
+        </p>
       </div>
     </div>
 
@@ -29,7 +40,6 @@
 <ng-template #accessDenied>
   <div class="alert alert-warning">
     <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
-    <a routerLink="/login" class="btn btn-primary">Zum Login</a>
   </div>
 </ng-template>
 
