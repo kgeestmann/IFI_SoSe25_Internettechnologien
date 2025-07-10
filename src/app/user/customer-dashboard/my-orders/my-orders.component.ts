@@ -1,41 +1,64 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { combineLatest } from 'rxjs';
+
 import { MyOrdersService, Order } from './my-orders.service';
 import { AuthService } from '../../../auth.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-my-orders',
-  imports: [ CommonModule],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './my-orders.component.html',
-  styleUrl: './my-orders.component.css'
+  styleUrls: ['./my-orders.component.css']
 })
-export class MyOrdersComponent {
+export class MyOrdersComponent implements OnInit {
   orders: Order[] = [];
-  loading: boolean = true;
   error: string | null = null;
 
   currentUser: any;
-  isEmployee = false;
+  isCustomer = false;
 
   constructor(
     private orderService: MyOrdersService,
     private authService: AuthService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.authService.checkSession();
-    this.loadOrders(); 
+
+    combineLatest([
+      this.authService.isLoggedIn$,
+      this.authService.isCustomer$
+    ]).subscribe(([loggedIn, isCustomer]) => {
+      this.isCustomer = isCustomer;
+
+      if (loggedIn && isCustomer && !this.currentUser) {
+        this.loadUserDetails();
+      }
+    });
   }
-  
-  loadOrders() {
+
+  loadUserDetails(): void {
+    this.authService.fetchUserDetails().subscribe({
+      next: (details) => {
+        this.currentUser = details;
+        this.authService.setLogin(details);
+        this.loadOrders();
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der User-Details', err);
+      }
+    });
+  }
+
+  loadOrders(): void {
     this.orderService.getOrders().subscribe({
       next: (data) => {
         this.orders = data;
-        this.loading = false;
       },
       error: () => {
         this.error = 'Fehler beim Laden der Bestellungen';
-        this.loading = false;
       }
     });
   }
