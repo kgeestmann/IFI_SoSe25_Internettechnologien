@@ -33,7 +33,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
+  padding: 1rem 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -41,11 +41,11 @@
   border-bottom: none;
 }
 
-/* Details des Artikels (Name + Preis) */
 .item-details {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  max-width: 50%;
+  max-width: none;
 }
 
 .item-name {
@@ -60,11 +60,18 @@
   margin-top: 0.25rem;
 }
 
+.item-actions {
+  display: flex;
+  align-items: center; /* oder flex-end, je nach gewünschter Ausrichtung */
+  gap: 3rem;
+}
+
 /* Mengensteuerung */
 .quantity-stepper {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  width: 100px;
+  justify-content: center;
 }
 
 .step-btn {
@@ -103,6 +110,8 @@
   font-size: 1.25rem;
   line-height: 1;
   user-select: none;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .remove-btn:hover {

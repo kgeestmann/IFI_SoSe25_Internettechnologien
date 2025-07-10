@@ -10,15 +10,17 @@
         <div class="item-price">{{ (item.price)/item.quantity| currency:'EUR':'symbol' }}</div>
       </div>
 
-      <div class="quantity-stepper">
-        <button (click)="decreaseQuantity(item)" aria-label="Menge verringern" class="step-btn">−</button>
-        <span class="quantity-display">{{ item.quantity }}</span>
-        <button (click)="increaseQuantity(item)" aria-label="Menge erhöhen" class="step-btn">+</button>
-      </div>
+      <div class="item-actions">
+        <div class="quantity-stepper">
+          <button (click)="decreaseQuantity(item)" aria-label="Menge verringern" class="step-btn">−</button>
+          <span class="quantity-display">{{ item.quantity }}</span>
+          <button (click)="increaseQuantity(item)" aria-label="Menge erhöhen" class="step-btn">+</button>
+        </div>
 
-      <button type="button" class="remove-btn" (click)="removeItem(item)" aria-label="Artikel entfernen">
-        ×
-      </button>
+        <button type="button" class="remove-btn" (click)="removeItem(item)" aria-label="Artikel entfernen">
+          ×
+        </button>
+      </div>
     </li>
   </ul>
 
