@@ -507,7 +507,7 @@ app.get('/api/get-my-orders', (req, res) => {
       SELECT *
       FROM Customer_Order
       WHERE customer_id = ?
-      ORDER BY date DESC
+      ORDER BY order_id DESC
     `;
 
     con.query(sql, [user.user_id], (error, results) => {
