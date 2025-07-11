@@ -24,10 +24,12 @@
   margin-bottom: 2rem;
 }
 
-.logo img {
-  max-width: 3.125rem;
+img {
+  max-width: 2.5rem;
   display: block;
 }
+
+
 
 .title {
   font-weight: bold;
