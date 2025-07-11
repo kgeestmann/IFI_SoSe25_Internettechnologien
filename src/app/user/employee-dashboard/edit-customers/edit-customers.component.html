@@ -1,43 +1,79 @@
 <!-- Nur anzeigen, wenn isEmployee true -->
 <div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
   <div *ngIf="currentUser; else loading" class="dashboard-content">
-    
-  <ng-container *ngIf="customer; else errorTpl">
-  <div class="customer-content">
-    <div class="info-wrapper">
-      <h2 class="headline">Kunde</h2>
-      <form class="customer-edit-form" (ngSubmit)="editCustomer()">
-        <label for="customer-id-label" class="customer-edit-label">Kunde-ID:</label>
-        <label for="customer-id-label" class="customer-edit-label">{{ customer.customer_id }}</label>
-        <label for="customer-street-label" class="customer-street-label">Straße:</label>
-        <input type="text" id="customer-street" name="customer-street" class="customer-edit-input"
-               value="{{ customer.street }}" [(ngModel)]="customer.street" required>
-        <label for="customer-house-number-label" class="customer-house-number-label">Hausnummer:</label>
-        <input type="text" id="customer-house-number" name="customer-house-number" class="customer-edit-input"
-               value="{{ customer.house_number }}" [(ngModel)]="customer.house_number" required>
-        <label for="customer-zip-code-label" class="customer-zip-code-label">PLZ:</label>
-        <input type="text" id="customer-zip-code" name="customer-zip-code" class="customer-edit-input"
-               value="{{ customer.zipcode }}" [(ngModel)]="customer.zipcode" required>
-        <label for="customer-country-label" class="customer-country-label">Land:</label>
-        <input type="text" id="customer-country" name="customer-country" class="customer-edit-input"
-               value="{{ customer.country }}" [(ngModel)]="customer.country" required>
-        <label for="customer-city-label" class="customer-city-label">Stadt:</label>
-        <input type="text" id="customer-city" name="customer-city" class="customer-edit-input"
-               value="{{ customer.city }}" [(ngModel)]="customer.city" required>
-        <button type="submit" class="customer-edit-button">Kunde speichern</button>
-        <button (click)="goBack()">Zurück zu den Kundes</button>
-      </form>
-    </div>
-  </div>
-</ng-container>
+
+    <ng-container *ngIf="customer; else errorTpl">
+      <div class="customer-content">
+        <div class="info-wrapper">
+          <h2 class="headline">Kundendaten bearbeiten</h2>
+          <form [formGroup]="customerForm" class="customer-edit-form" (ngSubmit)="onSubmit()">
+
+            <label class="customer-edit-label">Kunde-ID:</label>
+            <span class="customer-id-display">{{ customer.customer_id }}</span>
+
+            <label for="first_name" class="customer-edit-label">Vorname:</label>
+            <input id="first_name" type="text" formControlName="first_name" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('first_name')?.invalid && customerForm.get('first_name')?.touched" class="error">
+              Vorname ist erforderlich.
+            </div>
+
+            <label for="last_name" class="customer-edit-label">Nachname:</label>
+            <input id="last_name" type="text" formControlName="last_name" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('last_name')?.invalid && customerForm.get('last_name')?.touched" class="error">
+              Nachname ist erforderlich.
+            </div>
+
+            <label for="email" class="customer-edit-label">E-Mail:</label>
+            <input id="email" type="email" formControlName="email" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('email')?.invalid && customerForm.get('email')?.touched" class="error">
+              Bitte eine gültige E-Mail eingeben.
+            </div>
+
+            <label for="street" class="customer-edit-label">Straße:</label>
+            <input id="street" type="text" formControlName="street" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('street')?.invalid && customerForm.get('street')?.touched" class="error">
+              Straße ist erforderlich.
+            </div>
+
+            <label for="house_number" class="customer-edit-label">Hausnummer:</label>
+            <input id="house_number" type="text" formControlName="house_number" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('house_number')?.invalid && customerForm.get('house_number')?.touched" class="error">
+              Hausnummer ist erforderlich.
+            </div>
+
+            <label for="zipcode" class="customer-edit-label">Postleitzahl:</label>
+            <input id="zipcode" type="text" formControlName="zipcode" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('zipcode')?.invalid && customerForm.get('zipcode')?.touched" class="error">
+              Postleitzahl ist erforderlich.
+            </div>
+
+            <label for="city" class="customer-edit-label">Stadt:</label>
+            <input id="city" type="text" formControlName="city" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('city')?.invalid && customerForm.get('city')?.touched" class="error">
+              Stadt ist erforderlich.
+            </div>
+
+            <label for="country" class="customer-edit-label">Land:</label>
+            <input id="country" type="text" formControlName="country" class="customer-edit-input" required>
+            <div *ngIf="customerForm.get('country')?.invalid && customerForm.get('country')?.touched" class="error">
+              Land ist erforderlich.
+            </div>
+
+            <button type="submit" class="customer-edit-button" [disabled]="customerForm.invalid">Kunde speichern</button>
+            <button type="button" (click)="goBack()">Zurück zu den Kunden</button>
+          </form>
+        </div>
+      </div>
+    </ng-container>
 
   </div>
 </div>
 
+<!-- Fehleranzeige -->
 <ng-template #errorTpl>
   <div class="product-content">
     <p>{{ error || 'Kunde nicht gefunden.' }}</p>
-    <button (click)="goBack()">Zurück zu den Kundes</button>
+    <button (click)="goBack()">Zurück zu den Kunden</button>
   </div>
 </ng-template>
 
