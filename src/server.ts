@@ -806,31 +806,85 @@ app.get('/api/get-order/:id', (req, res) => {
   });
 });
 
-app.post('/api/edit-order', (req, res) => {
-  const { order_id, customer_id, date, delivery_status, total_price, payment_method } = req.body;
-  if (!order_id || !customer_id || !date || !delivery_status || !total_price || !payment_method) {
-    return res.status(400).json({ message: 'Fehlende Angaben' });
+app.post('/api/edit-order', async (req, res) => {
+  const user = req.session.user;
+
+  if (!user || user.role !== 'employee') {
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Bestellungen bearbeiten' });
   }
-  const con = createConnection(dbConfig);
-  con.connect(err => {
-    if (err) {
-      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
-    }
-    con.query(
-      'UPDATE Customer_Order SET customer_id = ?, date = ?, delivery_status = ?, total_price = ?, payment_method = ? WHERE order_id = ?',
-      [customer_id, new Date(date).toISOString().split('T')[0], delivery_status, total_price, payment_method, order_id],
-      err => {
-        if (err) {
-          console.error('SQL Error:', err);
-          con.end();
-          return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
-        }
-        return res.status(200).json({ message: 'Bestellung erfolgreich aktualisiert.' });
-      }
+
+  const { order_id, customer_id, date, delivery_status, total_price, payment_method } = req.body;
+
+  if (!order_id || !customer_id || !date || !delivery_status || !total_price || !payment_method) {
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder' });
+  }
+
+  const con = createConnection(dbConfig).promise();
+
+  try {
+    await con.connect();
+
+    // Aktuelle Bestellungsdaten abrufen
+    const [currentOrderRows] = await con.query<RowDataPacket[]>(
+      'SELECT customer_id, date, delivery_status, total_price, payment_method FROM Customer_Order WHERE order_id = ?',
+      [order_id]
     );
-    return;
-  });
-  return;
+
+    if (currentOrderRows.length === 0) {
+      await con.end();
+      return res.status(404).json({ message: 'Bestellung nicht gefunden' });
+    }
+
+    const oldValues = currentOrderRows[0];
+    const changes = [];
+
+    // Änderungen erkennen
+    if (oldValues['customer_id'] !== customer_id) {
+      changes.push({ field: 'customer_id', before: oldValues['customer_id'], after: customer_id });
+    }
+    if (new Date(oldValues['date']).toISOString().split('T')[0] !== new Date(date).toISOString().split('T')[0]) {
+      changes.push({ field: 'date', before: oldValues['date'], after: date });
+    }
+    if (oldValues['delivery_status'] !== delivery_status) {
+      changes.push({ field: 'delivery_status', before: oldValues['delivery_status'], after: delivery_status });
+    }
+    if (oldValues['total_price'] !== total_price) {
+      changes.push({ field: 'total_price', before: oldValues['total_price'], after: total_price });
+    }
+    if (oldValues['payment_method'] !== payment_method) {
+      changes.push({ field: 'payment_method', before: oldValues['payment_method'], after: payment_method });
+    }
+
+    // Bestellung aktualisieren
+    await con.query(
+      'UPDATE Customer_Order SET customer_id = ?, date = ?, delivery_status = ?, total_price = ?, payment_method = ? WHERE order_id = ?',
+      [customer_id, new Date(date).toISOString().split('T')[0], delivery_status, total_price, payment_method, order_id]
+    );
+
+    // Änderungen protokollieren
+    if (changes.length > 0) {
+      const changePromises = changes.map(change => 
+        con.query(
+          'INSERT INTO Order_Change (employee_id, order_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), ?, ?)',
+          [user.user_id, order_id, change.field, change.before, change.after]
+        )
+      );
+      await Promise.all(changePromises);
+    }
+
+    await con.end();
+    return res.status(200).json({ 
+      message: 'Bestellung erfolgreich aktualisiert', 
+      changes_made: changes.length 
+    });
+  } catch (error: any) {
+    await con.end();
+    console.error('Fehler beim Aktualisieren der Bestellung:', error);
+    return res.status(500).json({ 
+      message: 'Fehler beim Aktualisieren der Bestellung', 
+      error: error.message 
+    });
+  }
 });
 
 app.get('/api/get-logs', (req, res) => {
