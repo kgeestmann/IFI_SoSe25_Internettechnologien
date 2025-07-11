@@ -6,7 +6,6 @@
       <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="customer-edit-form">
         <!-- Readonly fields -->
         <label class="customer-edit-label">Kunde-ID: {{ customer.customer_id }}</label>
-        <label class="customer-edit-label">Benutzer-ID: {{ customer.user_id }}</label>
 
         <!-- Hidden field -->
         <input type="hidden" formControlName="address_id" [value]="customer.address_id">

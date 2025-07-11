@@ -115,7 +115,7 @@ export class EditCustomersComponent implements OnInit, OnDestroy {
       ...this.customerForm.value
     };
 
-    this.customerService.editCustomer(updatedCustomer).subscribe({
+    this.customerService.updateCustomer(updatedCustomer).subscribe({
       next: (response) => {
         this.successMessage = 'Kunde erfolgreich aktualisiert!';
         this.loadCustomer(this.customer!.customer_id);
