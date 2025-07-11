@@ -1,21 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CustomerService, Customer } from '../customer.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Customer, CustomerService } from '../customer.service';
 import { AuthService } from '../../../auth.service';
 import { combineLatest, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-edit-customers',
-  imports: [CommonModule, FormsModule],
   templateUrl: './edit-customers.component.html',
   styleUrls: ['./edit-customers.component.css'],
   standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
 })
-export class EditCustomersComponent implements OnInit {
+export class EditCustomersComponent implements OnInit, OnDestroy {
+  customerForm!: FormGroup;
   customer: Customer | null = null;
-  error: string = '';
+  error = '';
+  successMessage = '';
 
   currentUser: any = null;
   isEmployee = false;
@@ -26,8 +28,20 @@ export class EditCustomersComponent implements OnInit {
     private route: ActivatedRoute,
     private customerService: CustomerService,
     private router: Router,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private fb: FormBuilder
+  ) {
+    this.customerForm = this.fb.group({
+      first_name: ['', [Validators.required]],
+      last_name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      street: ['', [Validators.required]],
+      house_number: ['', [Validators.required]],
+      zipcode: ['', [Validators.required]],
+      city: ['', [Validators.required]],
+      country: ['', [Validators.required]]
+    });
+  }
 
   ngOnInit(): void {
     this.authService.checkSession();
@@ -68,6 +82,16 @@ export class EditCustomersComponent implements OnInit {
       next: (customer) => {
         if (customer) {
           this.customer = customer;
+          this.customerForm.patchValue({
+            first_name: customer.first_name,
+            last_name: customer.last_name,
+            email: customer.email,
+            street: customer.street,
+            house_number: customer.house_number,
+            zipcode: customer.zipcode,
+            city: customer.city,
+            country: customer.country
+          });
           this.error = '';
         } else {
           this.error = 'Kunde nicht gefunden.';
@@ -79,10 +103,44 @@ export class EditCustomersComponent implements OnInit {
     });
   }
 
-  editCustomer(): void {
-    this.customerService.editCustomer(this.customer);
-    this.goBack();
+  onSubmit(): void {
+    if (this.customerForm.invalid || !this.customer) {
+      return;
+    }
+
+    const updatedCustomer = {
+      customer_id: this.customer.customer_id,
+      ...this.customerForm.value
+    };
+
+    this.customerService.updateCustomer(updatedCustomer).subscribe({
+      next: () => {
+        this.successMessage = 'Kunde erfolgreich aktualisiert!';
+        this.loadCustomer(this.customer!.customer_id);
+      },
+      error: (error) => {
+        this.error = error.error.message || 'Fehler beim Aktualisieren des Kunden';
+      }
+    });
   }
+
+  // deleteCustomer(): void {
+  //   if (!this.customer || !confirm('Möchten Sie diesen Kunden wirklich löschen?')) {
+  //     return;
+  //   }
+
+  //   this.customerService.deleteCustomer(this.customer.customer_id).subscribe({
+  //     next: () => {
+  //       this.successMessage = 'Kunde erfolgreich gelöscht!';
+  //       setTimeout(() => {
+  //         this.router.navigate(['/customers-admin']);
+  //       }, 1500);
+  //     },
+  //     error: (error) => {
+  //       this.error = error.error.message || 'Fehler beim Löschen des Kunden';
+  //     }
+  //   });
+  // }
 
   goBack(): void {
     this.router.navigate(['/customers-admin']);

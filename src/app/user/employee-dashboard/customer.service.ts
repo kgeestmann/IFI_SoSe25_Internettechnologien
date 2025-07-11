@@ -4,8 +4,11 @@ import { Observable } from 'rxjs';
 
 export interface Customer {
   customer_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
   street: string;
-  house_number: number;
+  house_number: string;
   zipcode: string;
   country: string;
   city: string;
@@ -17,29 +20,30 @@ export interface Customer {
 export class CustomerService {
   constructor(private http: HttpClient) {}
 
+  // Alle Kunden abrufen
   getCustomers(): Observable<Customer[]> {
     return this.http.get<Customer[]>('/api/get-customers');
   }
 
+  // Einzelnen Kunden anhand der ID abrufen
   getCustomerById(id: number): Observable<Customer> {
     return this.http.get<Customer>(`/api/get-customer/${id}`);
   }
 
-  editCustomer(customer: Customer | null): void {
-    if (customer == null) {
-      return;
-    }
-    this.http.post('/api/edit-customer', {
+  // Kunden aktualisieren
+  updateCustomer(customer: Customer): Observable<any> {
+    return this.http.put('/api/edit-customer', {
       customer_id: customer.customer_id,
       street: customer.street,
       house_number: customer.house_number,
       zipcode: customer.zipcode,
       country: customer.country,
       city: customer.city
-    }).subscribe({
-      error: () => {
-        alert('Fehler beim Aktualisieren des Kunden.');
-      }
     });
+  }
+
+  // Kunden löschen 
+  deleteCustomer(customerId: number): Observable<any> {
+    return this.http.delete(`/api/delete-customer/${customerId}`);
   }
 }

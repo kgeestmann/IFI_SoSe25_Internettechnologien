@@ -689,22 +689,38 @@ app.delete('/api/delete-product/:id', async (req, res) => {
   }
 });
 
-app.get('/api/get-customers', (req, res) => {
-  const con = createConnection(dbConfig);
-  con.connect(err => {
-    if(err) {
-      res.status(500).send("DB connection error");
-      return;
-    }
-    con.query("SELECT * FROM Customer", (error, results) => {
-      if(error) {
-        res.status(500).send(error);
-      } else {
-        res.send(results);
-      }
-      con.end();
+app.get('/api/get-customers', async (req, res) => {
+  const con = createConnection(dbConfig).promise();
+
+  try {
+    await con.connect();
+
+    const [customers] = await con.query<RowDataPacket[]>(`
+      SELECT 
+        u.user_id AS customer_id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        a.street,
+        a.house_number,
+        a.zipcode,
+        a.country,
+        a.city
+      FROM Customer c
+      JOIN User u ON c.customer_id = u.user_id
+      LEFT JOIN Address a ON u.address_id = a.address_id
+    `);
+
+    res.status(200).json(customers);
+  } catch (error: any) {
+    console.error('Fehler beim Laden der Kunden:', error);
+    res.status(500).json({
+      message: 'Fehler beim Laden der Kunden',
+      error: error.message
     });
-  });
+  } finally {
+    await con.end();
+  }
 });
 
 app.get('/api/get-customer/:id', (req, res) => {
@@ -734,31 +750,96 @@ app.get('/api/get-customer/:id', (req, res) => {
   });
 });
 
-app.post('/api/edit-customer', (req, res) => {
-  const { customer_id, street, house_number, zipcode, country, city } = req.body;
-  if (!customer_id || !street || !house_number || !zipcode || !country || !city) {
-    return res.status(400).json({ message: 'Fehlende Angaben' });
+app.put('/api/edit-customer', async (req, res) => {
+  const user = req.session.user;
+
+  if (!user || user.role !== 'employee') {
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Kunden bearbeiten' });
   }
-  const con = createConnection(dbConfig);
-  con.connect(err => {
-    if (err) {
-      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
-    }
-    con.query(
-      'UPDATE User SET address_id = ? WHERE user_id = ?', // TODO - This needs updating so it can save the customer details
-      [customer_id],
-      err => {
-        if (err) {
-          console.error('SQL Error:', err);
-          con.end();
-          return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
-        }
-        return res.status(200).json({ message: 'Bestellung erfolgreich aktualisiert.' });
-      }
+
+  const { customer_id, street, house_number, zipcode, country, city } = req.body;
+
+  if (!customer_id || !street || !house_number || !zipcode || !country || !city) {
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder (customer_id, street, house_number, zipcode, country, city)' });
+  }
+
+  const con = createConnection(dbConfig).promise();
+
+  try {
+    await con.connect();
+
+    // Aktuelle Adressdaten holen
+    const [currentCustomerRows] = await con.query<RowDataPacket[]>(
+      `SELECT u.user_id, u.address_id, a.street, a.house_number, a.zipcode, a.country, a.city
+       FROM User u
+       LEFT JOIN Address a ON u.address_id = a.address_id
+       WHERE u.user_id = ?`, [customer_id]
     );
-    return;
-  });
-  return;
+
+    if (currentCustomerRows.length === 0) {
+      await con.end();
+      return res.status(404).json({ message: 'Kunde nicht gefunden' });
+    }
+
+    const oldValues = currentCustomerRows[0];
+    const changes = [];
+
+    if (oldValues['street'] !== street) {
+      changes.push({ field: 'street', before: oldValues['street'], after: street });
+    }
+    if (oldValues['house_number'] !== house_number) {
+      changes.push({ field: 'house_number', before: oldValues['house_number'], after: house_number });
+    }
+    if (String(oldValues['zipcode']) !== String(zipcode)) {
+      changes.push({ field: 'zipcode', before: oldValues['zipcode'], after: zipcode });
+    }
+    if (oldValues['country'] !== country) {
+      changes.push({ field: 'country', before: oldValues['country'], after: country });
+    }
+    if (oldValues['city'] !== city) {
+      changes.push({ field: 'city', before: oldValues['city'], after: city });
+    }
+
+    let address_id = oldValues['address_id'];
+
+    // Adresse aktualisieren oder neu anlegen
+    if (address_id) {
+      await con.query(
+        'UPDATE Address SET street = ?, house_number = ?, zipcode = ?, country = ?, city = ? WHERE address_id = ?',
+        [street, house_number, zipcode, country, city, address_id]
+      );
+    } else {
+      const [addressResult]: any = await con.execute(
+        'INSERT INTO Address (street, house_number, zipcode, country, city) VALUES (?, ?, ?, ?, ?)',
+        [street, house_number, zipcode, country, city]
+      );
+      address_id = addressResult.insertId;
+      await con.query('UPDATE User SET address_id = ? WHERE user_id = ?', [address_id, customer_id]);
+    }
+
+    if (changes.length > 0) {
+      const changePromises = changes.map(change =>
+        con.query(
+          'INSERT INTO User_Change (user_id, employee_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), ?, ?)',
+          [customer_id, user.user_id, change.field, change.before, change.after]
+        )
+      );
+      await Promise.all(changePromises);
+    }
+
+    await con.end();
+    return res.status(200).json({ 
+      message: 'Kunde erfolgreich aktualisiert', 
+      changes_made: changes.length 
+    });
+  } catch (error: any) {
+    await con.end();
+    console.error('Fehler beim Aktualisieren des Kunden:', error);
+    return res.status(500).json({ 
+      message: 'Fehler beim Aktualisieren des Kunden', 
+      error: error.message 
+    });
+  }
 });
 
 app.get('/api/get-orders', (req, res) => {
@@ -806,7 +887,7 @@ app.get('/api/get-order/:id', (req, res) => {
   });
 });
 
-app.post('/api/edit-order', async (req, res) => {
+app.put('/api/edit-order', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {

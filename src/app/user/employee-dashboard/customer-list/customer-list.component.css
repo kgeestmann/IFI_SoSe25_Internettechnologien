@@ -1,4 +1,3 @@
-/* Layout & Typografie */
 :host {
   display: block;
   font-family: system-ui, sans-serif;
@@ -57,7 +56,7 @@
   transition: background 0.2s ease;
 }
 
-edit-button:hover {
+.edit-button:hover {
   background: #5c7761;
 }
 
