@@ -7,6 +7,7 @@
     class="product-card" 
     *ngFor="let product of product" 
     tabindex="0"
+    (click)="goToDetails(product)"
   >
     <img 
       class="product-image" 
