@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Customer, CustomerService } from '../customer.service';
+import { CustomerService, Customer } from '../customer.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../auth.service';
 import { combineLatest, Subscription } from 'rxjs';
@@ -37,7 +37,7 @@ export class EditCustomersComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       street: ['', [Validators.required]],
       house_number: ['', [Validators.required]],
-      zipcode: ['', [Validators.required, Validators.pattern(/^[0-9]{5}$/)]],
+      zipcode: ['', [Validators.required]],
       city: ['', [Validators.required]],
       country: ['', [Validators.required]]
     });
@@ -110,21 +110,37 @@ export class EditCustomersComponent implements OnInit, OnDestroy {
 
     const updatedCustomer = {
       customer_id: this.customer.customer_id,
-      user_id: this.customer.user_id,
-      address_id: this.customer.address_id,
       ...this.customerForm.value
     };
 
-    this.customerService.editCustomer(updatedCustomer).subscribe({
-      next: (response) => {
+    this.customerService.updateCustomer(updatedCustomer).subscribe({
+      next: () => {
         this.successMessage = 'Kunde erfolgreich aktualisiert!';
         this.loadCustomer(this.customer!.customer_id);
       },
       error: (error) => {
-        this.error = error.error?.message || 'Fehler beim Aktualisieren des Kunden';
+        this.error = error.error.message || 'Fehler beim Aktualisieren des Kunden';
       }
     });
   }
+
+  // deleteCustomer(): void {
+  //   if (!this.customer || !confirm('Möchten Sie diesen Kunden wirklich löschen?')) {
+  //     return;
+  //   }
+
+  //   this.customerService.deleteCustomer(this.customer.customer_id).subscribe({
+  //     next: () => {
+  //       this.successMessage = 'Kunde erfolgreich gelöscht!';
+  //       setTimeout(() => {
+  //         this.router.navigate(['/customers-admin']);
+  //       }, 1500);
+  //     },
+  //     error: (error) => {
+  //       this.error = error.error.message || 'Fehler beim Löschen des Kunden';
+  //     }
+  //   });
+  // }
 
   goBack(): void {
     this.router.navigate(['/customers-admin']);
