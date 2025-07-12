@@ -1,12 +1,12 @@
-import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine, isMainModule } from '@angular/ssr/node';
+import {APP_BASE_HREF} from '@angular/common';
+import {CommonEngine, isMainModule} from '@angular/ssr/node';
 import express from 'express';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import {dirname, join, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import bootstrap from './main.server';
-import { createConnection, ResultSetHeader, RowDataPacket } from 'mysql2';
+import {createConnection, ResultSetHeader, RowDataPacket} from 'mysql2';
 import session from 'express-session';
-import { OkPacket } from 'mysql';
+import {OkPacket} from 'mysql';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -29,14 +29,14 @@ declare module "express-session" {
 }
 
 app.use(session({
-  secret: 'session', 
+  secret: 'session',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     secure: false,
     sameSite: 'lax',
-    maxAge: 1000 * 60 * 60 
+    maxAge: 1000 * 60 * 60
   }
 }));
 
@@ -48,22 +48,22 @@ const dbConfig = {
   database: "25_IT_Gruppe5",
   user: "25_IT_Grp5",
   password: "***REMOVED***",
-  ssl: { rejectUnauthorized: false }
+  ssl: {rejectUnauthorized: false}
 };
 
 
 app.post('/api/cart/add', (req, res) => {
-  const { customer_id, product_id, quantity, price } = req.body;
+  const {customer_id, product_id, quantity, price} = req.body;
 
   if (!customer_id || !product_id || !quantity || !price) {
-    return res.status(400).json({ message: 'Fehlende Angaben' });
+    return res.status(400).json({message: 'Fehlende Angaben'});
   }
 
   const con = createConnection(dbConfig);
 
   con.connect(err => {
     if (err) {
-      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+      return res.status(500).json({message: 'Datenbankverbindung fehlgeschlagen'});
     }
 
     con.query(
@@ -72,14 +72,14 @@ app.post('/api/cart/add', (req, res) => {
       (err, results) => {
         if (err) {
           con.end();
-          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
+          return res.status(500).json({message: 'Fehler beim Abrufen des Warenkorbs'});
         }
 
         const carts = results as RowDataPacket[];
 
         if (carts.length === 0) {
           con.end();
-          return res.status(404).json({ message: 'Kein Warenkorb gefunden' });
+          return res.status(404).json({message: 'Kein Warenkorb gefunden'});
         }
 
         const cart_id = carts[0]['cart_id'];
@@ -91,7 +91,7 @@ app.post('/api/cart/add', (req, res) => {
           (err, itemResult) => {
             if (err) {
               con.end();
-              return res.status(500).json({ message: 'Fehler beim Prüfen des Warenkorbs' });
+              return res.status(500).json({message: 'Fehler beim Prüfen des Warenkorbs'});
             }
 
             const items = itemResult as RowDataPacket[];
@@ -108,7 +108,7 @@ app.post('/api/cart/add', (req, res) => {
                   err => {
                     if (err) {
                       con.end();
-                      return res.status(500).json({ message: 'Fehler beim Löschen des Artikels' });
+                      return res.status(500).json({message: 'Fehler beim Löschen des Artikels'});
                     }
                     return updateCartTotal(con, cart_id, res);
                   }
@@ -122,7 +122,7 @@ app.post('/api/cart/add', (req, res) => {
                 err => {
                   if (err) {
                     con.end();
-                    return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
+                    return res.status(500).json({message: 'Fehler beim Aktualisieren des Artikels'});
                   }
                   return updateCartTotal(con, cart_id, res);
                 }
@@ -135,7 +135,7 @@ app.post('/api/cart/add', (req, res) => {
                 err => {
                   if (err) {
                     con.end();
-                    return res.status(500).json({ message: 'Fehler beim Hinzufügen des Artikels' });
+                    return res.status(500).json({message: 'Fehler beim Hinzufügen des Artikels'});
                   }
                   return updateCartTotal(con, cart_id, res);
                 }
@@ -156,37 +156,35 @@ app.post('/api/cart/add', (req, res) => {
 function updateCartTotal(con: ReturnType<typeof createConnection>, cart_id: number, res: express.Response) {
   return con.query(
     `UPDATE Cart
-     SET total_price = (
-       SELECT IFNULL(SUM(price), 0)
-       FROM Cart_Item
-       WHERE cart_id = ?
-     )
+     SET total_price = (SELECT IFNULL(SUM(price), 0)
+                        FROM Cart_Item
+                        WHERE cart_id = ?)
      WHERE cart_id = ?`,
     [cart_id, cart_id],
     err => {
       con.end();
 
       if (err) {
-        return res.status(500).json({ message: 'Fehler beim Aktualisieren des Gesamtpreises' });
+        return res.status(500).json({message: 'Fehler beim Aktualisieren des Gesamtpreises'});
       }
 
-      return res.status(201).json({ message: 'Artikel hinzugefügt oder aktualisiert' });
+      return res.status(201).json({message: 'Artikel hinzugefügt oder aktualisiert'});
     }
   );
 }
 
 app.post('/api/cart/clear', (req, res) => {
-  const { customer_id } = req.body;
+  const {customer_id} = req.body;
 
   if (!customer_id) {
-    return res.status(400).json({ message: 'Fehlende customer_id' });
+    return res.status(400).json({message: 'Fehlende customer_id'});
   }
 
   const con = createConnection(dbConfig);
 
   con.connect(err => {
     if (err) {
-      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+      return res.status(500).json({message: 'Datenbankverbindung fehlgeschlagen'});
     }
 
     // 1. Warenkorb-ID abrufen (SELECT liefert Array)
@@ -196,14 +194,14 @@ app.post('/api/cart/clear', (req, res) => {
       (err, results) => {
         if (err) {
           con.end();
-          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
+          return res.status(500).json({message: 'Fehler beim Abrufen des Warenkorbs'});
         }
 
         const carts = results as RowDataPacket[];
 
         if (carts.length === 0) {
           con.end();
-          return res.status(404).json({ message: 'Kein Warenkorb gefunden' });
+          return res.status(404).json({message: 'Kein Warenkorb gefunden'});
         }
 
         const cart_id = carts[0]['cart_id'];
@@ -215,7 +213,7 @@ app.post('/api/cart/clear', (req, res) => {
           (err, result) => {
             if (err) {
               con.end();
-              return res.status(500).json({ message: 'Fehler beim Leeren des Warenkorbs' });
+              return res.status(500).json({message: 'Fehler beim Leeren des Warenkorbs'});
             }
 
             const deleteResult = result as OkPacket;
@@ -233,10 +231,10 @@ app.post('/api/cart/clear', (req, res) => {
                 con.end();
 
                 if (err) {
-                  return res.status(500).json({ message: 'Fehler beim Aktualisieren des Gesamtpreises' });
+                  return res.status(500).json({message: 'Fehler beim Aktualisieren des Gesamtpreises'});
                 }
 
-                return res.status(200).json({ message: 'Warenkorb geleert' });
+                return res.status(200).json({message: 'Warenkorb geleert'});
               }
             );
             return;
@@ -254,7 +252,7 @@ app.get('/api/get-cart', (req, res) => {
   const sessionUser = req.session.user;
 
   if (!sessionUser || sessionUser.role !== 'customer') {
-    return res.status(401).json({ message: 'Nicht autorisiert' });
+    return res.status(401).json({message: 'Nicht autorisiert'});
   }
 
   const customer_id = sessionUser.user_id;
@@ -262,7 +260,7 @@ app.get('/api/get-cart', (req, res) => {
 
   con.connect(err => {
     if (err) {
-      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
+      return res.status(500).json({message: 'Datenbankverbindung fehlgeschlagen'});
     }
 
 
@@ -272,43 +270,42 @@ app.get('/api/get-cart', (req, res) => {
       (err, results) => {
         if (err) {
           con.end();
-          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
+          return res.status(500).json({message: 'Fehler beim Abrufen des Warenkorbs'});
         }
 
         const cartId = (results as RowDataPacket[])[0]['cart_id'];
 
         const sql = `
-          SELECT 
-            ci.product_id,
-            p.name,
-            p.description,
-            p.image,
-            ci.quantity,
-            ci.price,
-            c.total_price
+          SELECT ci.product_id,
+                 p.name,
+                 p.description,
+                 p.image,
+                 ci.quantity,
+                 ci.price,
+                 c.total_price
           FROM Cart_Item ci
-          LEFT JOIN Product p ON ci.product_id = p.product_id
-          INNER JOIN Cart c ON ci.cart_id = c.cart_id
+                 LEFT JOIN Product p ON ci.product_id = p.product_id
+                 INNER JOIN Cart c ON ci.cart_id = c.cart_id
           WHERE ci.cart_id = ?
         `;
 
         return con.query(sql, [cartId], (err, results) => {
-  if (err) {
-    con.end();
-    return res.status(500).json({ message: 'Fehler beim Laden der Warenkorbdaten' });
-  }
+          if (err) {
+            con.end();
+            return res.status(500).json({message: 'Fehler beim Laden der Warenkorbdaten'});
+          }
 
-  const items = results as RowDataPacket[];
+          const items = results as RowDataPacket[];
 
-  const total_price = items.length > 0 ? items[0]['total_price'] : 0;  
+          const total_price = items.length > 0 ? items[0]['total_price'] : 0;
 
-  con.end();
-  res.json({
-    cart_id: cartId,
-    items,
-    total_price
-    });
-        return;
+          con.end();
+          res.json({
+            cart_id: cartId,
+            items,
+            total_price
+          });
+          return;
         });
       }
     );
@@ -320,13 +317,13 @@ app.get('/api/get-products', (req, res) => {
   console.log("Anfrage angekommen");
   const con = createConnection(dbConfig);
 
-  con.connect(function(err){
-    if(err) throw err;
+  con.connect(function (err) {
+    if (err) throw err;
     console.log("connected to db");
-    con.query("SELECT * from Product", function(error,result,fields){
+    con.query("SELECT * from Product", function (error, result, fields) {
       //console.log(result);
       res.send(result);
-      con.end(function(err){
+      con.end(function (err) {
       });
     });
   });
@@ -336,13 +333,13 @@ app.post('/api/products', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte erstellen' });
+    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Produkte erstellen'});
   }
 
-  const { name, description, price, stock_quantity, image } = req.body;
+  const {name, description, price, stock_quantity, image} = req.body;
 
   if (!name || price === undefined || stock_quantity === undefined || !description || !image) {
-    return res.status(400).json({ message: 'Fehlende Pflichtfelder (name, price, stock_quantity, description, image)' });
+    return res.status(400).json({message: 'Fehlende Pflichtfelder (name, price, stock_quantity, description, image)'});
   }
 
   const con = createConnection(dbConfig).promise();
@@ -358,14 +355,14 @@ app.post('/api/products', async (req, res) => {
     const insertedId = (insertResult as OkPacket).insertId;
 
     const fieldsToLog = [
-      { field: 'name', value: name },
-      { field: 'description', value: description },
-      { field: 'price', value: price },
-      { field: 'stock_quantity', value: stock_quantity },
-      { field: 'image', value: image }
+      {field: 'name', value: name},
+      {field: 'description', value: description},
+      {field: 'price', value: price},
+      {field: 'stock_quantity', value: stock_quantity},
+      {field: 'image', value: image}
     ];
 
-    const logPromises = fieldsToLog.map(field => 
+    const logPromises = fieldsToLog.map(field =>
       con.query(
         'INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), NULL, ?)',
         [user.user_id, insertedId, field.field, field.value]
@@ -376,17 +373,17 @@ app.post('/api/products', async (req, res) => {
 
     await con.end();
 
-    return res.status(201).json({ 
-      message: 'Produkt erfolgreich erstellt', 
+    return res.status(201).json({
+      message: 'Produkt erfolgreich erstellt',
       product_id: insertedId,
-      logs_created: fieldsToLog.length 
+      logs_created: fieldsToLog.length
     });
   } catch (error: any) {
     await con.end();
     console.error('Fehler beim Erstellen des Produkts:', error);
-    return res.status(500).json({ 
-      message: 'Fehler beim Erstellen des Produkts', 
-      error: error.message 
+    return res.status(500).json({
+      message: 'Fehler beim Erstellen des Produkts',
+      error: error.message
     });
   }
 });
@@ -394,22 +391,25 @@ app.post('/api/products', async (req, res) => {
 app.post('/api/cart/checkout', (req, res) => {
   const user = req.session.user;
   if (!user || user.role !== 'customer') {
-    return res.status(401).json({ message: 'Nicht autorisiert' });
+    return res.status(401).json({message: 'Nicht autorisiert'});
   }
 
   const con = createConnection(dbConfig);
 
   con.connect(err => {
-    if (err) return res.status(500).json({ message: 'DB‑Verbindung fehlgeschlagen' });
+    if (err) return res.status(500).json({message: 'DB‑Verbindung fehlgeschlagen'});
 
     con.beginTransaction(err => {
-      if (err) { con.end(); return res.status(500).json({ message: 'Transaktionsfehler' }); }
+      if (err) {
+        con.end();
+        return res.status(500).json({message: 'Transaktionsfehler'});
+      }
 
       /* 1. Warenkorb holen */
       con.query(
         `SELECT cart_id, total_price
-           FROM Cart
-          WHERE customer_id = ?`,
+         FROM Cart
+         WHERE customer_id = ?`,
         [user.user_id],
         (err, results) => {
           if (err) return rollback('Fehler beim Lesen des Warenkorbs');
@@ -419,7 +419,7 @@ app.post('/api/cart/checkout', (req, res) => {
             return rollback('Warenkorb leer', 400);
           }
 
-          const cart_id     = cartRows[0]['cart_id'];
+          const cart_id = cartRows[0]['cart_id'];
           const total_price = cartRows[0]['total_price'];
 
           /* 2. Bestellungskopf einfügen */
@@ -438,21 +438,25 @@ app.post('/api/cart/checkout', (req, res) => {
                 `INSERT INTO Order_Item
                    (order_id, product_id, quantity, price)
                  SELECT ?, product_id, quantity, price
-                   FROM Cart_Item
-                  WHERE cart_id = ?`,
+                 FROM Cart_Item
+                 WHERE cart_id = ?`,
                 [order_id, cart_id],
                 err => {
                   if (err) return rollback('Fehler beim Kopieren der Positionen');
 
                   /* 4. Warenkorb leeren */
                   con.query(
-                    `DELETE FROM Cart_Item WHERE cart_id = ?`,
+                    `DELETE
+                     FROM Cart_Item
+                     WHERE cart_id = ?`,
                     [cart_id],
                     err => {
                       if (err) return rollback('Fehler beim Leeren des Warenkorbs');
 
                       con.query(
-                        `UPDATE Cart SET total_price = 0 WHERE cart_id = ?`,
+                        `UPDATE Cart
+                         SET total_price = 0
+                         WHERE cart_id = ?`,
                         [cart_id],
                         err => {
                           if (err) return rollback('Fehler beim Zurücksetzen des Warenkorbs');
@@ -460,7 +464,7 @@ app.post('/api/cart/checkout', (req, res) => {
                           /* 5. Commit und Antwort */
                           con.commit(err => {
                             con.end();
-                            if (err) return res.status(500).json({ message: 'Commit‑Fehler' });
+                            if (err) return res.status(500).json({message: 'Commit‑Fehler'});
 
                             return res.status(201).json({
                               message: 'Bestellung erfolgreich erstellt',
@@ -481,9 +485,10 @@ app.post('/api/cart/checkout', (req, res) => {
       function rollback(msg: string, code = 500) {
         con.rollback(() => {
           con.end();
-          res.status(code).json({ message: msg });
+          res.status(code).json({message: msg});
         });
       }
+
       return;
     });
     return;
@@ -494,7 +499,7 @@ app.post('/api/cart/checkout', (req, res) => {
 app.get('/api/get-my-orders', (req, res) => {
   const user = req.session.user;
   if (!user || user.role !== 'customer') {
-    return res.status(401).json({ message: 'Nicht autorisiert' });
+    return res.status(401).json({message: 'Nicht autorisiert'});
   }
 
   const con = createConnection(dbConfig);
@@ -528,7 +533,7 @@ app.get('/api/get-product/:id', (req, res) => {
 
   const con = createConnection(dbConfig);
 
-  con.connect(function(err) {
+  con.connect(function (err) {
     if (err) {
       console.error('DB-Verbindung fehlgeschlagen:', err);
       res.status(500).send('Datenbankfehler');
@@ -556,20 +561,20 @@ app.get('/api/get-product/:id', (req, res) => {
       }
     );
 
-  }); 
-});  
+  });
+});
 
 app.put('/api/edit-product', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte bearbeiten' });
+    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Produkte bearbeiten'});
   }
 
-  const { product_id, name, description, price, stock_quantity, image } = req.body;
+  const {product_id, name, description, price, stock_quantity, image} = req.body;
 
   if (!product_id || !name || price === undefined || stock_quantity === undefined || !description || !image) {
-    return res.status(400).json({ message: 'Fehlende Pflichtfelder (product_id, name, price, stock_quantity, description, image)' });
+    return res.status(400).json({message: 'Fehlende Pflichtfelder (product_id, name, price, stock_quantity, description, image)'});
   }
 
   const con = createConnection(dbConfig).promise();
@@ -584,26 +589,26 @@ app.put('/api/edit-product', async (req, res) => {
 
     if (currentProductRows.length === 0) {
       await con.end();
-      return res.status(404).json({ message: 'Produkt nicht gefunden' });
+      return res.status(404).json({message: 'Produkt nicht gefunden'});
     }
 
     const oldValues = currentProductRows[0];
     const changes = [];
 
     if (oldValues['name'] !== name) {
-      changes.push({ field: 'name', before: oldValues['name'], after: name });
+      changes.push({field: 'name', before: oldValues['name'], after: name});
     }
     if (oldValues['description'] !== description) {
-      changes.push({ field: 'description', before: oldValues['description'], after: description });
+      changes.push({field: 'description', before: oldValues['description'], after: description});
     }
     if (oldValues['price'] !== price) {
-      changes.push({ field: 'price', before: oldValues['price'], after: price });
+      changes.push({field: 'price', before: oldValues['price'], after: price});
     }
     if (oldValues['stock_quantity'] !== stock_quantity) {
-      changes.push({ field: 'stock_quantity', before: oldValues['stock_quantity'], after: stock_quantity });
+      changes.push({field: 'stock_quantity', before: oldValues['stock_quantity'], after: stock_quantity});
     }
     if (oldValues['image'] !== image) {
-      changes.push({ field: 'image', before: oldValues['image'], after: image });
+      changes.push({field: 'image', before: oldValues['image'], after: image});
     }
 
     await con.query(
@@ -612,7 +617,7 @@ app.put('/api/edit-product', async (req, res) => {
     );
 
     if (changes.length > 0) {
-      const changePromises = changes.map(change => 
+      const changePromises = changes.map(change =>
         con.query(
           'INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), ?, ?)',
           [user.user_id, product_id, change.field, change.before, change.after]
@@ -622,11 +627,11 @@ app.put('/api/edit-product', async (req, res) => {
     }
 
     await con.end();
-    return res.status(200).json({ message: 'Produkt erfolgreich aktualisiert', changes_made: changes.length > 0 });
+    return res.status(200).json({message: 'Produkt erfolgreich aktualisiert', changes_made: changes.length > 0});
   } catch (error: any) {
     await con.end();
     console.error('Fehler beim Aktualisieren des Produkts:', error);
-    return res.status(500).json({ message: 'Fehler beim Aktualisieren des Produkts', error: error.message });
+    return res.status(500).json({message: 'Fehler beim Aktualisieren des Produkts', error: error.message});
   }
 });
 
@@ -634,13 +639,13 @@ app.delete('/api/delete-product/:id', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte löschen' });
+    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Produkte löschen'});
   }
 
   const productId = req.params.id;
 
   if (!productId || isNaN(Number(productId))) {
-    return res.status(400).json({ message: 'Ungültige Produkt-ID' });
+    return res.status(400).json({message: 'Ungültige Produkt-ID'});
   }
 
   const con = createConnection(dbConfig).promise();
@@ -656,7 +661,7 @@ app.delete('/api/delete-product/:id', async (req, res) => {
 
     if (productRows.length === 0) {
       await con.end();
-      return res.status(404).json({ message: 'Produkt nicht gefunden' });
+      return res.status(404).json({message: 'Produkt nicht gefunden'});
     }
 
     const product = productRows[0];
@@ -675,16 +680,16 @@ app.delete('/api/delete-product/:id', async (req, res) => {
 
     await con.end();
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       message: 'Produkt erfolgreich gelöscht',
       deleted_product: product
     });
   } catch (error: any) {
     await con.end();
     console.error('Fehler beim Löschen des Produkts:', error);
-    return res.status(500).json({ 
-      message: 'Fehler beim Löschen des Produkts', 
-      error: error.message 
+    return res.status(500).json({
+      message: 'Fehler beim Löschen des Produkts',
+      error: error.message
     });
   }
 });
@@ -696,19 +701,18 @@ app.get('/api/get-customers', async (req, res) => {
     await con.connect();
 
     const [customers] = await con.query<RowDataPacket[]>(`
-      SELECT 
-        u.user_id AS customer_id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        a.street,
-        a.house_number,
-        a.zipcode,
-        a.country,
-        a.city
+      SELECT u.user_id AS customer_id,
+             u.first_name,
+             u.last_name,
+             u.email,
+             a.street,
+             a.house_number,
+             a.zipcode,
+             a.country,
+             a.city
       FROM Customer c
-      JOIN User u ON c.customer_id = u.user_id
-      LEFT JOIN Address a ON u.address_id = a.address_id
+             JOIN User u ON c.customer_id = u.user_id
+             LEFT JOIN Address a ON u.address_id = a.address_id
     `);
 
     res.status(200).json(customers);
@@ -723,44 +727,49 @@ app.get('/api/get-customers', async (req, res) => {
   }
 });
 
-app.get('/api/get-customer/:id', (req, res) => {
+app.get('/api/get-customer/:id', async (req, res) => {
   const customer_id = req.params.id;
-  const con = createConnection(dbConfig);
-  con.connect(err => {
-    if(err) {
-      res.status(500).send("DB connection error");
-      return;
-    }
-    con.query("SELECT * FROM Customer WHERE customer_id = ?",
-      [customer_id],
-      (error, results) => {
-        if(error) {
-          res.status(500).send(error);
-        } else {
-          if (Array.isArray(results) && results.length === 0) {
-            res.status(404).send('Kunde nicht gefunden.');
-          } else if (Array.isArray(results)) {
-            res.send(results[0]);
-          } else {
-            res.status(500).send('Unerwartetes Ergebnis');
-          }
-        }
-        con.end();
-      });
-  });
+  const con = createConnection(dbConfig).promise();
+  try {
+    await con.connect();
+    const [currentCustomerAttributes] = await con.query<RowDataPacket[]>(
+      `SELECT u.user_id,
+              u.first_name,
+              u.last_name,
+              u.email,
+              u.address_id,
+              a.street,
+              a.house_number,
+              a.zipcode,
+              a.country,
+              a.city
+       FROM User u
+              LEFT JOIN Address a ON u.address_id = a.address_id
+       WHERE u.user_id = ?`, [customer_id]
+    );
+    res.status(200).json(currentCustomerAttributes[0]);
+  } catch (error: any) {
+    console.error('Fehler beim Laden der Kunden:', error);
+    res.status(500).json({
+      message: 'Fehler beim Laden der Kunden',
+      error: error.message
+    });
+  } finally {
+    await con.end();
+  }
 });
 
 app.put('/api/edit-customer', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Kunden bearbeiten' });
+    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Kunden bearbeiten'});
   }
 
-  const { customer_id, street, house_number, zipcode, country, city } = req.body;
+  const {customer_id, first_name, last_name, email, street, house_number, zipcode, country, city} = req.body;
 
-  if (!customer_id || !street || !house_number || !zipcode || !country || !city) {
-    return res.status(400).json({ message: 'Fehlende Pflichtfelder (customer_id, street, house_number, zipcode, country, city)' });
+  if (!customer_id || !first_name || !last_name || !email || !street || !house_number || !zipcode || !country || !city) {
+    return res.status(400).json({message: 'Fehlende Pflichtfelder (customer_id, first_name, last_name, email, street, house_number, zipcode, country, city)'});
   }
 
   const con = createConnection(dbConfig).promise();
@@ -770,34 +779,52 @@ app.put('/api/edit-customer', async (req, res) => {
 
     // Aktuelle Adressdaten holen
     const [currentCustomerRows] = await con.query<RowDataPacket[]>(
-      `SELECT u.user_id, u.address_id, a.street, a.house_number, a.zipcode, a.country, a.city
+      `SELECT u.user_id,
+              u.first_name,
+              u.last_name,
+              u.email,
+              u.address_id,
+              a.street,
+              a.house_number,
+              a.zipcode,
+              a.country,
+              a.city
        FROM User u
-       LEFT JOIN Address a ON u.address_id = a.address_id
+              LEFT JOIN Address a ON u.address_id = a.address_id
        WHERE u.user_id = ?`, [customer_id]
     );
 
     if (currentCustomerRows.length === 0) {
       await con.end();
-      return res.status(404).json({ message: 'Kunde nicht gefunden' });
+      return res.status(404).json({message: 'Kunde nicht gefunden'});
     }
 
     const oldValues = currentCustomerRows[0];
     const changes = [];
 
+    if (oldValues['first_name'] !== first_name) {
+      changes.push({field: 'first_name', before: oldValues['first_name'], after: first_name});
+    }
+    if (oldValues['last_name'] !== last_name) {
+      changes.push({field: 'last_name', before: oldValues['last_name'], after: last_name});
+    }
+    if (oldValues['email'] !== email) {
+      changes.push({field: 'email', before: oldValues['email'], after: email});
+    }
     if (oldValues['street'] !== street) {
-      changes.push({ field: 'street', before: oldValues['street'], after: street });
+      changes.push({field: 'street', before: oldValues['street'], after: street});
     }
     if (oldValues['house_number'] !== house_number) {
-      changes.push({ field: 'house_number', before: oldValues['house_number'], after: house_number });
+      changes.push({field: 'house_number', before: oldValues['house_number'], after: house_number});
     }
     if (String(oldValues['zipcode']) !== String(zipcode)) {
-      changes.push({ field: 'zipcode', before: oldValues['zipcode'], after: zipcode });
+      changes.push({field: 'zipcode', before: oldValues['zipcode'], after: zipcode});
     }
     if (oldValues['country'] !== country) {
-      changes.push({ field: 'country', before: oldValues['country'], after: country });
+      changes.push({field: 'country', before: oldValues['country'], after: country});
     }
     if (oldValues['city'] !== city) {
-      changes.push({ field: 'city', before: oldValues['city'], after: city });
+      changes.push({field: 'city', before: oldValues['city'], after: city});
     }
 
     let address_id = oldValues['address_id'];
@@ -808,13 +835,16 @@ app.put('/api/edit-customer', async (req, res) => {
         'UPDATE Address SET street = ?, house_number = ?, zipcode = ?, country = ?, city = ? WHERE address_id = ?',
         [street, house_number, zipcode, country, city, address_id]
       );
+      await con.query('UPDATE User SET address_id = ?, first_name = ?, last_name = ?, email = ? WHERE user_id = ?',
+        [address_id, first_name, last_name, email, customer_id]);
     } else {
       const [addressResult]: any = await con.execute(
         'INSERT INTO Address (street, house_number, zipcode, country, city) VALUES (?, ?, ?, ?, ?)',
         [street, house_number, zipcode, country, city]
       );
       address_id = addressResult.insertId;
-      await con.query('UPDATE User SET address_id = ? WHERE user_id = ?', [address_id, customer_id]);
+      await con.query('UPDATE User SET address_id = ?, first_name = ?, last_name = ?, email = ? WHERE user_id = ?',
+        [address_id, first_name, last_name, email, customer_id]);
     }
 
     if (changes.length > 0) {
@@ -828,16 +858,16 @@ app.put('/api/edit-customer', async (req, res) => {
     }
 
     await con.end();
-    return res.status(200).json({ 
-      message: 'Kunde erfolgreich aktualisiert', 
-      changes_made: changes.length 
+    return res.status(200).json({
+      message: 'Kunde erfolgreich aktualisiert',
+      changes_made: changes.length
     });
   } catch (error: any) {
     await con.end();
     console.error('Fehler beim Aktualisieren des Kunden:', error);
-    return res.status(500).json({ 
-      message: 'Fehler beim Aktualisieren des Kunden', 
-      error: error.message 
+    return res.status(500).json({
+      message: 'Fehler beim Aktualisieren des Kunden',
+      error: error.message
     });
   }
 });
@@ -845,12 +875,12 @@ app.put('/api/edit-customer', async (req, res) => {
 app.get('/api/get-orders', (req, res) => {
   const con = createConnection(dbConfig);
   con.connect(err => {
-    if(err) {
+    if (err) {
       res.status(500).send("DB connection error");
       return;
     }
     con.query("SELECT * FROM Customer_Order", (error, results) => {
-      if(error) {
+      if (error) {
         res.status(500).send(error);
       } else {
         res.send(results);
@@ -864,26 +894,26 @@ app.get('/api/get-order/:id', (req, res) => {
   const order_id = req.params.id;
   const con = createConnection(dbConfig);
   con.connect(err => {
-    if(err) {
+    if (err) {
       res.status(500).send("DB connection error");
       return;
     }
     con.query("SELECT * FROM Customer_Order WHERE order_id = ?",
       [order_id],
       (error, results) => {
-      if(error) {
-        res.status(500).send(error);
-      } else {
-        if (Array.isArray(results) && results.length === 0) {
-          res.status(404).send('Bestellung nicht gefunden');
-        } else if (Array.isArray(results)) {
-          res.send(results[0]);
+        if (error) {
+          res.status(500).send(error);
         } else {
-          res.status(500).send('Unerwartetes Ergebnis');
+          if (Array.isArray(results) && results.length === 0) {
+            res.status(404).send('Bestellung nicht gefunden');
+          } else if (Array.isArray(results)) {
+            res.send(results[0]);
+          } else {
+            res.status(500).send('Unerwartetes Ergebnis');
+          }
         }
-      }
-      con.end();
-    });
+        con.end();
+      });
   });
 });
 
@@ -891,13 +921,13 @@ app.put('/api/edit-order', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Bestellungen bearbeiten' });
+    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Bestellungen bearbeiten'});
   }
 
-  const { order_id, customer_id, date, delivery_status, total_price, payment_method } = req.body;
+  const {order_id, customer_id, date, delivery_status, total_price, payment_method} = req.body;
 
   if (!order_id || !customer_id || !date || !delivery_status || !total_price || !payment_method) {
-    return res.status(400).json({ message: 'Fehlende Pflichtfelder' });
+    return res.status(400).json({message: 'Fehlende Pflichtfelder'});
   }
 
   const con = createConnection(dbConfig).promise();
@@ -913,7 +943,7 @@ app.put('/api/edit-order', async (req, res) => {
 
     if (currentOrderRows.length === 0) {
       await con.end();
-      return res.status(404).json({ message: 'Bestellung nicht gefunden' });
+      return res.status(404).json({message: 'Bestellung nicht gefunden'});
     }
 
     const oldValues = currentOrderRows[0];
@@ -921,19 +951,19 @@ app.put('/api/edit-order', async (req, res) => {
 
     // Änderungen erkennen
     if (oldValues['customer_id'] !== customer_id) {
-      changes.push({ field: 'customer_id', before: oldValues['customer_id'], after: customer_id });
+      changes.push({field: 'customer_id', before: oldValues['customer_id'], after: customer_id});
     }
     if (new Date(oldValues['date']).toISOString().split('T')[0] !== new Date(date).toISOString().split('T')[0]) {
-      changes.push({ field: 'date', before: oldValues['date'], after: date });
+      changes.push({field: 'date', before: oldValues['date'], after: date});
     }
     if (oldValues['delivery_status'] !== delivery_status) {
-      changes.push({ field: 'delivery_status', before: oldValues['delivery_status'], after: delivery_status });
+      changes.push({field: 'delivery_status', before: oldValues['delivery_status'], after: delivery_status});
     }
     if (oldValues['total_price'] !== total_price) {
-      changes.push({ field: 'total_price', before: oldValues['total_price'], after: total_price });
+      changes.push({field: 'total_price', before: oldValues['total_price'], after: total_price});
     }
     if (oldValues['payment_method'] !== payment_method) {
-      changes.push({ field: 'payment_method', before: oldValues['payment_method'], after: payment_method });
+      changes.push({field: 'payment_method', before: oldValues['payment_method'], after: payment_method});
     }
 
     // Bestellung aktualisieren
@@ -944,7 +974,7 @@ app.put('/api/edit-order', async (req, res) => {
 
     // Änderungen protokollieren
     if (changes.length > 0) {
-      const changePromises = changes.map(change => 
+      const changePromises = changes.map(change =>
         con.query(
           'INSERT INTO Order_Change (employee_id, order_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), ?, ?)',
           [user.user_id, order_id, change.field, change.before, change.after]
@@ -954,23 +984,23 @@ app.put('/api/edit-order', async (req, res) => {
     }
 
     await con.end();
-    return res.status(200).json({ 
-      message: 'Bestellung erfolgreich aktualisiert', 
-      changes_made: changes.length 
+    return res.status(200).json({
+      message: 'Bestellung erfolgreich aktualisiert',
+      changes_made: changes.length
     });
   } catch (error: any) {
     await con.end();
     console.error('Fehler beim Aktualisieren der Bestellung:', error);
-    return res.status(500).json({ 
-      message: 'Fehler beim Aktualisieren der Bestellung', 
-      error: error.message 
+    return res.status(500).json({
+      message: 'Fehler beim Aktualisieren der Bestellung',
+      error: error.message
     });
   }
 });
 
 app.get('/api/get-logs', (req, res) => {
   const con = createConnection(dbConfig);
-  
+
   con.connect(err => {
     if (err) {
       res.status(500).send("DB connection error");
@@ -1013,24 +1043,23 @@ app.post('/api/login', (req, res) => {
   console.log("Anfrage angekommen");
   const con = createConnection(dbConfig);
 
-  const { email, password } = req.body;
+  const {email, password} = req.body;
   const sql = `
-    SELECT 
-      u.user_id,
-      u.first_name,
-      u.last_name,
-      u.password,
-      u.email,
-      CASE 
-        WHEN c.customer_id IS NOT NULL THEN 'customer'
-        WHEN e.employee_id IS NOT NULL THEN 'employee'
-        ELSE 'unknown'
-      END AS role
+    SELECT u.user_id,
+           u.first_name,
+           u.last_name,
+           u.password,
+           u.email,
+           CASE
+             WHEN c.customer_id IS NOT NULL THEN 'customer'
+             WHEN e.employee_id IS NOT NULL THEN 'employee'
+             ELSE 'unknown'
+             END AS role
     FROM User u
-    LEFT JOIN Customer c ON u.user_id = c.customer_id
-    LEFT JOIN Employee e ON u.user_id = e.employee_id
-    WHERE u.email = ? AND u.password = ?
-    LIMIT 1
+           LEFT JOIN Customer c ON u.user_id = c.customer_id
+           LEFT JOIN Employee e ON u.user_id = e.employee_id
+    WHERE u.email = ?
+      AND u.password = ? LIMIT 1
   `;
 
   con.query(
@@ -1052,14 +1081,14 @@ app.post('/api/login', (req, res) => {
           last_name: rows[0].last_name,
           email: rows[0].email
         };
-        res.json({ 
+        res.json({
           user_id: rows[0].user_id,
           role: rows[0].role,
           first_name: rows[0].first_name,
           last_name: rows[0].last_name
         });
       } else {
-        res.status(401).json({ message: 'Falsche Zugangsdaten' });
+        res.status(401).json({message: 'Falsche Zugangsdaten'});
       }
       con.end();
     }
@@ -1068,7 +1097,7 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/user-details', (req, res) => {
   if (!req.session.user) {
-    res.status(401).json({ message: 'Nicht eingeloggt' });
+    res.status(401).json({message: 'Nicht eingeloggt'});
     return;
   }
 
@@ -1076,44 +1105,42 @@ app.get('/api/user-details', (req, res) => {
   const con = createConnection(dbConfig);
 
   const sql = `
-    SELECT 
-      u.user_id,
-      u.first_name,
-      u.last_name,
-      u.email,
-      u.address_id,
-      a.street,
-      a.house_number,
-      a.zipcode,
-      a.country,
-      a.city,
-      e.monthly_salary,
-      e.role AS employee_role,
-      CASE 
-        WHEN c.customer_id IS NOT NULL THEN 'customer'
-        WHEN e.employee_id IS NOT NULL THEN 'employee'
-        ELSE 'unknown'
-      END AS role
+    SELECT u.user_id,
+           u.first_name,
+           u.last_name,
+           u.email,
+           u.address_id,
+           a.street,
+           a.house_number,
+           a.zipcode,
+           a.country,
+           a.city,
+           e.monthly_salary,
+           e.role AS employee_role,
+           CASE
+             WHEN c.customer_id IS NOT NULL THEN 'customer'
+             WHEN e.employee_id IS NOT NULL THEN 'employee'
+             ELSE 'unknown'
+             END  AS role
     FROM User u
-    LEFT JOIN Address a ON u.address_id = a.address_id
-    LEFT JOIN Customer c ON u.user_id = c.customer_id
-    LEFT JOIN Employee e ON u.user_id = e.employee_id
-    WHERE u.user_id = ?
-    LIMIT 1
+           LEFT JOIN Address a ON u.address_id = a.address_id
+           LEFT JOIN Customer c ON u.user_id = c.customer_id
+           LEFT JOIN Employee e ON u.user_id = e.employee_id
+    WHERE u.user_id = ? LIMIT 1
   `;
 
   con.query(sql, [userId], (error, results) => {
     con.end();
 
     if (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({error: error.message});
       return;
     }
 
     const rows = results as any[];
 
     if (rows.length === 0) {
-      res.status(404).json({ message: 'User nicht gefunden' });
+      res.status(404).json({message: 'User nicht gefunden'});
       return;
     }
 
@@ -1144,15 +1171,15 @@ app.get('/api/user-details', (req, res) => {
 
 app.get('/api/me', (req, res) => {
   if (req.session.user) {
-    res.json({ user: req.session.user });
+    res.json({user: req.session.user});
   } else {
-    res.status(401).json({ message: 'Nicht eingeloggt' });
+    res.status(401).json({message: 'Nicht eingeloggt'});
   }
 });
 
 app.post('/api/logout', (req, res) => {
   req.session.destroy(() => {
-    res.json({ success: true });
+    res.json({success: true});
   });
 });
 
@@ -1171,7 +1198,7 @@ app.get(
  * Handle all other requests by rendering the Angular application.
  */
 app.get('**', (req, res, next) => {
-  const { protocol, originalUrl, baseUrl, headers } = req;
+  const {protocol, originalUrl, baseUrl, headers} = req;
 
   commonEngine
     .render({
@@ -1179,7 +1206,7 @@ app.get('**', (req, res, next) => {
       documentFilePath: indexHtml,
       url: `${protocol}://${headers.host}${originalUrl}`,
       publicPath: browserDistFolder,
-      providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+      providers: [{provide: APP_BASE_HREF, useValue: baseUrl}],
     })
     .then((html) => res.send(html))
     .catch((err) => next(err));

@@ -82,6 +82,7 @@ export class EditCustomersComponent implements OnInit, OnDestroy {
       next: (customer) => {
         if (customer) {
           this.customer = customer;
+          this.customer.customer_id = customer.user_id;
           this.customerForm.patchValue({
             first_name: customer.first_name,
             last_name: customer.last_name,
@@ -117,6 +118,7 @@ export class EditCustomersComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.successMessage = 'Kunde erfolgreich aktualisiert!';
         this.loadCustomer(this.customer!.customer_id);
+        this.router.navigate(['/customers-admin']);
       },
       error: (error) => {
         this.error = error.error.message || 'Fehler beim Aktualisieren des Kunden';

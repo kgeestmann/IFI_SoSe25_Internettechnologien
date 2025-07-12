@@ -36,6 +36,9 @@ export class CustomerService {
   updateCustomer(customer: Customer): Observable<any> {
     return this.http.put('/api/edit-customer', {
       customer_id: customer.customer_id,
+      first_name: customer.first_name,
+      last_name: customer.last_name,
+      email: customer.email,
       street: customer.street,
       house_number: customer.house_number,
       zipcode: customer.zipcode,
@@ -44,7 +47,7 @@ export class CustomerService {
     });
   }
 
-  // Kunden löschen 
+  // Kunden löschen
   deleteCustomer(customerId: number): Observable<any> {
     return this.http.delete(`/api/delete-customer/${customerId}`);
   }
