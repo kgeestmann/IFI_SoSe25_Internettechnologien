@@ -45,45 +45,46 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
     private location: Location,
     private socketService: SocketService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-  this.route.paramMap.subscribe(params => {
-    const id = params.get('id');
-    if (id) {
-      this.productService.getProducts().subscribe(products => {
-        const found = products.find(p => p.product_id === +id) || null;
-        if (found) {
-          this.product = {
-            ...found,
-            infoText: this.getInfoText(found.name),
-            care: this.getCareText(found.name)
-          };
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.productService.getProducts().subscribe(products => {
+          const found = products.find(p => p.product_id === +id) || null;
+          if (found) {
+            /*this.product = {
+              ...found,
+              infoText: this.getInfoText(found.name),
+              care: this.getCareText(found.name)
+            };*/
+            this.product = found;
 
-          this.recommendedProducts = products
-            .filter(p => p.product_id !== +id)
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 3);
-        }
-      });
-    }
-  });
+            this.recommendedProducts = products
+              .filter(p => p.product_id !== +id)
+              .sort(() => 0.5 - Math.random())
+              .slice(0, 3);
+          }
+        });
+      }
+    });
 
-  this.authService.isCustomer$.subscribe(status => {
-    this.isCustomer = status;
-  });
+    this.authService.isCustomer$.subscribe(status => {
+      this.isCustomer = status;
+    });
 
-   this.socketService.onLowStock().subscribe((data) => {
-    if (this.product && data.product_id === this.product.product_id) {
-      this.showLowStock = data.stock <= 5;
-    }
-  });
-}
+    this.socketService.onLowStock().subscribe((data) => {
+      if (this.product && data.product_id === this.product.product_id) {
+        this.showLowStock = data.stock <= 5;
+      }
+    });
+  }
 
 
   goToProduct(id: number): void {
-  this.router.navigate(['/product', id]);
-}
+    this.router.navigate(['/product', id]);
+  }
 
   addToCart(): void {
     if (this.product) {
@@ -108,7 +109,7 @@ export class ProductDetailComponent implements OnInit {
     this.showInfo = !this.showInfo;
   }
 
-  getInfoText(name: string): string {
+  /*getInfoText(name: string): string {
     switch (name) {
       case 'Sansevieria':
         return 'Die Sansevieria ist eine äußerst robuste Zimmerpflanze mit aufrecht wachsenden, schwertförmigen Blättern. Sie passt perfekt in jedes Zuhause.';
@@ -140,5 +141,5 @@ export class ProductDetailComponent implements OnInit {
       default:
         return 'Keine Pflegehinweise verfügbar.';
     }
-  }
+  }*/
 }

@@ -97,7 +97,7 @@ a.active,
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 1.10rem;
+  font-size: 1 rem;
   transition: right 0.3s ease;
   z-index: 999;
 }
@@ -132,6 +132,13 @@ a.active,
     background: #b0d8b7;
     border-radius: 0.5rem;
     padding: 0.3rem;
+}
+
+.off-screen-menu li a img,
+.off-screen-menu .logo img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* --- Hamburger-Menü (rechts in der Leiste) --- */

@@ -11,14 +11,16 @@
 
   <!-- Rechte Seite: Navigation -->
   <div class="navigationGr" [class.hide]="menuActive">
-    <a *ngIf="!(isEmployee$ | async)" routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">Produkte</a>
-    <a *ngIf="!(isLoggedIn$ | async)" routerLink="/login" routerLinkActive="active">Login</a>
+    <a *ngIf="!(isEmployee$ | async)" routerLink="/products" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: false }">Produkte</a>
+    <a *ngIf="!(isLoggedIn$ | async)" routerLink="/login" routerLinkActive="active"><img src="assets/login.png"
+        alt="Login" /></a>
 
     <ng-container *ngIf="(isLoggedIn$ | async) && (isCustomer$ | async)">
-      <a routerLink="/cart" routerLinkActive="active"><img src="assets/cart.png" alt="Warenkorb" /></a>
       <a routerLink="/customer-profile" routerLinkActive="active">Mein Account</a>
       <a routerLink="/customer-orders" routerLinkActive="active">Meine Bestellungen</a>
-      <a (click)="logout()">Logout</a>
+      <a routerLink="/cart" routerLinkActive="active"><img src="assets/cart.png" alt="Warenkorb" /></a>
+      <a (click)="logout()"><img src="assets/logout.png" alt="Logout" /></a>
     </ng-container>
 
     <ng-container *ngIf="(isLoggedIn$ | async) && (isEmployee$ | async)">
@@ -43,23 +45,23 @@
 <!-- Off-Screen-Menü für Mobil AUSSERHALB von <nav> -->
 <div class="off-screen-menu" [class.active]="menuActive">
   <div class="nav-logo">
-    <p class="title">Pflanziversum</p> 
+    <p class="title">Pflanziversum</p>
     <div class="logo">
-    <a [routerLink]="(isEmployee$ | async) ? '/products-admin' : (isCustomer$ | async) ? '/products' : '/products'">        
-      <img src="assets/plant5.png" alt="logo" />
-    </a>
-    </div> 
+      <a [routerLink]="(isEmployee$ | async) ? '/products-admin' : (isCustomer$ | async) ? '/products' : '/products'">
+        <img src="assets/plant5.png" alt="logo" />
+      </a>
+    </div>
   </div>
-  
+
   <ul class="menu">
     <li *ngIf="!(isEmployee$ | async)"><a routerLink="/products" routerLinkActive="active">Produkte</a></li>
-    <li *ngIf="!(isLoggedIn$ | async)"><a routerLink="/login" routerLinkActive="active">Login</a></li>
+    <li *ngIf="!(isLoggedIn$ | async)"><a routerLink="/login" routerLinkActive="active"><img src="assets/login.png" alt="Login"/></a></li>
 
     <ng-container *ngIf="(isLoggedIn$ | async) && (isCustomer$ | async)">
-      <li><a routerLink="/cart" routerLinkActive="active"><img src="assets/cart.png" alt="Warenkorb" /></a></li>
       <li><a routerLink="/customer-profile" routerLinkActive="active">Mein Account</a></li>
       <li><a routerLink="/customer-orders" routerLinkActive="active">Meine Bestellungen</a></li>
-      <li><a (click)="logout()">Logout</a></li>
+      <li><a routerLink="/cart" routerLinkActive="active"><img src="assets/cart.png" alt="Warenkorb"/></a></li>
+      <li><a (click)="logout()"><img src="assets/logout.png" alt="Logout"/></a></li>
     </ng-container>
 
     <ng-container *ngIf="(isLoggedIn$ | async) && (isEmployee$ | async)">
@@ -68,7 +70,7 @@
       <li><a routerLink="/orders-admin" routerLinkActive="active">Bestellungen verwalten</a></li>
       <li><a routerLink="/customers-admin" routerLinkActive="active">Kunden verwalten</a></li>
       <li><a routerLink="/logs" routerLinkActive="active">Logbuch</a></li>
-      <li><a (click)="logout()">Logout</a></li>
+      <li><a (click)="logout()"><img src="assets/logout.png" alt="Logout"/></a></li>
     </ng-container>
   </ul>
 </div>

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NavigationComponent } from './shared/navigation/navigation.component'; // <--- Import hinzufügen
+import { FooterComponent } from './shared/footer/footer.component'; // <--- Import hinzufügen
 import { AuthService } from './auth.service';
 
 
@@ -12,7 +13,8 @@ import { AuthService } from './auth.service';
     RouterOutlet,
     NavigationComponent,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    FooterComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
