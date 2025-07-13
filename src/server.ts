@@ -1,12 +1,14 @@
-import {APP_BASE_HREF} from '@angular/common';
-import {CommonEngine, isMainModule} from '@angular/ssr/node';
+import { APP_BASE_HREF } from '@angular/common';
+import { CommonEngine, isMainModule } from '@angular/ssr/node';
 import express from 'express';
-import {dirname, join, resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import bootstrap from './main.server';
-import {createConnection, ResultSetHeader, RowDataPacket} from 'mysql2';
+import { createConnection, ResultSetHeader, RowDataPacket } from 'mysql2';
 import session from 'express-session';
-import {OkPacket} from 'mysql';
+import { OkPacket } from 'mysql';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -48,22 +50,22 @@ const dbConfig = {
   database: "25_IT_Gruppe5",
   user: "25_IT_Grp5",
   password: "***REMOVED***",
-  ssl: {rejectUnauthorized: false}
+  ssl: { rejectUnauthorized: false }
 };
 
 
 app.post('/api/cart/add', (req, res) => {
-  const {customer_id, product_id, quantity, price} = req.body;
+  const { customer_id, product_id, quantity, price } = req.body;
 
   if (!customer_id || !product_id || !quantity || !price) {
-    return res.status(400).json({message: 'Fehlende Angaben'});
+    return res.status(400).json({ message: 'Fehlende Angaben' });
   }
 
   const con = createConnection(dbConfig);
 
   con.connect(err => {
     if (err) {
-      return res.status(500).json({message: 'Datenbankverbindung fehlgeschlagen'});
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
     }
 
     con.query(
@@ -72,14 +74,14 @@ app.post('/api/cart/add', (req, res) => {
       (err, results) => {
         if (err) {
           con.end();
-          return res.status(500).json({message: 'Fehler beim Abrufen des Warenkorbs'});
+          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
         }
 
         const carts = results as RowDataPacket[];
 
         if (carts.length === 0) {
           con.end();
-          return res.status(404).json({message: 'Kein Warenkorb gefunden'});
+          return res.status(404).json({ message: 'Kein Warenkorb gefunden' });
         }
 
         const cart_id = carts[0]['cart_id'];
@@ -91,7 +93,7 @@ app.post('/api/cart/add', (req, res) => {
           (err, itemResult) => {
             if (err) {
               con.end();
-              return res.status(500).json({message: 'Fehler beim Prüfen des Warenkorbs'});
+              return res.status(500).json({ message: 'Fehler beim Prüfen des Warenkorbs' });
             }
 
             const items = itemResult as RowDataPacket[];
@@ -108,7 +110,7 @@ app.post('/api/cart/add', (req, res) => {
                   err => {
                     if (err) {
                       con.end();
-                      return res.status(500).json({message: 'Fehler beim Löschen des Artikels'});
+                      return res.status(500).json({ message: 'Fehler beim Löschen des Artikels' });
                     }
                     return updateCartTotal(con, cart_id, res);
                   }
@@ -122,7 +124,7 @@ app.post('/api/cart/add', (req, res) => {
                 err => {
                   if (err) {
                     con.end();
-                    return res.status(500).json({message: 'Fehler beim Aktualisieren des Artikels'});
+                    return res.status(500).json({ message: 'Fehler beim Aktualisieren des Artikels' });
                   }
                   return updateCartTotal(con, cart_id, res);
                 }
@@ -135,7 +137,7 @@ app.post('/api/cart/add', (req, res) => {
                 err => {
                   if (err) {
                     con.end();
-                    return res.status(500).json({message: 'Fehler beim Hinzufügen des Artikels'});
+                    return res.status(500).json({ message: 'Fehler beim Hinzufügen des Artikels' });
                   }
                   return updateCartTotal(con, cart_id, res);
                 }
@@ -165,26 +167,26 @@ function updateCartTotal(con: ReturnType<typeof createConnection>, cart_id: numb
       con.end();
 
       if (err) {
-        return res.status(500).json({message: 'Fehler beim Aktualisieren des Gesamtpreises'});
+        return res.status(500).json({ message: 'Fehler beim Aktualisieren des Gesamtpreises' });
       }
 
-      return res.status(201).json({message: 'Artikel hinzugefügt oder aktualisiert'});
+      return res.status(201).json({ message: 'Artikel hinzugefügt oder aktualisiert' });
     }
   );
 }
 
 app.post('/api/cart/clear', (req, res) => {
-  const {customer_id} = req.body;
+  const { customer_id } = req.body;
 
   if (!customer_id) {
-    return res.status(400).json({message: 'Fehlende customer_id'});
+    return res.status(400).json({ message: 'Fehlende customer_id' });
   }
 
   const con = createConnection(dbConfig);
 
   con.connect(err => {
     if (err) {
-      return res.status(500).json({message: 'Datenbankverbindung fehlgeschlagen'});
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
     }
 
     // 1. Warenkorb-ID abrufen (SELECT liefert Array)
@@ -194,14 +196,14 @@ app.post('/api/cart/clear', (req, res) => {
       (err, results) => {
         if (err) {
           con.end();
-          return res.status(500).json({message: 'Fehler beim Abrufen des Warenkorbs'});
+          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
         }
 
         const carts = results as RowDataPacket[];
 
         if (carts.length === 0) {
           con.end();
-          return res.status(404).json({message: 'Kein Warenkorb gefunden'});
+          return res.status(404).json({ message: 'Kein Warenkorb gefunden' });
         }
 
         const cart_id = carts[0]['cart_id'];
@@ -213,7 +215,7 @@ app.post('/api/cart/clear', (req, res) => {
           (err, result) => {
             if (err) {
               con.end();
-              return res.status(500).json({message: 'Fehler beim Leeren des Warenkorbs'});
+              return res.status(500).json({ message: 'Fehler beim Leeren des Warenkorbs' });
             }
 
             const deleteResult = result as OkPacket;
@@ -231,10 +233,10 @@ app.post('/api/cart/clear', (req, res) => {
                 con.end();
 
                 if (err) {
-                  return res.status(500).json({message: 'Fehler beim Aktualisieren des Gesamtpreises'});
+                  return res.status(500).json({ message: 'Fehler beim Aktualisieren des Gesamtpreises' });
                 }
 
-                return res.status(200).json({message: 'Warenkorb geleert'});
+                return res.status(200).json({ message: 'Warenkorb geleert' });
               }
             );
             return;
@@ -252,7 +254,7 @@ app.get('/api/get-cart', (req, res) => {
   const sessionUser = req.session.user;
 
   if (!sessionUser || sessionUser.role !== 'customer') {
-    return res.status(401).json({message: 'Nicht autorisiert'});
+    return res.status(401).json({ message: 'Nicht autorisiert' });
   }
 
   const customer_id = sessionUser.user_id;
@@ -260,7 +262,7 @@ app.get('/api/get-cart', (req, res) => {
 
   con.connect(err => {
     if (err) {
-      return res.status(500).json({message: 'Datenbankverbindung fehlgeschlagen'});
+      return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
     }
 
 
@@ -270,7 +272,7 @@ app.get('/api/get-cart', (req, res) => {
       (err, results) => {
         if (err) {
           con.end();
-          return res.status(500).json({message: 'Fehler beim Abrufen des Warenkorbs'});
+          return res.status(500).json({ message: 'Fehler beim Abrufen des Warenkorbs' });
         }
 
         const cartId = (results as RowDataPacket[])[0]['cart_id'];
@@ -292,7 +294,7 @@ app.get('/api/get-cart', (req, res) => {
         return con.query(sql, [cartId], (err, results) => {
           if (err) {
             con.end();
-            return res.status(500).json({message: 'Fehler beim Laden der Warenkorbdaten'});
+            return res.status(500).json({ message: 'Fehler beim Laden der Warenkorbdaten' });
           }
 
           const items = results as RowDataPacket[];
@@ -333,13 +335,13 @@ app.post('/api/products', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Produkte erstellen'});
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte erstellen' });
   }
 
-  const {name, description, price, stock_quantity, image} = req.body;
+  const { name, description, price, stock_quantity, image } = req.body;
 
   if (!name || price === undefined || stock_quantity === undefined || !description || !image) {
-    return res.status(400).json({message: 'Fehlende Pflichtfelder (name, price, stock_quantity, description, image)'});
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder (name, price, stock_quantity, description, image)' });
   }
 
   const con = createConnection(dbConfig).promise();
@@ -355,11 +357,11 @@ app.post('/api/products', async (req, res) => {
     const insertedId = (insertResult as OkPacket).insertId;
 
     const fieldsToLog = [
-      {field: 'name', value: name},
-      {field: 'description', value: description},
-      {field: 'price', value: price},
-      {field: 'stock_quantity', value: stock_quantity},
-      {field: 'image', value: image}
+      { field: 'name', value: name },
+      { field: 'description', value: description },
+      { field: 'price', value: price },
+      { field: 'stock_quantity', value: stock_quantity },
+      { field: 'image', value: image }
     ];
 
     const logPromises = fieldsToLog.map(field =>
@@ -391,30 +393,28 @@ app.post('/api/products', async (req, res) => {
 app.post('/api/cart/checkout', (req, res) => {
   const user = req.session.user;
   if (!user || user.role !== 'customer') {
-    return res.status(401).json({message: 'Nicht autorisiert'});
+    return res.status(401).json({ message: 'Nicht autorisiert' });
   }
 
   const con = createConnection(dbConfig);
 
   con.connect(err => {
-    if (err) return res.status(500).json({message: 'DB‑Verbindung fehlgeschlagen'});
+    if (err) return res.status(500).json({ message: 'DB‑Verbindung fehlgeschlagen' });
 
     con.beginTransaction(err => {
       if (err) {
         con.end();
-        return res.status(500).json({message: 'Transaktionsfehler'});
+        return res.status(500).json({ message: 'Transaktionsfehler' });
       }
 
-      /* 1. Warenkorb holen */
+      // 1. Warenkorb holen
       con.query(
-        `SELECT cart_id, total_price
-         FROM Cart
-         WHERE customer_id = ?`,
+        `SELECT cart_id, total_price FROM Cart WHERE customer_id = ?`,
         [user.user_id],
         (err, results) => {
           if (err) return rollback('Fehler beim Lesen des Warenkorbs');
 
-          const cartRows = results as RowDataPacket[];
+          const cartRows = results as any[];
           if (!cartRows.length || cartRows[0]['total_price'] === 0) {
             return rollback('Warenkorb leer', 400);
           }
@@ -422,7 +422,7 @@ app.post('/api/cart/checkout', (req, res) => {
           const cart_id = cartRows[0]['cart_id'];
           const total_price = cartRows[0]['total_price'];
 
-          /* 2. Bestellungskopf einfügen */
+          // 2. Bestellungskopf einfügen
           con.query(
             `INSERT INTO Customer_Order
                (customer_id, date, delivery_status, total_price, payment_method)
@@ -431,9 +431,9 @@ app.post('/api/cart/checkout', (req, res) => {
             (err, results) => {
               if (err) return rollback('Fehler beim Anlegen der Bestellung');
 
-              const order_id = (results as ResultSetHeader).insertId;
+              const order_id = (results as any).insertId;
 
-              /* 3. Positionen kopieren in Order_Item */
+              // 3. Positionen kopieren in Order_Item
               con.query(
                 `INSERT INTO Order_Item
                    (order_id, product_id, quantity, price)
@@ -444,33 +444,99 @@ app.post('/api/cart/checkout', (req, res) => {
                 err => {
                   if (err) return rollback('Fehler beim Kopieren der Positionen');
 
-                  /* 4. Warenkorb leeren */
+                  // 4. Warenkorb leeren
                   con.query(
-                    `DELETE
-                     FROM Cart_Item
-                     WHERE cart_id = ?`,
+                    `DELETE FROM Cart_Item WHERE cart_id = ?`,
                     [cart_id],
                     err => {
                       if (err) return rollback('Fehler beim Leeren des Warenkorbs');
 
                       con.query(
-                        `UPDATE Cart
-                         SET total_price = 0
-                         WHERE cart_id = ?`,
+                        `UPDATE Cart SET total_price = 0 WHERE cart_id = ?`,
                         [cart_id],
                         err => {
                           if (err) return rollback('Fehler beim Zurücksetzen des Warenkorbs');
 
-                          /* 5. Commit und Antwort */
-                          con.commit(err => {
-                            con.end();
-                            if (err) return res.status(500).json({message: 'Commit‑Fehler'});
+                          // 5. Jetzt Bestände reduzieren und ggf. Events senden
+                          con.query(
+                            `SELECT product_id, quantity FROM Order_Item WHERE order_id = ?`,
+                            [order_id],
+                            (err, results) => {
+                              if (err) {
+                                con.end();
+                                return res.status(201).json({
+                                  message: 'Bestellung erfolgreich erstellt (Warnung: Bestand konnte nicht geprüft werden)',
+                                  order_id
+                                });
+                              }
 
-                            return res.status(201).json({
-                              message: 'Bestellung erfolgreich erstellt',
-                              order_id
-                            });
-                          });
+                              const orderItems = results as any[];
+                              if (orderItems.length === 0) {
+                                con.end();
+                                return res.status(201).json({
+                                  message: 'Bestellung erfolgreich erstellt',
+                                  order_id
+                                });
+                              }
+
+                              // Socket.IO-Instanz holen
+                              const io = req.app.get('io');
+                              let checked = 0;
+                              let hasError = false;
+
+                              for (const item of orderItems) {
+
+                                // Bestand reduzieren, aber nur wenn genug vorhanden ist
+                                con.query(
+                                  `UPDATE Product SET stock_quantity = stock_quantity - ? WHERE product_id = ? AND stock_quantity >= ?`,
+                                  [item.quantity, item.product_id, item.quantity],
+                                  (err, result) => {
+                                    // Typumwandlung:
+                                    const updateResult = result as { affectedRows: number };
+                                    if (err || updateResult.affectedRows === 0) {
+                                      hasError = true;
+                                      return rollback('Nicht genügend Bestand für Produkt ' + item.product_id, 400);
+                                    }
+
+                                    // Nach dem Update aktuellen Bestand abfragen
+                                    con.query(
+                                      `SELECT stock_quantity FROM Product WHERE product_id = ?`,
+                                      [item.product_id],
+                                      (err, results) => {
+                                        const stockRows = results as any[];
+                                        if (!err && stockRows.length > 0) {
+                                          const stock = stockRows[0].stock_quantity;
+                                          if (stock <= 5) {
+                                            console.log('LowStock-Event wird gesendet für Produkt', item.product_id, 'Bestand:', stock);
+                                            io.emit('lowStock', {
+                                              product_id: item.product_id,
+                                              stock: stock
+                                            });
+                                          }
+                                        }
+                                        checked++;
+                                        
+                                        // Wenn alle Produkte geprüft sind, Verbindung schließen und Antwort senden
+                                        if (checked === orderItems.length && !hasError) {
+                                          con.commit(err => {
+                                            con.end();
+                                            if (err) {
+                                              return res.status(500).json({ message: 'Commit‑Fehler' });
+                                            }
+                                            return res.status(201).json({
+                                              message: 'Bestellung erfolgreich erstellt',
+                                              order_id
+                                            });
+                                          });
+                                        }
+                                      }
+                                    );
+                                  }
+                                );
+                              }
+                              return;
+                            }
+                          );
                         }
                       );
                     }
@@ -485,10 +551,9 @@ app.post('/api/cart/checkout', (req, res) => {
       function rollback(msg: string, code = 500) {
         con.rollback(() => {
           con.end();
-          res.status(code).json({message: msg});
+          res.status(code).json({ message: msg });
         });
       }
-
       return;
     });
     return;
@@ -496,10 +561,13 @@ app.post('/api/cart/checkout', (req, res) => {
   return;
 });
 
+
+
+
 app.get('/api/get-my-orders', (req, res) => {
   const user = req.session.user;
   if (!user || user.role !== 'customer') {
-    return res.status(401).json({message: 'Nicht autorisiert'});
+    return res.status(401).json({ message: 'Nicht autorisiert' });
   }
 
   const con = createConnection(dbConfig);
@@ -568,13 +636,13 @@ app.put('/api/edit-product', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Produkte bearbeiten'});
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte bearbeiten' });
   }
 
-  const {product_id, name, description, price, stock_quantity, image} = req.body;
+  const { product_id, name, description, price, stock_quantity, image } = req.body;
 
   if (!product_id || !name || price === undefined || stock_quantity === undefined || !description || !image) {
-    return res.status(400).json({message: 'Fehlende Pflichtfelder (product_id, name, price, stock_quantity, description, image)'});
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder (product_id, name, price, stock_quantity, description, image)' });
   }
 
   const con = createConnection(dbConfig).promise();
@@ -589,26 +657,26 @@ app.put('/api/edit-product', async (req, res) => {
 
     if (currentProductRows.length === 0) {
       await con.end();
-      return res.status(404).json({message: 'Produkt nicht gefunden'});
+      return res.status(404).json({ message: 'Produkt nicht gefunden' });
     }
 
     const oldValues = currentProductRows[0];
     const changes = [];
 
     if (oldValues['name'] !== name) {
-      changes.push({field: 'name', before: oldValues['name'], after: name});
+      changes.push({ field: 'name', before: oldValues['name'], after: name });
     }
     if (oldValues['description'] !== description) {
-      changes.push({field: 'description', before: oldValues['description'], after: description});
+      changes.push({ field: 'description', before: oldValues['description'], after: description });
     }
     if (oldValues['price'] !== price) {
-      changes.push({field: 'price', before: oldValues['price'], after: price});
+      changes.push({ field: 'price', before: oldValues['price'], after: price });
     }
     if (oldValues['stock_quantity'] !== stock_quantity) {
-      changes.push({field: 'stock_quantity', before: oldValues['stock_quantity'], after: stock_quantity});
+      changes.push({ field: 'stock_quantity', before: oldValues['stock_quantity'], after: stock_quantity });
     }
     if (oldValues['image'] !== image) {
-      changes.push({field: 'image', before: oldValues['image'], after: image});
+      changes.push({ field: 'image', before: oldValues['image'], after: image });
     }
 
     await con.query(
@@ -627,11 +695,11 @@ app.put('/api/edit-product', async (req, res) => {
     }
 
     await con.end();
-    return res.status(200).json({message: 'Produkt erfolgreich aktualisiert', changes_made: changes.length > 0});
+    return res.status(200).json({ message: 'Produkt erfolgreich aktualisiert', changes_made: changes.length > 0 });
   } catch (error: any) {
     await con.end();
     console.error('Fehler beim Aktualisieren des Produkts:', error);
-    return res.status(500).json({message: 'Fehler beim Aktualisieren des Produkts', error: error.message});
+    return res.status(500).json({ message: 'Fehler beim Aktualisieren des Produkts', error: error.message });
   }
 });
 
@@ -639,13 +707,13 @@ app.delete('/api/delete-product/:id', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Produkte löschen'});
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Produkte löschen' });
   }
 
   const productId = req.params.id;
 
   if (!productId || isNaN(Number(productId))) {
-    return res.status(400).json({message: 'Ungültige Produkt-ID'});
+    return res.status(400).json({ message: 'Ungültige Produkt-ID' });
   }
 
   const con = createConnection(dbConfig).promise();
@@ -661,7 +729,7 @@ app.delete('/api/delete-product/:id', async (req, res) => {
 
     if (productRows.length === 0) {
       await con.end();
-      return res.status(404).json({message: 'Produkt nicht gefunden'});
+      return res.status(404).json({ message: 'Produkt nicht gefunden' });
     }
 
     const product = productRows[0];
@@ -763,13 +831,13 @@ app.put('/api/edit-customer', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Kunden bearbeiten'});
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Kunden bearbeiten' });
   }
 
-  const {customer_id, first_name, last_name, email, street, house_number, zipcode, country, city} = req.body;
+  const { customer_id, first_name, last_name, email, street, house_number, zipcode, country, city } = req.body;
 
   if (!customer_id || !first_name || !last_name || !email || !street || !house_number || !zipcode || !country || !city) {
-    return res.status(400).json({message: 'Fehlende Pflichtfelder (customer_id, first_name, last_name, email, street, house_number, zipcode, country, city)'});
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder (customer_id, first_name, last_name, email, street, house_number, zipcode, country, city)' });
   }
 
   const con = createConnection(dbConfig).promise();
@@ -796,35 +864,35 @@ app.put('/api/edit-customer', async (req, res) => {
 
     if (currentCustomerRows.length === 0) {
       await con.end();
-      return res.status(404).json({message: 'Kunde nicht gefunden'});
+      return res.status(404).json({ message: 'Kunde nicht gefunden' });
     }
 
     const oldValues = currentCustomerRows[0];
     const changes = [];
 
     if (oldValues['first_name'] !== first_name) {
-      changes.push({field: 'first_name', before: oldValues['first_name'], after: first_name});
+      changes.push({ field: 'first_name', before: oldValues['first_name'], after: first_name });
     }
     if (oldValues['last_name'] !== last_name) {
-      changes.push({field: 'last_name', before: oldValues['last_name'], after: last_name});
+      changes.push({ field: 'last_name', before: oldValues['last_name'], after: last_name });
     }
     if (oldValues['email'] !== email) {
-      changes.push({field: 'email', before: oldValues['email'], after: email});
+      changes.push({ field: 'email', before: oldValues['email'], after: email });
     }
     if (oldValues['street'] !== street) {
-      changes.push({field: 'street', before: oldValues['street'], after: street});
+      changes.push({ field: 'street', before: oldValues['street'], after: street });
     }
     if (oldValues['house_number'] !== house_number) {
-      changes.push({field: 'house_number', before: oldValues['house_number'], after: house_number});
+      changes.push({ field: 'house_number', before: oldValues['house_number'], after: house_number });
     }
     if (String(oldValues['zipcode']) !== String(zipcode)) {
-      changes.push({field: 'zipcode', before: oldValues['zipcode'], after: zipcode});
+      changes.push({ field: 'zipcode', before: oldValues['zipcode'], after: zipcode });
     }
     if (oldValues['country'] !== country) {
-      changes.push({field: 'country', before: oldValues['country'], after: country});
+      changes.push({ field: 'country', before: oldValues['country'], after: country });
     }
     if (oldValues['city'] !== city) {
-      changes.push({field: 'city', before: oldValues['city'], after: city});
+      changes.push({ field: 'city', before: oldValues['city'], after: city });
     }
 
     let address_id = oldValues['address_id'];
@@ -921,13 +989,13 @@ app.put('/api/edit-order', async (req, res) => {
   const user = req.session.user;
 
   if (!user || user.role !== 'employee') {
-    return res.status(403).json({message: 'Nur Mitarbeiter dürfen Bestellungen bearbeiten'});
+    return res.status(403).json({ message: 'Nur Mitarbeiter dürfen Bestellungen bearbeiten' });
   }
 
-  const {order_id, customer_id, date, delivery_status, total_price, payment_method} = req.body;
+  const { order_id, customer_id, date, delivery_status, total_price, payment_method } = req.body;
 
   if (!order_id || !customer_id || !date || !delivery_status || !total_price || !payment_method) {
-    return res.status(400).json({message: 'Fehlende Pflichtfelder'});
+    return res.status(400).json({ message: 'Fehlende Pflichtfelder' });
   }
 
   const con = createConnection(dbConfig).promise();
@@ -943,7 +1011,7 @@ app.put('/api/edit-order', async (req, res) => {
 
     if (currentOrderRows.length === 0) {
       await con.end();
-      return res.status(404).json({message: 'Bestellung nicht gefunden'});
+      return res.status(404).json({ message: 'Bestellung nicht gefunden' });
     }
 
     const oldValues = currentOrderRows[0];
@@ -951,19 +1019,19 @@ app.put('/api/edit-order', async (req, res) => {
 
     // Änderungen erkennen
     if (oldValues['customer_id'] !== customer_id) {
-      changes.push({field: 'customer_id', before: oldValues['customer_id'], after: customer_id});
+      changes.push({ field: 'customer_id', before: oldValues['customer_id'], after: customer_id });
     }
     if (new Date(oldValues['date']).toISOString().split('T')[0] !== new Date(date).toISOString().split('T')[0]) {
-      changes.push({field: 'date', before: oldValues['date'], after: date});
+      changes.push({ field: 'date', before: oldValues['date'], after: date });
     }
     if (oldValues['delivery_status'] !== delivery_status) {
-      changes.push({field: 'delivery_status', before: oldValues['delivery_status'], after: delivery_status});
+      changes.push({ field: 'delivery_status', before: oldValues['delivery_status'], after: delivery_status });
     }
     if (oldValues['total_price'] !== total_price) {
-      changes.push({field: 'total_price', before: oldValues['total_price'], after: total_price});
+      changes.push({ field: 'total_price', before: oldValues['total_price'], after: total_price });
     }
     if (oldValues['payment_method'] !== payment_method) {
-      changes.push({field: 'payment_method', before: oldValues['payment_method'], after: payment_method});
+      changes.push({ field: 'payment_method', before: oldValues['payment_method'], after: payment_method });
     }
 
     // Bestellung aktualisieren
@@ -1043,7 +1111,7 @@ app.post('/api/login', (req, res) => {
   console.log("Anfrage angekommen");
   const con = createConnection(dbConfig);
 
-  const {email, password} = req.body;
+  const { email, password } = req.body;
   const sql = `
     SELECT u.user_id,
            u.first_name,
@@ -1073,7 +1141,6 @@ app.post('/api/login', (req, res) => {
       }
       const rows = results as any[];
       if (rows.length === 1 && rows[0].role !== 'unknown') {
-        // Session setzen!
         req.session.user = {
           user_id: rows[0].user_id,
           role: rows[0].role,
@@ -1088,7 +1155,7 @@ app.post('/api/login', (req, res) => {
           last_name: rows[0].last_name
         });
       } else {
-        res.status(401).json({message: 'Falsche Zugangsdaten'});
+        res.status(401).json({ message: 'Falsche Zugangsdaten' });
       }
       con.end();
     }
@@ -1097,7 +1164,7 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/user-details', (req, res) => {
   if (!req.session.user) {
-    res.status(401).json({message: 'Nicht eingeloggt'});
+    res.status(401).json({ message: 'Nicht eingeloggt' });
     return;
   }
 
@@ -1133,14 +1200,14 @@ app.get('/api/user-details', (req, res) => {
     con.end();
 
     if (error) {
-      res.status(500).json({error: error.message});
+      res.status(500).json({ error: error.message });
       return;
     }
 
     const rows = results as any[];
 
     if (rows.length === 0) {
-      res.status(404).json({message: 'User nicht gefunden'});
+      res.status(404).json({ message: 'User nicht gefunden' });
       return;
     }
 
@@ -1171,15 +1238,15 @@ app.get('/api/user-details', (req, res) => {
 
 app.get('/api/me', (req, res) => {
   if (req.session.user) {
-    res.json({user: req.session.user});
+    res.json({ user: req.session.user });
   } else {
-    res.status(401).json({message: 'Nicht eingeloggt'});
+    res.status(401).json({ message: 'Nicht eingeloggt' });
   }
 });
 
 app.post('/api/logout', (req, res) => {
   req.session.destroy(() => {
-    res.json({success: true});
+    res.json({ success: true });
   });
 });
 
@@ -1198,7 +1265,7 @@ app.get(
  * Handle all other requests by rendering the Angular application.
  */
 app.get('**', (req, res, next) => {
-  const {protocol, originalUrl, baseUrl, headers} = req;
+  const { protocol, originalUrl, baseUrl, headers } = req;
 
   commonEngine
     .render({
@@ -1206,7 +1273,7 @@ app.get('**', (req, res, next) => {
       documentFilePath: indexHtml,
       url: `${protocol}://${headers.host}${originalUrl}`,
       publicPath: browserDistFolder,
-      providers: [{provide: APP_BASE_HREF, useValue: baseUrl}],
+      providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
     })
     .then((html) => res.send(html))
     .catch((err) => next(err));
@@ -1218,8 +1285,18 @@ app.get('**', (req, res, next) => {
  */
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  const httpServer = createServer(app); // <-- HTTP-Server erstellen
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: "*", // Passe ggf. an deine Umgebung an!
+    }
+  });
+
+  // Socket.IO-Instanz in Express-App speichern
+  app.set('io', io);
+
+  httpServer.listen(port, () => {
+    console.log(`Node Express is listening on http://localhost:${port}`);
   });
 }
 

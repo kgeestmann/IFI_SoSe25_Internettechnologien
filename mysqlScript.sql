@@ -103,14 +103,13 @@ CREATE TABLE Invoice (
 CREATE TABLE Order_Item (
   order_item_id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT,
-  product_id INT,
-  quantity INT,
+  product_id INT NULL,  quantity INT,
   price DECIMAL(10,2),
   FOREIGN KEY (order_id) REFERENCES Customer_Order(order_id) 
     ON DELETE CASCADE 
     ON UPDATE CASCADE,
   FOREIGN KEY (product_id) REFERENCES Product(product_id) 
-    ON DELETE RESTRICT
+    ON DELETE SET NULL
     ON UPDATE CASCADE
 );
 

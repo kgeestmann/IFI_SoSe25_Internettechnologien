@@ -4,6 +4,8 @@ import { ProductService, Product } from '../product.service';
 import { CartService } from '../../user/customer-dashboard/cart-list/cart.service';
 import { AuthService } from '../../auth.service';
 import { CommonModule, Location } from '@angular/common';
+import { SocketService } from '../../socket.service';
+
 import {
   trigger,
   state,
@@ -31,6 +33,7 @@ export class ProductDetailComponent implements OnInit {
   isCustomer = false;
   showCare = false;
   showInfo = false;
+  showLowStock = false;
 
   recommendedProducts: Product[] = [];
 
@@ -41,6 +44,7 @@ export class ProductDetailComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private location: Location,
+    private socketService: SocketService
   ) {}
 
   ngOnInit(): void {
@@ -67,6 +71,12 @@ export class ProductDetailComponent implements OnInit {
 
   this.authService.isCustomer$.subscribe(status => {
     this.isCustomer = status;
+  });
+
+   this.socketService.onLowStock().subscribe((data) => {
+    if (this.product && data.product_id === this.product.product_id) {
+      this.showLowStock = data.stock <= 5;
+    }
   });
 }
 
