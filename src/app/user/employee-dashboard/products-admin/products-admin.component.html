@@ -1,8 +1,6 @@
-<!-- Nur anzeigen, wenn isEmployee true -->
 <!-- <div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
   <div *ngIf="currentUser; else loading" class="dashboard-content"> -->
 
-<!-- Produktformular -->
 <div class="product-create-page">
   <h2 class="product-create-headline">Neues Produkt erstellen</h2>
 
@@ -29,27 +27,23 @@
     </button>
   </form>
 
-  <!-- Funktioniert nicht -->
   <div *ngIf="successMessage" class="alert alert-success">
     {{ successMessage }}
   </div>
 
 </div>
 
-<!-- Produktliste -->
 <app-product-list></app-product-list>
 
 <!-- </div>
 </div> -->
 
-<!-- Zugriff verweigert -->
 <!-- <ng-template #accessDenied>
   <div class="alert alert-warning">
     <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
   </div>
 </ng-template> -->
 
-<!-- Ladeanzeige -->
 <!-- <ng-template #loading>
   <p class="loader">Lade Produkte...</p>
 </ng-template> -->

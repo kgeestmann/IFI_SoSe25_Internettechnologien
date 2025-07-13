@@ -54,11 +54,6 @@ export class ProductDetailComponent implements OnInit {
         this.productService.getProducts().subscribe(products => {
           const found = products.find(p => p.product_id === +id) || null;
           if (found) {
-            /*this.product = {
-              ...found,
-              infoText: this.getInfoText(found.name),
-              care: this.getCareText(found.name)
-            };*/
             this.product = found;
 
             this.recommendedProducts = products
@@ -80,7 +75,6 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
-
 
   goToProduct(id: number): void {
     this.router.navigate(['/product', id]);
@@ -108,38 +102,4 @@ export class ProductDetailComponent implements OnInit {
   toggleInfo(): void {
     this.showInfo = !this.showInfo;
   }
-
-  /*getInfoText(name: string): string {
-    switch (name) {
-      case 'Sansevieria':
-        return 'Die Sansevieria ist eine äußerst robuste Zimmerpflanze mit aufrecht wachsenden, schwertförmigen Blättern. Sie passt perfekt in jedes Zuhause.';
-      case 'Aloe Vera':
-        return 'Die Aloe Vera ist eine beliebte Sukkulente mit heilenden Eigenschaften. Sie ist ideal für sonnige Fensterplätze geeignet.';
-      case 'Ficus benjamina':
-        return 'Der Ficus benjamina ist ein eleganter Zimmerbaum mit glänzenden Blättern und ein echter Klassiker für Wohnzimmer oder Büros.';
-      case 'Calathea':
-        return 'Die Calathea überzeugt mit aufwändigen Blattmustern und schließt ihre Blätter nachts – eine „bewegte“ Pflanze.';
-      case 'Monstera deliciosa':
-        return 'Die Monstera ist ein echter Blickfang mit auffälligen, geschlitzten Blättern – sehr beliebt in modernen Einrichtungen.';
-      default:
-        return 'Keine weiteren Informationen verfügbar.';
-    }
-  }
-
-  getCareText(name: string): string {
-    switch (name) {
-      case 'Sansevieria':
-        return 'Hell bis halbschattig. Gießen alle 2–3 Wochen. Sehr robust und luftreinigend.';
-      case 'Aloe Vera':
-        return 'Viel Sonne, wenig Wasser. Erde gut abtrocknen lassen.';
-      case 'Ficus benjamina':
-        return 'Heller Standort, gleichmäßiges Gießen. Keine Zugluft.';
-      case 'Calathea':
-        return 'Licht ohne direkte Sonne, hohe Luftfeuchtigkeit, weiches Wasser.';
-      case 'Monstera deliciosa':
-        return 'Lichtreich, aber keine direkte Sonne. Regelmäßig gießen. Kletterhilfe fördert das Wachstum.';
-      default:
-        return 'Keine Pflegehinweise verfügbar.';
-    }
-  }*/
 }

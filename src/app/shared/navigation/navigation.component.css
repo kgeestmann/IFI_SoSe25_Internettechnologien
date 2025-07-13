@@ -1,4 +1,3 @@
-/* --- Grundlayout --- */
 .navigation {
   display: flex;
   align-items: center;
@@ -13,7 +12,6 @@
   top: 0;
 }
 
-/* Linke Seite: Logo + Titel */
 .nav-left {
   display: flex;
   align-items: center;
@@ -29,8 +27,6 @@ img {
   display: block;
 }
 
-
-
 .title {
   font-weight: bold;
   color: #cfd8cf;
@@ -38,7 +34,6 @@ img {
   font-size: 1.35rem;
 }
 
-/* Rechte Seite: Navigation */
 .navigationGr {
   display: flex;
   align-items: center;
@@ -59,7 +54,6 @@ img {
   margin-right: 0;
 }
 
-/* Aktiver Menüpunkt */
 a.active,
 .navigationGr a.active {
   font-weight: bold;
@@ -83,7 +77,6 @@ a.active,
   box-shadow: none;
 }
 
-/* --- Off-Screen-Menü (Burger-Menü) --- */
 .off-screen-menu {
   background-color: #4f704f;
   height: 100vh;
@@ -101,24 +94,29 @@ a.active,
   transition: right 0.3s ease;
   z-index: 999;
 }
+
 .off-screen-menu.active {
   right: 0;
 }
+
 .off-screen-menu ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
+
 .off-screen-menu ul li {
   margin: 0;
   padding: 1.25rem 0;
 }
+
 .off-screen-menu a {
   text-decoration: none;
   color: #cfd8cf;
   font-weight: 500;
   transition: background 0.2s, color 0.2s;
 }
+
 .off-screen-menu a.active {
   font-weight: bold;
   color: #4f704f;
@@ -141,7 +139,6 @@ a.active,
   margin-right: auto;
 }
 
-/* --- Hamburger-Menü (rechts in der Leiste) --- */
 .ham-menu {
   display: none;
   height: 3.125rem;
@@ -153,6 +150,7 @@ a.active,
   align-items: center;
   justify-content: center;
 }
+
 .ham-menu span {
   height: 0.3125rem;
   width: 100%;
@@ -164,31 +162,37 @@ a.active,
   transform: translate(-50%, -50%);
   transition: 0.3s ease;
 }
+
 .ham-menu span:nth-child(1) {
   top: 25%;
 }
+
 .ham-menu span:nth-child(2) {
   top: 50%;
 }
+
 .ham-menu span:nth-child(3) {
   top: 75%;
 }
+
 .ham-menu.active span {
   background-color: #cfd8cf;
 }
+
 .ham-menu.active span:nth-child(1) {
   top: 50%;
   transform: translate(-50%, -50%) rotate(45deg);
 }
+
 .ham-menu.active span:nth-child(2) {
   opacity: 0;
 }
+
 .ham-menu.active span:nth-child(3) {
   top: 50%;
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-/* --- Responsive: Mobile Ansicht --- */
 @media (max-width: 48em) {
   .ham-menu {
     display: block;
@@ -196,31 +200,36 @@ a.active,
 
   .nav-left {
      display: flex;
-
   }
+
   .navigationGr {
     display: none !important;
   }
+
   .off-screen-menu {
     display: none;
   }
+
   .off-screen-menu.active {
     display: flex;
   }
 }
-/* --- Desktop-Ansicht --- */
+
 @media (min-width: 48.0625em) {
   .navigationGr {
     display: flex;
     z-index: 1000;
     justify-content: space-between;
   }
+  
   .off-screen-menu {
     display: none !important;
   }
+
   .ham-menu {
     display: none;
   }
+
   .nav-left,
   .navigationGr {
     display: flex !important;

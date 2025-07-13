@@ -126,24 +126,6 @@ export class EditCustomersComponent implements OnInit, OnDestroy {
     });
   }
 
-  // deleteCustomer(): void {
-  //   if (!this.customer || !confirm('Möchten Sie diesen Kunden wirklich löschen?')) {
-  //     return;
-  //   }
-
-  //   this.customerService.deleteCustomer(this.customer.customer_id).subscribe({
-  //     next: () => {
-  //       this.successMessage = 'Kunde erfolgreich gelöscht!';
-  //       setTimeout(() => {
-  //         this.router.navigate(['/customers-admin']);
-  //       }, 1500);
-  //     },
-  //     error: (error) => {
-  //       this.error = error.error.message || 'Fehler beim Löschen des Kunden';
-  //     }
-  //   });
-  // }
-
   goBack(): void {
     this.router.navigate(['/customers-admin']);
   }

@@ -1,4 +1,3 @@
-/* Ganze Seite einrahmen */
 .product-page {
   display: flex;
   flex-direction: column;
@@ -8,7 +7,6 @@
   position: relative;
 }
 
-/* Zurück & Warenkorb Buttons */
 .back-button,
 .cart-button {
   position: absolute;
@@ -29,7 +27,6 @@
   right: 1rem;
 }
 
-/* Produktbereich */
 .product-content {
   display: flex;
   flex-direction: column;
@@ -48,7 +45,6 @@
   }
 }
 
-/* Bild */
 .image-wrapper {
   flex: 1;
   display: flex;
@@ -62,7 +58,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Info-Bereich */
 .info-wrapper {
   flex: 1;
   display: flex;
@@ -77,7 +72,6 @@
   margin: 0;
 }
 
-/* Preisblock mit Hinweis */
 .price-block {
   display: flex;
   flex-direction: column;
@@ -97,7 +91,6 @@
   margin-top: 0.2rem;
 }
 
-/* Beschreibung als Liste */
 .description-list {
   padding-left: 1.2rem;
   margin: 0;
@@ -110,7 +103,6 @@
   line-height: 1.5;
 }
 
-/* Button */
 button {
   align-self: flex-start;
   padding: 0.5rem 1rem;
@@ -127,7 +119,6 @@ button:hover {
   background-color: #5c7761;
 }
 
-/* Empfehlungen */
 .recommendation-section {
   margin-top: 3rem;
 }

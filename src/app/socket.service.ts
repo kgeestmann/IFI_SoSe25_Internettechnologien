@@ -7,11 +7,9 @@ export class SocketService {
   private socket: Socket;
 
   constructor() {
-    // Passe ggf. die URL an deinen Server an!
     this.socket = io('http://localhost:4000');
   }
 
-  // Observable für das lowStock-Event
   onLowStock(): Observable<{ product_id: number; stock: number }> {
     return new Observable((subscriber) => {
       this.socket.on('lowStock', (data) => {

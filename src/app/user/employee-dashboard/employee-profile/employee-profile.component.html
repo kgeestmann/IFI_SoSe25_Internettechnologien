@@ -1,4 +1,3 @@
-<!-- Nur anzeigen, wenn isEmployee true -->
 <div *ngIf="isEmployee; else accessDenied" class="dashboard-container">
   <div *ngIf="currentUser; else loading" class="dashboard-content">
     <div class="user-main">
@@ -36,14 +35,12 @@
   </div>
 </div>
 
-<!-- Zugriff verweigert -->
 <ng-template #accessDenied>
   <div class="alert alert-warning">
     <p>Zugriff verweigert. Nur für Mitarbeiter.</p>
   </div>
 </ng-template>
 
-<!-- Ladeanzeige -->
 <ng-template #loading>
   <p class="loader">Lade Benutzerdaten...</p>
 </ng-template>

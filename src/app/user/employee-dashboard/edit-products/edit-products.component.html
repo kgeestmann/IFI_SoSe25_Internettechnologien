@@ -1,4 +1,3 @@
-<!-- edit-products.component.html -->
 <div *ngIf="isEmployee; else accessDenied" class="product-page">
   <button class="back-button" (click)="goBack()">← Zurück</button>
 
@@ -54,7 +53,6 @@
   </ng-container>
 </div>
 
-<!-- Rest bleibt gleich -->
 <ng-template #errorTpl>
   <div class="product-content">
     <p>{{ error || 'Produkt nicht gefunden.' }}</p>

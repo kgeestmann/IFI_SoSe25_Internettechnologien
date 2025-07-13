@@ -1,5 +1,4 @@
 <nav class="navigation" [class.menu-open]="menuActive">
-  <!-- Linke Seite: Logo + Titel zusammenfassen -->
   <div class="nav-left" [class.hide]="menuActive">
     <div class="logo">
       <a [routerLink]="(isEmployee$ | async) ? '/products-admin' : (isCustomer$ | async) ? '/products' : '/products'">
@@ -9,7 +8,6 @@
     <p class="title">Pflanziversum</p>
   </div>
 
-  <!-- Rechte Seite: Navigation -->
   <div class="navigationGr" [class.hide]="menuActive">
     <a *ngIf="!(isEmployee$ | async)" routerLink="/products" routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: false }">Produkte</a>
@@ -33,7 +31,6 @@
     </ng-container>
   </div>
 
-  <!-- Hamburger Menü für Mobil -->
   <div class="ham-menu" (click)="toggleMenu()" [class.active]="menuActive">
     <span></span>
     <span></span>
@@ -42,7 +39,6 @@
 </nav>
 
 
-<!-- Off-Screen-Menü für Mobil AUSSERHALB von <nav> -->
 <div class="off-screen-menu" [class.active]="menuActive">
   <div class="nav-logo">
     <p class="title">Pflanziversum</p>

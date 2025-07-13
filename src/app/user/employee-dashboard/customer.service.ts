@@ -22,17 +22,14 @@ export interface Customer {
 export class CustomerService {
   constructor(private http: HttpClient) {}
 
-  // Alle Kunden abrufen
   getCustomers(): Observable<Customer[]> {
     return this.http.get<Customer[]>('/api/get-customers');
   }
 
-  // Einzelnen Kunden anhand der ID abrufen
   getCustomerById(id: number): Observable<Customer> {
     return this.http.get<Customer>(`/api/get-customer/${id}`);
   }
 
-  // Kunden aktualisieren
   updateCustomer(customer: Customer): Observable<any> {
     return this.http.put('/api/edit-customer', {
       customer_id: customer.customer_id,
@@ -47,7 +44,6 @@ export class CustomerService {
     });
   }
 
-  // Kunden löschen
   deleteCustomer(customerId: number): Observable<any> {
     return this.http.delete(`/api/delete-customer/${customerId}`);
   }

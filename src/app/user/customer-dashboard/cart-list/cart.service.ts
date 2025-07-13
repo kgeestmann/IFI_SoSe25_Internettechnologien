@@ -22,7 +22,6 @@ export interface Cart {
 export class CartService {
   private userId: number | null = null;
 
-  // Signal für den Warenkorb
   private cart = signal<Cart | null>(null);
   readonly cart$ = computed(() => this.cart());
 

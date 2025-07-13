@@ -23,7 +23,6 @@ type User = {
   email: string;
 };
 
-// Declaration Merging direkt hier:
 declare module "express-session" {
   interface SessionData {
     user?: User;
@@ -189,7 +188,6 @@ app.post('/api/cart/clear', (req, res) => {
       return res.status(500).json({ message: 'Datenbankverbindung fehlgeschlagen' });
     }
 
-    // 1. Warenkorb-ID abrufen (SELECT liefert Array)
     return con.query(
       'SELECT cart_id FROM Cart WHERE customer_id = ?',
       [customer_id],
@@ -208,7 +206,6 @@ app.post('/api/cart/clear', (req, res) => {
 
         const cart_id = carts[0]['cart_id'];
 
-        // 2. Alle Artikel aus Cart_Item löschen (DELETE liefert OkPacket, kein Array!)
         return con.query(
           'DELETE FROM Cart_Item WHERE cart_id = ?',
           [cart_id],
@@ -221,11 +218,9 @@ app.post('/api/cart/clear', (req, res) => {
             const deleteResult = result as OkPacket;
 
             if (deleteResult.affectedRows === 0) {
-              // Warenkorb war schon leer, kein Problem
               console.log('Warenkorb war bereits leer');
             }
 
-            // 3. Gesamtpreis im Warenkorb auf 0 setzen (UPDATE liefert OkPacket)
             return con.query(
               'UPDATE Cart SET total_price = 0 WHERE cart_id = ?',
               [cart_id],
@@ -323,7 +318,6 @@ app.get('/api/get-products', (req, res) => {
     if (err) throw err;
     console.log("connected to db");
     con.query("SELECT * from Product", function (error, result, fields) {
-      //console.log(result);
       res.send(result);
       con.end(function (err) {
       });
@@ -407,7 +401,6 @@ app.post('/api/cart/checkout', (req, res) => {
         return res.status(500).json({ message: 'Transaktionsfehler' });
       }
 
-      // 1. Warenkorb holen
       con.query(
         `SELECT cart_id, total_price FROM Cart WHERE customer_id = ?`,
         [user.user_id],
@@ -422,7 +415,6 @@ app.post('/api/cart/checkout', (req, res) => {
           const cart_id = cartRows[0]['cart_id'];
           const total_price = cartRows[0]['total_price'];
 
-          // 2. Bestellungskopf einfügen
           con.query(
             `INSERT INTO Customer_Order
                (customer_id, date, delivery_status, total_price, payment_method)
@@ -433,7 +425,6 @@ app.post('/api/cart/checkout', (req, res) => {
 
               const order_id = (results as any).insertId;
 
-              // 3. Positionen kopieren in Order_Item
               con.query(
                 `INSERT INTO Order_Item
                    (order_id, product_id, quantity, price)
@@ -444,7 +435,6 @@ app.post('/api/cart/checkout', (req, res) => {
                 err => {
                   if (err) return rollback('Fehler beim Kopieren der Positionen');
 
-                  // 4. Warenkorb leeren
                   con.query(
                     `DELETE FROM Cart_Item WHERE cart_id = ?`,
                     [cart_id],
@@ -457,7 +447,6 @@ app.post('/api/cart/checkout', (req, res) => {
                         err => {
                           if (err) return rollback('Fehler beim Zurücksetzen des Warenkorbs');
 
-                          // 5. Jetzt Bestände reduzieren und ggf. Events senden
                           con.query(
                             `SELECT product_id, quantity FROM Order_Item WHERE order_id = ?`,
                             [order_id],
@@ -479,26 +468,22 @@ app.post('/api/cart/checkout', (req, res) => {
                                 });
                               }
 
-                              // Socket.IO-Instanz holen
                               const io = req.app.get('io');
                               let checked = 0;
                               let hasError = false;
 
                               for (const item of orderItems) {
 
-                                // Bestand reduzieren, aber nur wenn genug vorhanden ist
                                 con.query(
                                   `UPDATE Product SET stock_quantity = stock_quantity - ? WHERE product_id = ? AND stock_quantity >= ?`,
                                   [item.quantity, item.product_id, item.quantity],
                                   (err, result) => {
-                                    // Typumwandlung:
                                     const updateResult = result as { affectedRows: number };
                                     if (err || updateResult.affectedRows === 0) {
                                       hasError = true;
                                       return rollback('Nicht genügend Bestand für Produkt ' + item.product_id, 400);
                                     }
 
-                                    // Nach dem Update aktuellen Bestand abfragen
                                     con.query(
                                       `SELECT stock_quantity FROM Product WHERE product_id = ?`,
                                       [item.product_id],
@@ -516,7 +501,6 @@ app.post('/api/cart/checkout', (req, res) => {
                                         }
                                         checked++;
                                         
-                                        // Wenn alle Produkte geprüft sind, Verbindung schließen und Antwort senden
                                         if (checked === orderItems.length && !hasError) {
                                           con.commit(err => {
                                             con.end();
@@ -721,7 +705,6 @@ app.delete('/api/delete-product/:id', async (req, res) => {
   try {
     await con.connect();
 
-    // Erst prüfen, ob das Produkt existiert
     const [productRows] = await con.query<RowDataPacket[]>(
       'SELECT * FROM Product WHERE product_id = ?',
       [productId]
@@ -734,13 +717,11 @@ app.delete('/api/delete-product/:id', async (req, res) => {
 
     const product = productRows[0];
 
-    // Zuerst das Logging durchführen, BEVOR das Produkt gelöscht wird
     await con.query(
       'INSERT INTO Product_Change (employee_id, product_id, field_changed, change_date, field_before, field_after) VALUES (?, ?, ?, CURDATE(), ?, NULL)',
       [user.user_id, productId, 'product_deleted', JSON.stringify(product)]
     );
 
-    // Dann das Produkt löschen
     await con.query(
       'DELETE FROM Product WHERE product_id = ?',
       [productId]
@@ -845,7 +826,6 @@ app.put('/api/edit-customer', async (req, res) => {
   try {
     await con.connect();
 
-    // Aktuelle Adressdaten holen
     const [currentCustomerRows] = await con.query<RowDataPacket[]>(
       `SELECT u.user_id,
               u.first_name,
@@ -897,7 +877,6 @@ app.put('/api/edit-customer', async (req, res) => {
 
     let address_id = oldValues['address_id'];
 
-    // Adresse aktualisieren oder neu anlegen
     if (address_id) {
       await con.query(
         'UPDATE Address SET street = ?, house_number = ?, zipcode = ?, country = ?, city = ? WHERE address_id = ?',
@@ -1003,7 +982,6 @@ app.put('/api/edit-order', async (req, res) => {
   try {
     await con.connect();
 
-    // Aktuelle Bestellungsdaten abrufen
     const [currentOrderRows] = await con.query<RowDataPacket[]>(
       'SELECT customer_id, date, delivery_status, total_price, payment_method FROM Customer_Order WHERE order_id = ?',
       [order_id]
@@ -1017,7 +995,6 @@ app.put('/api/edit-order', async (req, res) => {
     const oldValues = currentOrderRows[0];
     const changes = [];
 
-    // Änderungen erkennen
     if (oldValues['customer_id'] !== customer_id) {
       changes.push({ field: 'customer_id', before: oldValues['customer_id'], after: customer_id });
     }
@@ -1034,13 +1011,11 @@ app.put('/api/edit-order', async (req, res) => {
       changes.push({ field: 'payment_method', before: oldValues['payment_method'], after: payment_method });
     }
 
-    // Bestellung aktualisieren
     await con.query(
       'UPDATE Customer_Order SET customer_id = ?, date = ?, delivery_status = ?, total_price = ?, payment_method = ? WHERE order_id = ?',
       [customer_id, new Date(date).toISOString().split('T')[0], delivery_status, total_price, payment_method, order_id]
     );
 
-    // Änderungen protokollieren
     if (changes.length > 0) {
       const changePromises = changes.map(change =>
         con.query(
@@ -1250,9 +1225,6 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-/**
- * Serve static files from /browser
- */
 app.get(
   '**',
   express.static(browserDistFolder, {
@@ -1261,9 +1233,6 @@ app.get(
   }),
 );
 
-/**
- * Handle all other requests by rendering the Angular application.
- */
 app.get('**', (req, res, next) => {
   const { protocol, originalUrl, baseUrl, headers } = req;
 
@@ -1279,20 +1248,15 @@ app.get('**', (req, res, next) => {
     .catch((err) => next(err));
 });
 
-/**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
-  const httpServer = createServer(app); // <-- HTTP-Server erstellen
+  const httpServer = createServer(app);
   const io = new SocketIOServer(httpServer, {
     cors: {
-      origin: "*", // Passe ggf. an deine Umgebung an!
+      origin: "*",
     }
   });
 
-  // Socket.IO-Instanz in Express-App speichern
   app.set('io', io);
 
   httpServer.listen(port, () => {

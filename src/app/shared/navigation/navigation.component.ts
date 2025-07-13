@@ -33,7 +33,6 @@ export class NavigationComponent {
     this.router.navigate(['/products']);
   }
 
-  // HostListener für Fenstergröße
   @HostListener('window:resize')
   onResize() {
     if (window.innerWidth > 768) {

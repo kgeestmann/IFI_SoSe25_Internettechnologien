@@ -1,4 +1,3 @@
-/* Layout & Typografie */
 :host {
   display: block;
   font-family: system-ui, sans-serif;
@@ -11,14 +10,12 @@
   text-align: center;
 }
 
-/* Karten‑Raster */
 .products-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
 }
 
-/* Karten‑Stil */
 .product-card {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
@@ -33,7 +30,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Textstile */
 .product-name {
   display: block;
   font-size: 1.1rem;
@@ -49,7 +45,6 @@
   margin-bottom: 1rem;
 }
 
-/* Button */
 button {
   width: 100%;
   padding: 0.5rem 1rem;
@@ -66,7 +61,6 @@ button:hover {
   background: #5c7761;
 }
 
-/* Loader & Fehlermeldung */
 .loader,
 .error {
   padding: 1rem;

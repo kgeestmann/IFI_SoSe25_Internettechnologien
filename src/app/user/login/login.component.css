@@ -10,7 +10,6 @@
   text-align: center;
 }
 
-/* Login-Container */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -24,7 +23,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Inputs */
 .login-form input {
   padding: 0.5rem 0.75rem;
   border: 1px solid #ccc;
@@ -40,7 +38,6 @@
   box-shadow: 0 0 0 2px rgba(148, 187, 155, 0.25);
 }
 
-/* Button – wie Produkt-Button */
 .login-form button {
   padding: 0.5rem 1rem;
   border: none;
@@ -61,7 +58,6 @@
   cursor: not-allowed;
 }
 
-/* Link unter dem Formular */
 .register-link {
   display: block;
   margin: 1rem auto 0;

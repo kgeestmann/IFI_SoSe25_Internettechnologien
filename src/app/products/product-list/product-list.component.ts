@@ -29,7 +29,6 @@ export class ProductListComponent implements OnInit {
     this.isEmployee$ = this.authService.isEmployee$;
   }
 
-
   ngOnInit() {
     this.productService.getProducts().subscribe({
       next: data => {

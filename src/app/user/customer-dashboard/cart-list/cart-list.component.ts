@@ -14,7 +14,6 @@ export class CartListComponent {
 
   cart = this.cartService.cart$;
 
-  // Optional: Getter für Template
   get cartItems(): CartItem[] {
     return this.cart()?.items ?? [];
   }
