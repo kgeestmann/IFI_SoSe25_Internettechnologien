@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { testProviders } from '../testing/test-providers';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
+      providers: testProviders,
     }).compileComponents();
   });
 
@@ -14,16 +16,12 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'vorlesung' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('vorlesung');
-  });
-
-  it('should render title', () => {
+  it('should render navigation, page content and footer', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, vorlesung');
+    expect(compiled.querySelector('app-navigation')).not.toBeNull();
+    expect(compiled.querySelector('main router-outlet')).not.toBeNull();
+    expect(compiled.querySelector('app-footer')).not.toBeNull();
   });
 });

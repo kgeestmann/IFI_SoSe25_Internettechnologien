@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { testProviders } from '../../../../testing/test-providers';
 
 import { EditCustomersComponent } from './edit-customers.component';
 
@@ -8,7 +9,8 @@ describe('EditCustomersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditCustomersComponent]
+      imports: [EditCustomersComponent],
+      providers: testProviders
     })
     .compileComponents();
 
