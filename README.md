@@ -10,6 +10,8 @@ The user interface is in German.
 
 **Customers**
 - Browse the product list and product details with care information
+- See a live "only a few left" notice (Socket.IO) on a product page as
+  soon as an order drops that product's stock to 5 or less
 - Add products to the cart, change quantities and check out
 - View their own orders and profile
 
@@ -17,8 +19,6 @@ The user interface is in German.
 - Create, edit and delete products
 - Edit customers and orders
 - See a change log of every edit to products, customers and orders
-- Get a live notification (Socket.IO) when an order drops a product's
-  stock to 5 or less
 
 ## Tech stack
 
@@ -29,10 +29,23 @@ The user interface is in German.
 | Database | MySQL (via `mysql2`) |
 | Live updates | Socket.IO |
 
+The data model is documented in the [ER diagram](docs/er-diagram.pdf).
+
+## Team
+
+| Member | Built |
+| --- | --- |
+| Sophia | Navigation, login, multi-user sessions, footer |
+| Kim | Employee area: product, customer and order management |
+| Rumeysa | Product list and product details, live stock notice |
+| Frieda | Customer area: profile, cart, order history |
+
 ## Structure
 
 ```
 .
+├── docs/
+│   └── er-diagram.pdf       # ER diagram of the database
 ├── mysqlScript.sql          # Database schema, triggers and demo data
 ├── src/
 │   ├── server.ts            # Express server: REST API (/api/...) and SSR
@@ -45,7 +58,8 @@ The user interface is in German.
 │   │   │   └── login/
 │   │   ├── auth.service.ts
 │   │   └── socket.service.ts
-│   └── assets/              # Product images and icons
+│   ├── assets/              # Product images and icons
+│   └── testing/             # Shared providers for the unit tests
 └── angular.json
 ```
 
@@ -111,12 +125,22 @@ the live stock notifications connect to port 4000.
 | Customer | `anna.mueller@example.com` | `1` |
 | Employee | `ines.meier@example.com` | `9` |
 
+## Tests
+
+The unit tests run with Karma in Chrome:
+
+```bash
+npm test -- --watch=false
+```
+
+HTTP requests go to Angular's test backend (`src/testing/test-providers.ts`),
+so no server or database is needed.
+
 ## Known limitations
 
 This is a course project, not production software:
 
 - Passwords are stored and compared in plain text.
 - The session cookie is not marked `secure`, so it also works over plain HTTP.
-- The unit tests (`npm test`) are the generated Angular `should create`
-  stubs. Most of them fail because the test setup does not provide
-  `HttpClient` and the router.
+- The unit tests only check that each component and service can be
+  created. They do not cover the shop logic or the REST API.
