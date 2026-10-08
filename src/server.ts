@@ -29,8 +29,19 @@ declare module "express-session" {
   }
 }
 
+// Credentials come from the environment so they never end up in the repository.
+const REQUIRED_ENV_VARS = ['DB_NAME', 'DB_USER', 'DB_PASSWORD', 'SESSION_SECRET'];
+
+if (isMainModule(import.meta.url)) {
+  const missingEnvVars = REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
+  if (missingEnvVars.length > 0) {
+    console.error(`Missing environment variables: ${missingEnvVars.join(', ')}. See README.md.`);
+    process.exit(1);
+  }
+}
+
 app.use(session({
-  secret: 'session',
+  secret: process.env['SESSION_SECRET'] ?? '',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -45,10 +56,11 @@ app.use(express.json());
 const commonEngine = new CommonEngine();
 
 const dbConfig = {
-  host: "***REMOVED***",
-  database: "25_IT_Gruppe5",
-  user: "25_IT_Grp5",
-  password: "***REMOVED***",
+  host: process.env['DB_HOST'] ?? 'localhost',
+  port: Number(process.env['DB_PORT'] ?? 3306),
+  database: process.env['DB_NAME'],
+  user: process.env['DB_USER'],
+  password: process.env['DB_PASSWORD'],
   ssl: { rejectUnauthorized: false }
 };
 
