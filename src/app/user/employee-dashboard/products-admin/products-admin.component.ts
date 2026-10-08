@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { ProductListComponent } from '../../../products/product-list/product-list.component';
 import { AuthService } from '../../../auth.service';
 import { combineLatest } from 'rxjs';
@@ -11,6 +12,7 @@ import { combineLatest } from 'rxjs';
   templateUrl: './products-admin.component.html',
   styleUrls: ['./products-admin.component.css'],
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     ProductListComponent
   ]
